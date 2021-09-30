@@ -144,6 +144,8 @@ const Color activeColor = const Color(0xFFF44336);
 const Color redColor = const Color(0xFFFF0000);
 const Color buttonStop = const Color(0xFFF44336);
 const Color primaryColor = const Color(0xFF016F56);
+const Color lightPrimaryColor = const Color(0xFF80B7AA);
+const Color veryLightPrimaryColor = const Color(0xFFCCE2DD);
 const Color accentColor = const Color(0xFFB4C304);
 const Color splashBgColor = const Color(0xFF00008B);
 const Color secondaryColor = const Color(0xFFB4C304);
@@ -171,7 +173,7 @@ BoxDecoration decoration = BoxDecoration(
 
 EdgeInsets defaultPadding = const EdgeInsets.symmetric(horizontal: 20);
 EdgeInsets defaultVHPadding =
-    const EdgeInsets.symmetric(horizontal: 20, vertical: 40);
+    const EdgeInsets.symmetric(horizontal: 17, vertical: 40);
 
 TextStyle headingWhite = new TextStyle(
   color: Colors.white,
@@ -243,6 +245,13 @@ TextStyle headingSmallGreyColor = new TextStyle(
   fontFamily: "Montserrat",
 );
 
+TextStyle headingBigGreyColor = new TextStyle(
+  color: Color(0XFF999CAD),
+  fontSize: 18.0,
+  fontWeight: FontWeight.w400,
+  fontFamily: "Montserrat",
+);
+
 TextStyle headingLogo = new TextStyle(
   color: blackColor,
   fontSize: 22.0,
@@ -265,6 +274,8 @@ TextStyle heading35Black = new TextStyle(
 );
 
 SizedBox kSmallWidth = SizedBox(width: 20.0);
+SizedBox kLargeWidth = SizedBox(width: 50.0);
+SizedBox kVerySmallHeight = SizedBox(height: 5.0);
 SizedBox kSmallHeight = SizedBox(height: 20.0);
 SizedBox kLargeHeight = SizedBox(height: 50.0);
 

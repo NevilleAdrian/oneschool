@@ -1,11 +1,11 @@
-import 'package:cliqlite/background/background.dart';
-import 'package:cliqlite/getStarted/get_started.dart';
+import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/get_started/get_started.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  static String id = 'onboarding';
+  static String id = 'screens.onboarding';
 
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();

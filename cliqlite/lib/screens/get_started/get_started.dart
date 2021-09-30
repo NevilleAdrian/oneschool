@@ -1,10 +1,13 @@
-import 'package:cliqlite/auth/registration.dart';
-import 'package:cliqlite/background/background.dart';
+import 'package:cliqlite/screens/auth/child_registration.dart';
+import 'package:cliqlite/screens/auth/registration.dart';
+import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
-import 'package:cliqlite/utils/LargeButton.dart';
+import 'package:cliqlite/utils/have_account.dart';
+import 'package:cliqlite/utils/large_button.dart';
 import 'package:flutter/material.dart';
 
 class GetStarted extends StatefulWidget {
+  static String id = 'get-started';
   @override
   _GetStartedState createState() => _GetStartedState();
 }
@@ -14,8 +17,17 @@ enum Attribute { parent, child }
 class _GetStartedState extends State<GetStarted> {
   Attribute val = Attribute.parent;
 
-  nextPage() {
-    Navigator.pushNamed(context, Registration.id);
+  nextPage(Attribute val) {
+    if (val == Attribute.parent) {
+      Navigator.pushNamed(context, Registration.id);
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ChildRegistration(
+                    user: 'parent',
+                  )));
+    }
   }
 
   @override
@@ -49,6 +61,7 @@ class _GetStartedState extends State<GetStarted> {
                   attribute: Attribute.parent,
                   groupVal: val,
                   decoration: decoration.copyWith(
+                      borderRadius: BorderRadius.circular(40),
                       border: Border.all(
                           color: val == Attribute.parent
                               ? primaryColor
@@ -65,6 +78,7 @@ class _GetStartedState extends State<GetStarted> {
                   subTitle: 'I want to set up my own account',
                   attribute: Attribute.child,
                   decoration: decoration.copyWith(
+                      borderRadius: BorderRadius.circular(40),
                       border: Border.all(
                           color: val == Attribute.child
                               ? primaryColor
@@ -78,25 +92,13 @@ class _GetStartedState extends State<GetStarted> {
                   }),
               kLargeHeight,
               LargeButton(
-                submit: () => nextPage(),
+                submit: () => nextPage(val),
                 color: primaryColor,
                 name: 'Continue',
                 buttonColor: secondaryColor,
               ),
               kLargeHeight,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account?',
-                    style: smallPrimaryColor.copyWith(color: blackColor),
-                  ),
-                  Text(
-                    ' Login',
-                    style: smallPrimaryColor,
-                  )
-                ],
-              )
+              HaveAccount()
             ],
           ),
         ),
@@ -126,10 +128,12 @@ class OptionBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: decoration,
-      padding: EdgeInsets.only(right: 20, top: 10, bottom: 20),
-      child: Column(
+      padding: EdgeInsets.only(right: 20, top: 30, bottom: 30),
+      child: Row(
         children: [
-          Row(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Radio(
                 value: attribute,
@@ -137,23 +141,26 @@ class OptionBox extends StatelessWidget {
                 activeColor: primaryColor,
                 onChanged: onChanged,
               ),
-              // kSmallWidth,
+              Container(
+                height: 14,
+              )
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
                 title,
                 style: textLightBlack,
               ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+              kVerySmallHeight,
               Text(
                 subTitle,
                 style: textExtraLightBlack.copyWith(fontSize: 12),
               )
-              // kSmallHeight,
             ],
-          )
+          ),
         ],
       ),
     );

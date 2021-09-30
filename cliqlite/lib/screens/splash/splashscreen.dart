@@ -1,5 +1,5 @@
-import 'package:cliqlite/background/background.dart';
-import 'package:cliqlite/onboarding/onboarding.dart';
+import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/onboarding/onboarding.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
