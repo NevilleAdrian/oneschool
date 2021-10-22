@@ -111,8 +111,9 @@ TextStyle textGreen = const TextStyle(
 );
 
 final ThemeData base = ThemeData.light();
+final ThemeData darkBase = ThemeData.dark();
 
-ThemeData appTheme = new ThemeData(
+ThemeData lightTheme = new ThemeData(
   primaryColor: primaryColor,
   buttonColor: primaryColor,
   indicatorColor: Colors.white,
@@ -131,6 +132,27 @@ ThemeData appTheme = new ThemeData(
   textTheme: _buildTextTheme(base.textTheme),
   primaryTextTheme: _buildTextTheme(base.primaryTextTheme),
   accentTextTheme: _buildTextTheme(base.accentTextTheme),
+);
+
+ThemeData darkTheme = new ThemeData(
+  primaryColor: secondaryColor,
+  buttonColor: secondaryColor,
+  indicatorColor: Colors.white,
+  fontFamily: "Montserrat",
+  splashColor: Colors.white24,
+  splashFactory: InkRipple.splashFactory,
+  accentColor: accentColor,
+  canvasColor: Colors.black,
+  scaffoldBackgroundColor: backgroundColor,
+  backgroundColor: backgroundColor,
+  errorColor: const Color(0xFFB00020),
+  iconTheme: new IconThemeData(color: primaryColor),
+  buttonTheme: const ButtonThemeData(
+    textTheme: ButtonTextTheme.primary,
+  ),
+  textTheme: _buildTextTheme(darkBase.textTheme),
+  primaryTextTheme: _buildTextTheme(darkBase.primaryTextTheme),
+  accentTextTheme: _buildTextTheme(darkBase.accentTextTheme),
 );
 
 Color textFieldColor = const Color.fromRGBO(168, 160, 149, 0.6);
@@ -276,6 +298,7 @@ TextStyle heading35Black = new TextStyle(
 SizedBox kSmallWidth = SizedBox(width: 20.0);
 SizedBox kLargeWidth = SizedBox(width: 50.0);
 SizedBox kVerySmallHeight = SizedBox(height: 5.0);
+SizedBox kVerySmallWidth = SizedBox(width: 5.0);
 SizedBox kSmallHeight = SizedBox(height: 20.0);
 SizedBox kLargeHeight = SizedBox(height: 50.0);
 

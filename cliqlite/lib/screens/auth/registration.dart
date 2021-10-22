@@ -32,7 +32,15 @@ class _RegistrationState extends State<Registration> {
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      Navigator.pushNamed(context, ChildRegistration.id);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ChildRegistration(
+                    fullName: _controllerName.text,
+                    email: _controllerEmail.text,
+                    phoneNo: _controllerPhone.text,
+                    password: _controllerPassword.text,
+                  )));
     }
   }
 

@@ -1,5 +1,8 @@
+import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/mock_data/mock_data.dart';
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/auth/child_registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/notifications.dart';
@@ -24,6 +27,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> children = ChildProvider.childProvider(context).children;
+    AuthUser user = AuthProvider.auth(context).user;
+
     return BackgroundImage(
       child: SingleChildScrollView(
         child: Column(
@@ -51,7 +56,7 @@ class _HomeState extends State<Home> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Hello Aanu',
+                          Text('Hello ${user?.fullname ?? ''}',
                               style: headingWhite.copyWith(fontSize: 24)),
                           SizedBox(
                             height: 15,
@@ -117,6 +122,13 @@ class _HomeState extends State<Home> {
                   child: GroupedWidgets(
                     data: data,
                     text: 'Popular Subjects',
+                  ),
+                ),
+                Container(
+                  padding: defaultPadding.copyWith(right: 0),
+                  child: GroupedWidgets(
+                    data: data,
+                    text: 'Popular Classes',
                   ),
                 ),
               ],
@@ -226,6 +238,8 @@ class GroupedWidgets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     onTap(String name) {
       Navigator.push(
           context,
@@ -241,7 +255,7 @@ class GroupedWidgets extends StatelessWidget {
       children: [
         Text(
           text,
-          style: heading18Black,
+          style: theme.status ? headingWhite : heading18Black,
         ),
         kSmallHeight,
         Container(

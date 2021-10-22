@@ -1,4 +1,5 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
@@ -23,6 +24,8 @@ class SubjectScreen extends StatefulWidget {
 class _SubjectScreenState extends State<SubjectScreen> {
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return BackgroundImage(
       child: SafeArea(
         child: Padding(
@@ -44,7 +47,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
                   style: textStyleSmall.copyWith(
                       fontSize: 21.0,
                       fontWeight: FontWeight.w700,
-                      color: primaryColor),
+                      color: theme.status ? secondaryColor : primaryColor),
                 ),
                 SizedBox(
                   height: 35,
@@ -63,7 +66,9 @@ class _SubjectScreenState extends State<SubjectScreen> {
                   children: [
                     Text(
                       'Select Topic',
-                      style: textLightBlack,
+                      style: theme.status
+                          ? textLightBlack.copyWith(color: whiteColor)
+                          : textLightBlack,
                     ),
                     kSmallHeight,
                     Padding(
@@ -102,7 +107,7 @@ class Pills extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 2,
+      elevation: 1,
       borderRadius: BorderRadius.circular(30.0),
       color: Colors.white,
       shadowColor: Colors.black,

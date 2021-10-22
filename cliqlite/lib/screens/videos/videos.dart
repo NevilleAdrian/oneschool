@@ -24,11 +24,11 @@ class _VideosState extends State<Videos> {
     return BackgroundImage(
       child: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: defaultVHPadding,
-            child: Column(
-              children: [
-                Row(
+          child: Column(
+            children: [
+              Padding(
+                padding: defaultVHPadding.copyWith(left: 0),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
@@ -48,35 +48,33 @@ class _VideosState extends State<Videos> {
                     )
                   ],
                 ),
-                kLargeHeight,
-                Container(
-                  padding: defaultPadding.copyWith(right: 0),
-                  child: GroupedWidgets(
-                    data: data,
-                    text: "Popular Videos",
-                    onPressed: () => onPressed(),
-                  ),
+              ),
+              kLargeHeight,
+              Container(
+                padding: defaultPadding.copyWith(right: 0),
+                child: GroupedWidgets(
+                  data: data,
+                  text: "Popular Videos",
+                  onPressed: () => onPressed(),
                 ),
-                kSmallHeight,
-                Container(
-                  padding: defaultPadding.copyWith(right: 0),
-                  child: GroupedWidgets(
-                    data: data,
-                    text: "Science Videos",
-                    onPressed: () => onPressed(),
-                  ),
+              ),
+              Container(
+                padding: defaultPadding.copyWith(right: 0),
+                child: GroupedWidgets(
+                  data: data,
+                  text: "Science Videos",
+                  onPressed: () => onPressed(),
                 ),
-                kSmallHeight,
-                Container(
-                  padding: defaultPadding.copyWith(right: 0),
-                  child: GroupedWidgets(
-                    data: data,
-                    text: "Art Videos",
-                    onPressed: () => onPressed(),
-                  ),
+              ),
+              Container(
+                padding: defaultPadding.copyWith(right: 0),
+                child: GroupedWidgets(
+                  data: data,
+                  text: "Art Videos",
+                  onPressed: () => onPressed(),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

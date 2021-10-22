@@ -2,15 +2,16 @@ import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
 
 class LineButton extends StatelessWidget {
-  const LineButton({this.text, this.onPressed});
+  const LineButton({this.text, this.onPressed, this.height});
   final String text;
   final Function onPressed;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ButtonTheme(
-        height: 50.0,
+        height: height ?? 50.0,
         minWidth: MediaQuery.of(context).size.width,
         child: RaisedButton(
           shape: new RoundedRectangleBorder(

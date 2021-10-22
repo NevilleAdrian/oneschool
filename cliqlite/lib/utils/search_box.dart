@@ -27,7 +27,7 @@ class SearchBox extends StatelessWidget {
       color: Colors.transparent,
       padding: padding ?? defaultPadding,
       child: Material(
-        elevation: 5,
+        elevation: 1,
         borderRadius: BorderRadius.circular(30.0),
         color: Colors.white,
         shadowColor: Colors.black,

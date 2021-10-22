@@ -5,6 +5,33 @@ var data = [
   {"name": "ENGLISH", "image": "assets/images/pic-1.png"}
 ];
 
+var billingData = [
+  {
+    "date": "31/08/21",
+    "timeStamp": "01/08/2021-31/08/2021",
+    "amount": "3,600",
+    "card_number": "**** **** **** 8495"
+  },
+  {
+    "date": "20/10/21",
+    "timeStamp": "01/08/2021-31/08/2021",
+    "amount": "3,900",
+    "card_number": "**** **** **** 8495"
+  },
+  {
+    "date": "31/02/21",
+    "timeStamp": "01/08/2021-31/08/2021",
+    "amount": "45,000",
+    "card_number": "**** **** **** 8495"
+  },
+  {
+    "date": "24/08/21",
+    "timeStamp": "01/08/2021-31/08/2021",
+    "amount": "3,300",
+    "card_number": "**** **** **** 8495"
+  },
+];
+
 var pillData = [
   {"name": "Lorem Ipsum Dolor sit amet"},
   {"name": "Lorem Ipsum Dolor sit amet"},
@@ -28,7 +55,7 @@ List<dynamic> quizTypes = [
     "description":
         "Lorem ipsum dolor sit amet, conse ctetur adipiscing elit. Volutpat vitae elementum?",
     "image": "assets/images/skeleton.png",
-    "option1": "Lorem ipsum ",
+    "option1": "Lorem ipsum",
     "option2": "Lorem ipsum rigiueuee",
     "option3": "Lorem ipsum dolor",
     "option4": "Lorem ipsum dolor",
@@ -39,14 +66,26 @@ List<dynamic> quizTypes = [
     "description": "Lorem ipsum dolor sit amet, conse ctetur adipiscing elit",
     "image": "assets/images/elephant.png",
     "questions": [
-      {"name": "E", "active": true},
-      {"name": "L", "active": false},
-      {"name": "E", "active": false},
-      {"name": "P", "active": true},
-      {"name": "H", "active": false},
-      {"name": "A", "active": true},
-      {"name": "N", "active": true},
-      {"name": "T", "active": false},
+      {
+        "id": 1,
+        "name": "E",
+        "active": true,
+      },
+      {"id": 2, "name": "L", "active": false},
+      {"id": 3, "name": "E", "active": false},
+      {"id": 4, "name": "P", "active": true},
+      {"id": 5, "name": "H", "active": false},
+      {"id": 6, "name": "A", "active": true},
+      {"id": 7, "name": "N", "active": true},
+      {"id": 8, "name": "T", "active": false},
+    ],
+    "options": [
+      {"name": "E"},
+      {"name": "K"},
+      {"name": "T"},
+      {"name": "H"},
+      {"name": "L"},
+      {"name": "O"},
     ],
     "type": "completeType"
   },

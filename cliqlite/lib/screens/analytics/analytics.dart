@@ -1,3 +1,4 @@
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/notifications.dart';
 import 'package:cliqlite/themes/style.dart';
@@ -22,6 +23,8 @@ class _AnalyticsState extends State<Analytics> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return BackgroundImage(
       child: SafeArea(
         child: SingleChildScrollView(
@@ -38,7 +41,7 @@ class _AnalyticsState extends State<Analytics> {
                       style: textStyleSmall.copyWith(
                           fontSize: 21.0,
                           fontWeight: FontWeight.w700,
-                          color: primaryColor),
+                          color: theme.status ? secondaryColor : primaryColor),
                     ),
                     InkWell(
                       onTap: () => onTap(context),
@@ -158,7 +161,7 @@ class _AnalyticsState extends State<Analytics> {
                                 ),
                                 show
                                     ? Positioned(
-                                        bottom: -140,
+                                        bottom: -170,
                                         // left: 0,
                                         // right: 0,
                                         child: Container(
@@ -168,7 +171,7 @@ class _AnalyticsState extends State<Analytics> {
                                           child: Column(
                                             children: [
                                               Text('Highest to Lowest'),
-                                              kSmallHeight,
+                                              kLargeHeight,
                                               Text('Lowest to Highest'),
                                             ],
                                           ),

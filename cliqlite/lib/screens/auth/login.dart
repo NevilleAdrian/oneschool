@@ -1,9 +1,13 @@
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
+import 'package:cliqlite/screens/auth/forgot_password.dart';
+import 'package:cliqlite/screens/auth/registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/google_button.dart';
 import 'package:cliqlite/utils/have_account.dart';
 import 'package:cliqlite/utils/large_button.dart';
+import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
@@ -32,17 +36,46 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  nextPage() {
+  nextPage(BuildContext context) async {
     final FormState form = formKey.currentState;
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      Navigator.pushNamed(context, AppLayout.id);
+      try {
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(true);
+        });
+        var result;
+        if (type == Type.parent) {
+          result = await AuthProvider.auth(context).loginUser(
+              _controllerEmail.text,
+              _controllerPassword.text,
+              'auth/parent/login');
+        } else {
+          result = await AuthProvider.auth(context).loginUser(
+              _controllerEmail.text,
+              _controllerPassword.text,
+              'auth/user/login');
+        }
+        if (result != null) {
+          Navigator.pushNamed(context, AppLayout.id);
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+        }
+      } catch (ex) {
+        showFlush(context, ex.toString(), primaryColor);
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(false);
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider auth = AuthProvider.auth(context);
+
     return BackgroundImage(
       child: SingleChildScrollView(
         child: SafeArea(
@@ -123,15 +156,10 @@ class _LoginState extends State<Login> {
                     child: Column(
                       children: [
                         MyTextForm(
-                          controllerName: _controllerEmail,
-                          validations: validations.validateEmail,
-                          type: type == Type.parent
-                              ? TextInputType.text
-                              : TextInputType.number,
-                          hintText: type == Type.parent
-                              ? 'Email Address'
-                              : 'Enter Code',
-                        ),
+                            controllerName: _controllerEmail,
+                            validations: validations.validateEmail,
+                            type: TextInputType.text,
+                            hintText: 'Email Address'),
                         kSmallHeight,
                         MyTextForm(
                           controllerName: _controllerPassword,
@@ -157,21 +185,35 @@ class _LoginState extends State<Login> {
                               )),
                         ),
                         kSmallHeight,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Forgot Password?',
-                              style: heading18.copyWith(color: blackColor),
-                            )
-                          ],
+                        InkWell(
+                          onTap: () =>
+                              Navigator.pushNamed(context, ForgotPassword.id),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Forgot Password?',
+                                style: heading18.copyWith(color: blackColor),
+                              )
+                            ],
+                          ),
                         ),
                         kLargeHeight,
                         LargeButton(
-                          submit: () => nextPage(),
+                          submit: () {
+                            nextPage(context);
+                          },
                           color: primaryColor,
                           name: 'Log In',
                           buttonColor: secondaryColor,
+                          loader: auth.isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  'Log In',
+                                  style: headingWhite.copyWith(
+                                    color: secondaryColor,
+                                  ),
+                                ),
                         ),
                         kSmallHeight,
                         type == Type.parent
@@ -208,6 +250,8 @@ class _LoginState extends State<Login> {
                         HaveAccount(
                           text: "Don't have an account?",
                           subText: " Sign Up",
+                          onPressed: () =>
+                              Navigator.pushNamed(context, Registration.id),
                         )
                       ],
                     ))

@@ -1,4 +1,5 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/notifications.dart';
 import 'package:cliqlite/screens/search_screen/search_screen.dart';
@@ -54,6 +55,8 @@ class _LiveTutorState extends State<LiveTutor> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return InkWell(
       onTap: () {
         setState(() {
@@ -78,7 +81,9 @@ class _LiveTutorState extends State<LiveTutor> {
                             style: textStyleSmall.copyWith(
                                 fontSize: 21.0,
                                 fontWeight: FontWeight.w700,
-                                color: primaryColor),
+                                color: theme.status
+                                    ? secondaryColor
+                                    : primaryColor),
                           ),
                           InkWell(
                             onTap: () => onTap(context),

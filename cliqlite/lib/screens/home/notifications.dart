@@ -1,3 +1,5 @@
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/back_arrow.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +17,9 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+    return BackgroundImage(
+      child: SafeArea(
           child: Padding(
         padding: defaultVHPadding,
         child: Column(
@@ -41,7 +44,7 @@ class _NotificationsState extends State<Notifications> {
               style: textStyleSmall.copyWith(
                   fontSize: 21.0,
                   fontWeight: FontWeight.w700,
-                  color: primaryColor),
+                  color: theme.status ? secondaryColor : primaryColor),
             ),
             kSmallHeight,
             Row(
@@ -52,8 +55,12 @@ class _NotificationsState extends State<Notifications> {
                     setState(() => type = Type.all);
                   },
                   style: type == Type.all
-                      ? heading18Black.copyWith(fontSize: 16)
-                      : headingGrey.copyWith(color: greyColor, fontSize: 16),
+                      ? heading18Black.copyWith(
+                          fontSize: 16,
+                          color: theme.status ? whiteColor : greyColor)
+                      : headingGrey.copyWith(
+                          color: theme.status ? whiteColor : greyColor,
+                          fontSize: 16),
                   widget: type == Type.all
                       ? SvgPicture.asset('assets/images/svg/circle.svg')
                       : Container(
@@ -67,8 +74,12 @@ class _NotificationsState extends State<Notifications> {
                     setState(() => type = Type.recent);
                   },
                   style: type == Type.recent
-                      ? heading18Black.copyWith(fontSize: 16)
-                      : headingGrey.copyWith(color: greyColor, fontSize: 16),
+                      ? heading18Black.copyWith(
+                          fontSize: 16,
+                          color: theme.status ? whiteColor : greyColor)
+                      : headingGrey.copyWith(
+                          color: theme.status ? whiteColor : greyColor,
+                          fontSize: 16),
                   widget: type == Type.recent
                       ? SvgPicture.asset('assets/images/svg/circle.svg')
                       : Container(
@@ -116,6 +127,8 @@ class NotificationItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -127,7 +140,9 @@ class NotificationItems extends StatelessWidget {
               children: [
                 Text(
                   text,
-                  style: heading18Black.copyWith(fontWeight: FontWeight.w500),
+                  style: heading18Black.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: theme.status ? whiteColor : blackColor),
                 ),
                 SizedBox(
                   height: 10,
@@ -135,7 +150,9 @@ class NotificationItems extends StatelessWidget {
                 Text(
                   'Join here',
                   style: headingPrimaryColor.copyWith(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: theme.status ? secondaryColor : primaryColor),
                 ),
               ],
             ),
@@ -143,14 +160,18 @@ class NotificationItems extends StatelessWidget {
               children: [
                 Text(
                   '8th Sept',
-                  style: headingSmallGreyColor,
+                  style: theme.status
+                      ? headingWhite.copyWith(fontSize: 12)
+                      : headingSmallGreyColor,
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 Text(
                   '4pm',
-                  style: headingSmallGreyColor,
+                  style: theme.status
+                      ? headingWhite.copyWith(fontSize: 12)
+                      : headingSmallGreyColor,
                 ),
               ],
             )

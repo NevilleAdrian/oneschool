@@ -1,11 +1,15 @@
+import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/get_started/get_started.dart';
 import 'package:cliqlite/themes/style.dart';
+import 'package:cliqlite/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  static String id = 'screens.onboarding';
+  static String id = 'onboarding';
 
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
@@ -14,6 +18,8 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final pageViewController = PageController();
   int _currentPage = 0;
+  FirstTime first;
+  HiveRepository _hiveRepository = HiveRepository();
 
   @override
   void initState() {
@@ -102,6 +108,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             MaterialPageRoute(
                                 builder: (context) => GetStarted()),
                           );
+                          first = AuthProvider.auth(context)
+                              .myFirst(FirstTime.fromJson({"bool": true}));
+                          _hiveRepository.add<FirstTime>(
+                              name: kFirst, key: 'first', item: first);
                           return;
                         }
                         pageViewController.nextPage(

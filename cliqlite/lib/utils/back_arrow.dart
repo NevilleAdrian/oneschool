@@ -1,3 +1,4 @@
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,8 @@ class BackArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return InkWell(
       onTap: onTap,
       child: Row(
@@ -16,12 +19,14 @@ class BackArrow extends StatelessWidget {
         children: [
           Icon(
             Icons.arrow_back_ios,
-            color: blackColor,
+            color: theme.status ? whiteColor : blackColor,
             size: 15,
           ),
           Text(
             text ?? 'Back',
-            style: textLightBlack.copyWith(fontWeight: FontWeight.w400),
+            style: theme.status
+                ? textStyleWhite
+                : textLightBlack.copyWith(fontWeight: FontWeight.w400),
           )
         ],
       ),

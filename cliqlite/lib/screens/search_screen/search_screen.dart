@@ -1,4 +1,5 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
+import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/subject_screen/subject_screen.dart';
@@ -41,6 +42,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeProvider theme = ThemeProvider.themeProvider(context);
+
     return BackgroundImage(
         child: SafeArea(
       child: Padding(
@@ -49,6 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             XButton(
               onTap: () => Navigator.pushNamed(context, AppLayout.id),
+              color: theme.status ? whiteColor : greyColor,
             ),
             SizedBox(height: 15),
             SearchBox(
@@ -79,7 +83,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           toBeginningOfSentenceCase(
                               filteredSearch[index]['name']),
                           style: textExtraLightBlack.copyWith(
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w500,
+                              color: theme.status ? whiteColor : blackColor),
                         ),
                       );
                     }),

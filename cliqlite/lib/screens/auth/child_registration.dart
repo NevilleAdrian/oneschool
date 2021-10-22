@@ -1,9 +1,11 @@
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/back_arrow.dart';
 import 'package:cliqlite/utils/large_button.dart';
+import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +13,13 @@ import 'package:flutter/material.dart';
 class ChildRegistration extends StatefulWidget {
   static String id = 'child';
 
-  ChildRegistration({this.user});
+  ChildRegistration(
+      {this.user, this.fullName, this.email, this.phoneNo, this.password});
   final String user;
+  final String fullName;
+  final String email;
+  final String phoneNo;
+  final String password;
 
   @override
   _ChildRegistrationState createState() => _ChildRegistrationState();
@@ -50,12 +57,36 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   String childClassName;
 
   //Route to next page
-  nextPage() {
+  nextPage() async {
     final FormState form = formKey.currentState;
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      Navigator.pushNamed(context, ChildRegistration.id);
+      try {
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(true);
+        });
+
+        var result = await AuthProvider.auth(context).registerParent(
+            widget.email.trim(),
+            widget.phoneNo.trim(),
+            widget.fullName,
+            widget.password.trim(),
+            _controllerName.text,
+            age.replaceAll(' years', ''),
+            childClassName);
+        if (result != null) {
+          Navigator.pushNamed(context, AppLayout.id);
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+        }
+      } catch (ex) {
+        showFlush(context, ex.toString(), primaryColor);
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(false);
+        });
+      }
     }
   }
 
@@ -86,6 +117,17 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     {"name": 'Primary 5', "class": Class.fifth},
     {"name": 'Primary 6', "class": Class.sixth},
   ];
+
+  //init state
+  @override
+  void initState() {
+    print('name:${widget.fullName}');
+    print('email:${widget.email}');
+    print('phoneNo:${widget.phoneNo}');
+    print('password:${widget.password}');
+    print('user:${widget.user}');
+    super.initState();
+  }
 
   //Modal bottom sheet
   void bottomSheet(BuildContext context, String type) {
@@ -156,6 +198,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                                     childClassName =
                                                         childClass[index]
                                                             ['name'];
+                                                    print(
+                                                        'classNme:${childClassName}');
                                                   }
                                                 });
                                               }),
@@ -183,6 +227,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider auth = AuthProvider.auth(context);
+
     return BackgroundImage(
       child: SingleChildScrollView(
         child: SafeArea(
@@ -260,6 +306,16 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                           name:
                               widget.user == 'child' ? 'Add Child' : 'Sign Up',
                           buttonColor: secondaryColor,
+                          loader: auth.isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  widget.user == 'child'
+                                      ? 'Add Child'
+                                      : 'Sign Up',
+                                  style: headingWhite.copyWith(
+                                    color: secondaryColor,
+                                  ),
+                                ),
                         ),
                         kLargeHeight,
                         widget.user != 'parent'

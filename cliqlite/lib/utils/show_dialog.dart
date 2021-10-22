@@ -1,4 +1,5 @@
 import 'package:cliqlite/utils/x_button.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
 dynamic dialogBox(BuildContext context, Widget widget, {Function onTap}) {
@@ -15,4 +16,13 @@ dynamic dialogBox(BuildContext context, Widget widget, {Function onTap}) {
           content: widget,
         );
       });
+}
+
+void showFlush(BuildContext context, String message, Color color) {
+  Flushbar(
+    backgroundColor: color,
+    message: message,
+    duration: Duration(seconds: 7),
+    flushbarStyle: FlushbarStyle.GROUNDED,
+  ).show(context);
 }
