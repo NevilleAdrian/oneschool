@@ -1,3 +1,4 @@
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/auth/child_registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/get_started/get_started.dart';
@@ -6,6 +7,7 @@ import 'package:cliqlite/utils/back_arrow.dart';
 import 'package:cliqlite/utils/google_button.dart';
 import 'package:cliqlite/utils/have_account.dart';
 import 'package:cliqlite/utils/large_button.dart';
+import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
@@ -27,25 +29,44 @@ class _RegistrationState extends State<Registration> {
   bool _visible = true;
   bool autoValidate = false;
 
-  nextPage() {
+  nextPage() async {
     final FormState form = formKey.currentState;
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ChildRegistration(
-                    fullName: _controllerName.text,
-                    email: _controllerEmail.text,
-                    phoneNo: _controllerPhone.text,
-                    password: _controllerPassword.text,
-                  )));
+      try {
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(true);
+        });
+        var result;
+        result = await AuthProvider.auth(context).getGrades();
+        if (result != null) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChildRegistration(
+                        fullName: _controllerName.text,
+                        email: _controllerEmail.text,
+                        phoneNo: _controllerPhone.text,
+                        password: _controllerPassword.text,
+                      )));
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+        }
+      } catch (ex) {
+        showFlush(context, ex.toString(), primaryColor);
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(false);
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider auth = AuthProvider.auth(context);
+
     return BackgroundImage(
       child: SingleChildScrollView(
         child: SafeArea(
@@ -125,6 +146,14 @@ class _RegistrationState extends State<Registration> {
                           color: primaryColor,
                           name: 'Next',
                           buttonColor: secondaryColor,
+                          loader: auth.isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  'Next',
+                                  style: headingWhite.copyWith(
+                                    color: secondaryColor,
+                                  ),
+                                ),
                         ),
                         kSmallHeight,
                         Row(

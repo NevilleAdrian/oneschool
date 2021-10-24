@@ -1,8 +1,8 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/forgot_password.dart';
-import 'package:cliqlite/screens/auth/registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/get_started/get_started.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/google_button.dart';
 import 'package:cliqlite/utils/have_account.dart';
@@ -50,12 +50,14 @@ class _LoginState extends State<Login> {
           result = await AuthProvider.auth(context).loginUser(
               _controllerEmail.text,
               _controllerPassword.text,
-              'auth/parent/login');
+              'auth/parent/login',
+              'parent');
         } else {
           result = await AuthProvider.auth(context).loginUser(
               _controllerEmail.text,
               _controllerPassword.text,
-              'auth/user/login');
+              'auth/user/login',
+              'user');
         }
         if (result != null) {
           Navigator.pushNamed(context, AppLayout.id);
@@ -251,7 +253,7 @@ class _LoginState extends State<Login> {
                           text: "Don't have an account?",
                           subText: " Sign Up",
                           onPressed: () =>
-                              Navigator.pushNamed(context, Registration.id),
+                              Navigator.pushNamed(context, GetStarted.id),
                         )
                       ],
                     ))

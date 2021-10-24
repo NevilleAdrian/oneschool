@@ -1,7 +1,6 @@
-import 'dart:async';
-
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/models/children_model/children.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
@@ -31,9 +30,6 @@ class _SplashScreenState extends State<SplashScreen>
   //Initialize animation
   Animation animation;
 
-  //complete animation
-  var _animationReady = Completer();
-
   @override
   void initState() {
     controller = AnimationController(
@@ -54,19 +50,25 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   _prepareAppState() async {
-    await HiveRepository.openHives([kUser, kFirst, kGrades]);
+    await HiveRepository.openHives([kUser, kFirst, kGrades, kChildren]);
     AuthUser user;
     FirstTime first;
     List<Grades> grades;
+    List<Children> children;
 
     try {
       user = _hiveRepository.get<AuthUser>(key: 'user', name: kUser);
+      children =
+          _hiveRepository.get<List<Children>>(key: 'children', name: kChildren);
       grades = _hiveRepository.get<List<Grades>>(key: 'grades', name: kGrades);
     } catch (ex) {
       print(ex);
     }
     first = _hiveRepository.get<FirstTime>(key: 'first', name: kFirst);
     AuthProvider.auth(context).setFirst(first);
+    print('grades:$grades');
+    print('user:$user');
+    print('children:$children');
 
     if (first == null) {
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -78,6 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
       } else {
         AuthProvider.auth(context).setUser(user);
         AuthProvider.auth(context).setGrades(grades);
+        AuthProvider.auth(context).setChildren(children);
         Navigator.of(context).pushNamedAndRemoveUntil(
             AppLayout.id, (Route<dynamic> route) => false);
       }
@@ -100,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
         children: [
           Image.asset(
             'assets/images/logo.png',
-            height: controller.value * 100,
+            height: controller.value * 200,
           ),
           kSmallWidth,
           SvgPicture.asset('assets/images/svg/text.svg'),

@@ -1,5 +1,6 @@
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/models/children_model/children.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/providers/app_providers.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
@@ -35,6 +36,7 @@ _openHive() async {
   Hive.registerAdapter(AuthUserAdapter());
   Hive.registerAdapter(FirstTimeAdapter());
   Hive.registerAdapter(GradesAdapter());
+  Hive.registerAdapter(ChildrenAdapter());
 }
 
 class MyApp extends StatelessWidget {

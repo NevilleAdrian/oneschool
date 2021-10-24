@@ -4,6 +4,7 @@ import 'package:cliqlite/exceptions/api_failure_exception.dart';
 import 'package:cliqlite/helper/network_helper.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/models/children_model/children.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/utils/constants.dart';
@@ -20,16 +21,19 @@ class AuthProvider extends ChangeNotifier {
   AuthUser _user;
   FirstTime _first;
   List<Grades> _grades;
+  List<Children> _children;
 
   bool get isLoading => _isLoading;
   AuthUser get user => _user;
   FirstTime get first => _first;
   List<Grades> get grades => _grades;
+  List<Children> get children => _children;
 
   setIsLoading(bool isLoading) => _isLoading = isLoading;
   setUser(AuthUser user) => _user = user;
   setFirst(FirstTime first) => _first = first;
   setGrades(List<Grades> grades) => _grades = grades;
+  setChildren(List<Children> children) => _children = children;
 
   Future<dynamic> registerParent(emailAddress, phone, fullName, password,
       childName, childAge, childClass) async {
@@ -44,18 +48,27 @@ class AuthProvider extends ChangeNotifier {
         childClass,
         _context,
       );
-      print('registration data: $data');
+      return data;
     } catch (ex) {
       throw ApiFailureException(ex);
     }
   }
 
   Future<dynamic> loginUser(
-      String emailAddress, String password, String url) async {
+      String emailAddress, String password, String url, String role) async {
     try {
       var data = await _helper.loginUser(emailAddress, password, url, _context);
+
       setUser(AuthUser.fromJson(parseJwtPayLoad(data['token'])));
+
       _hiveRepository.add<AuthUser>(name: kUser, key: 'user', item: user);
+
+      if (role == 'parent') {
+        setChildren(
+            (data['data'] as List).map((e) => Children.fromJson(e)).toList());
+        _hiveRepository.add<List<Children>>(
+            name: kChildren, key: 'children', item: children);
+      }
       return data;
     } catch (ex) {
       throw ApiFailureException(ex);
@@ -75,7 +88,7 @@ class AuthProvider extends ChangeNotifier {
     var data = await _helper.getGrades(_context);
     data = (data as List).map((e) => Grades.fromJson(e)).toList();
     setGrades(data);
-    _hiveRepository.add<List<Grades>>(name: kUser, key: 'user', item: data);
+    _hiveRepository.add<List<Grades>>(name: kGrades, key: 'grades', item: data);
     return data;
   }
 

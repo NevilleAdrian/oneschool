@@ -1,4 +1,5 @@
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
+import 'package:cliqlite/models/children_model/children.dart';
 import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
@@ -26,8 +27,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    List<dynamic> children = ChildProvider.childProvider(context).children;
+    List<dynamic> mockChildren = ChildProvider.childProvider(context).children;
     AuthUser user = AuthProvider.auth(context).user;
+    List<Children> children = AuthProvider.auth(context).children;
 
     return BackgroundImage(
       child: SingleChildScrollView(
@@ -56,7 +58,8 @@ class _HomeState extends State<Home> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Hello ${user?.fullname ?? ''}',
+                          Text(
+                              'Hello ${toBeginningOfSentenceCase(user?.fullname) ?? ''}',
                               style: headingWhite.copyWith(fontSize: 24)),
                           SizedBox(
                             height: 15,
@@ -114,7 +117,8 @@ class _HomeState extends State<Home> {
                   padding: defaultPadding.copyWith(right: 0),
                   child: GroupedWidgets(
                     data: data,
-                    text: "Subjects based on${children[0]['name']}'s class",
+                    text:
+                        "Subjects based on ${children[0].name ?? mockChildren[0]['name']}'s class",
                   ),
                 ),
                 Container(
@@ -150,7 +154,8 @@ class DialogBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> children = ChildProvider.childProvider(context).children;
+    List<dynamic> mockChild = ChildProvider.childProvider(context).children;
+    List<Children> children = AuthProvider.auth(context).children;
     return Container(
       height: 280,
       width: MediaQuery.of(context).size.width * 2,
@@ -185,7 +190,8 @@ class DialogBody extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Image.asset(
-                                      children[index]['image_url'],
+                                      children[index].photo ??
+                                          mockChild[0]['image_url'],
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -194,7 +200,8 @@ class DialogBody extends StatelessWidget {
                                   ),
                                   Text(
                                     toBeginningOfSentenceCase(
-                                        children[index]['name']),
+                                        children[index].name ??
+                                            mockChild[0]['image_url']),
                                     style:
                                         textLightBlack.copyWith(fontSize: 12),
                                   )

@@ -1,6 +1,8 @@
+import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
+import 'package:cliqlite/screens/auth/login.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/back_arrow.dart';
@@ -9,6 +11,7 @@ import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChildRegistration extends StatefulWidget {
   static String id = 'child';
@@ -40,6 +43,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
 
   //Controllers
   TextEditingController _controllerName = new TextEditingController();
+  TextEditingController _controllerEmail = new TextEditingController();
+  TextEditingController _controllerPassword = new TextEditingController();
 
   //validation boolean
   bool autoValidate = false;
@@ -48,7 +53,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   Years val = Years.fifth;
 
   //Instantiate enum
-  Class classVal = Class.first;
+  String classVal = 'Grade-1';
 
   //Age
   String age;
@@ -58,6 +63,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
 
   //Route to next page
   nextPage() async {
+    print('hey');
     final FormState form = formKey.currentState;
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
@@ -68,15 +74,17 @@ class _ChildRegistrationState extends State<ChildRegistration> {
         });
 
         var result = await AuthProvider.auth(context).registerParent(
-            widget.email.trim(),
-            widget.phoneNo.trim(),
-            widget.fullName,
-            widget.password.trim(),
+            widget.email ?? _controllerEmail.text,
+            widget.phoneNo,
+            widget.fullName ?? _controllerName.text,
+            widget.password ?? _controllerPassword.text,
             _controllerName.text,
             age.replaceAll(' years', ''),
             childClassName);
         if (result != null) {
-          Navigator.pushNamed(context, AppLayout.id);
+          Navigator.pushNamed(context, Login.id);
+          showFlush(context, 'Registration Successful', primaryColor);
+
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
           });
@@ -118,9 +126,18 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     {"name": 'Primary 6', "class": Class.sixth},
   ];
 
+  void getGrades() async {
+    var result = await AuthProvider.auth(context).getGrades();
+    print('result: $result');
+  }
+
   //init state
   @override
   void initState() {
+    if (widget.user == 'parent') {
+      getGrades();
+      print('grades:${AuthProvider.auth(context).grades}');
+    }
     print('name:${widget.fullName}');
     print('email:${widget.email}');
     print('phoneNo:${widget.phoneNo}');
@@ -131,6 +148,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
 
   //Modal bottom sheet
   void bottomSheet(BuildContext context, String type) {
+    List<Grades> grades = AuthProvider.auth(context).grades;
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -167,11 +185,11 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                           height: 500.0,
                           child: Container(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 30, horizontal: 20),
+                                  vertical: 40, horizontal: 20),
                               child: ListView.builder(
                                   itemCount: type == 'age'
                                       ? childYears.length
-                                      : childClass.length,
+                                      : grades.length,
                                   itemBuilder: (context, index) {
                                     return Padding(
                                       padding:
@@ -181,7 +199,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                           Radio(
                                               value: type == 'age'
                                                   ? childYears[index]['years']
-                                                  : childClass[index]['class'],
+                                                  : toBeginningOfSentenceCase(
+                                                      grades[index].name),
                                               groupValue: type == 'age'
                                                   ? val
                                                   : classVal,
@@ -196,10 +215,10 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                                   } else {
                                                     classVal = value;
                                                     childClassName =
-                                                        childClass[index]
-                                                            ['name'];
+                                                        grades[index].gradeId;
                                                     print(
-                                                        'classNme:${childClassName}');
+                                                        'classNme:$childClassName');
+                                                    print('classNme:$classVal');
                                                   }
                                                 });
                                               }),
@@ -207,7 +226,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                           Text(
                                             type == 'age'
                                                 ? childYears[index]['name']
-                                                : childClass[index]['name'],
+                                                : toBeginningOfSentenceCase(
+                                                    grades[index].name),
                                             style: textLightBlack,
                                           ),
                                         ],
@@ -281,6 +301,27 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                               : 'Full Name',
                         ),
                         kSmallHeight,
+                        if (widget.user == 'parent')
+                          Column(
+                            children: [
+                              MyTextForm(
+                                controllerName: _controllerEmail,
+                                validations: validations.validateEmail,
+                                hintText: 'Email',
+                              ),
+                              kSmallHeight,
+                            ],
+                          ),
+                        if (widget.user == 'parent')
+                          Column(
+                            children: [
+                              MyTextForm(
+                                  controllerName: _controllerPassword,
+                                  validations: validations.validatePassword,
+                                  hintText: 'Password'),
+                              kSmallHeight,
+                            ],
+                          ),
                         DropDown(
                           onTap: () => bottomSheet(context, 'age'),
                           text: widget.user != 'parent'
@@ -291,8 +332,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                         DropDown(
                           onTap: () => bottomSheet(context, 'class'),
                           text: widget.user != 'parent'
-                              ? (childClassName ?? "Child's Class")
-                              : (childClassName ?? "Class"),
+                              ? (classVal ?? "Child's Class")
+                              : (classVal ?? "Class"),
                         ),
                         kLargeHeight,
                         LargeButton(
@@ -318,12 +359,12 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                 ),
                         ),
                         kLargeHeight,
-                        widget.user != 'parent'
-                            ? Container()
-                            : Text(
-                                'Skip for now',
-                                style: textExtraLightBlack,
-                              )
+                        // widget.user != 'parent'
+                        //     ? Container()
+                        //     : Text(
+                        //         'Skip for now',
+                        //         style: textExtraLightBlack,
+                        //       )
                       ],
                     ))
               ],
