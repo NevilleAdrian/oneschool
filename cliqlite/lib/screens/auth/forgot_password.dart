@@ -10,6 +10,10 @@ import 'package:flutter/material.dart';
 
 class ForgotPassword extends StatefulWidget {
   static String id = 'forgot_password';
+
+  ForgotPassword({this.user});
+  final String user;
+
   @override
   _ForgotPasswordState createState() => _ForgotPasswordState();
 }
@@ -37,8 +41,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         setState(() {
           AuthProvider.auth(context).setIsLoading(true);
         });
-        var result = await AuthProvider.auth(context)
-            .forgotPassword(_controllerEmail.text);
+        var result = await AuthProvider.auth(context).forgotPassword(
+            _controllerEmail.text,
+            widget.user == 'parent'
+                ? 'auth/parent/forgotpassword'
+                : 'auth/user/forgotpassword');
 
         if (result != null) {
           Navigator.pushNamed(context, Login.id);

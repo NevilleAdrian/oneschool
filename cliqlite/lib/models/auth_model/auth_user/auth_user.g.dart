@@ -20,14 +20,15 @@ class AuthUserAdapter extends TypeAdapter<AuthUser> {
       email: fields[0] as String,
       fullname: fields[1] as String,
       id: fields[2] as String,
-      role: fields[3] as String,
+      grade: fields[3] as String,
+      role: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, AuthUser obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.email)
       ..writeByte(1)
@@ -35,6 +36,8 @@ class AuthUserAdapter extends TypeAdapter<AuthUser> {
       ..writeByte(2)
       ..write(obj.id)
       ..writeByte(3)
+      ..write(obj.grade)
+      ..writeByte(4)
       ..write(obj.role);
   }
 

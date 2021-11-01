@@ -18,6 +18,7 @@ class AuthUser {
     this.email,
     this.fullname,
     this.id,
+    this.grade,
     this.role,
   });
   @HiveField(0)
@@ -27,12 +28,15 @@ class AuthUser {
   @HiveField(2)
   String id;
   @HiveField(3)
+  String grade;
+  @HiveField(4)
   String role;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
         email: json["email"],
         fullname: json["fullname"],
         id: json["id"],
+        grade: json["grade"],
         role: json["role"],
       );
 
@@ -40,6 +44,7 @@ class AuthUser {
         "email": email,
         "fullname": fullname,
         "id": id,
+        "grade": grade,
         "role": role,
       };
 }

@@ -188,8 +188,14 @@ class _LoginState extends State<Login> {
                         ),
                         kSmallHeight,
                         InkWell(
-                          onTap: () =>
-                              Navigator.pushNamed(context, ForgotPassword.id),
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ForgotPassword(
+                                        user: type == Type.parent
+                                            ? 'parent'
+                                            : 'child',
+                                      ))),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [

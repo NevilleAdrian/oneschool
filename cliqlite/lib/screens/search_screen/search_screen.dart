@@ -1,96 +1,163 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
+import 'package:cliqlite/models/subject/subject.dart';
+import 'package:cliqlite/models/topic/topic.dart';
+import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/subject_screen/subject_screen.dart';
 import 'package:cliqlite/themes/style.dart';
+import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/search_box.dart';
+import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/x_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {
   static String id = 'search';
+  final String route;
+  SearchScreen({this.route});
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  Future<List<Subject>> futureSubject;
+  List<Subject> subject;
+
+  Future<List<Topic>> futureTopic;
+  List<Topic> topic;
+
   TextEditingController _nameController = TextEditingController();
   List<dynamic> filteredSearch = [];
 
-  onSearch() {
-    print('text is ${_nameController.text}');
+  Future<List<Topic>> futureTopicTask() async {
+    List<Topic> result =
+        await TopicProvider.topic(context).getTopicsBySearch(description: '');
+    print('result: $result');
     setState(() {
-      filteredSearch = onFilter(_nameController.text);
+      topic = result;
     });
+    return Future.value(result);
   }
 
-  List<dynamic> onFilter(String term) {
-    return data
-        .where((element) =>
-            element['name'].toLowerCase().contains(term.toLowerCase()))
-        .toList();
+  Future<List<Subject>> futureSubjectTask() async {
+    List<Subject> result = await SubjectProvider.subject(context)
+        .getSubjectsBySearch(description: '');
+    print('result: $result');
+    setState(() {
+      subject = result;
+    });
+    return Future.value(result);
+  }
+
+  onSearch() async {
+    print('text is ${_nameController.text}');
+    List<Subject> result;
+    List<Topic> topicResult;
+    if (widget.route == 'topics') {
+      if (_nameController.text.length > 1) {
+        topicResult = await TopicProvider.topic(context)
+            .getTopicsBySearch(description: _nameController.text.toLowerCase());
+      } else {
+        topicResult = await TopicProvider.topic(context)
+            .getTopicsBySearch(description: '');
+      }
+      setState(() {
+        topic = topicResult;
+      });
+    } else {
+      if (_nameController.text.length > 1) {
+        result = await SubjectProvider.subject(context).getSubjectsBySearch(
+            description: _nameController.text.toLowerCase());
+      } else {
+        result = await SubjectProvider.subject(context)
+            .getSubjectsBySearch(description: '');
+      }
+      setState(() {
+        subject = result;
+      });
+    }
   }
 
   @override
   void initState() {
     filteredSearch = data;
     _nameController.addListener(onSearch);
+    futureSubject = futureSubjectTask();
+    futureTopic = futureTopicTask();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     ThemeProvider theme = ThemeProvider.themeProvider(context);
+    print('topic: $topic');
 
     return BackgroundImage(
         child: SafeArea(
-      child: Padding(
-        padding: defaultVHPadding,
-        child: Column(
-          children: [
-            XButton(
-              onTap: () => Navigator.pushNamed(context, AppLayout.id),
-              color: theme.status ? whiteColor : greyColor,
-            ),
-            SizedBox(height: 15),
-            SearchBox(
-              type: 'search',
-              size: 5.0,
-              nameController: _nameController,
-            ),
-            kLargeHeight,
-            Expanded(
-              child: Padding(
-                padding: defaultPadding.copyWith(left: 65),
-                child: ListView.separated(
-                    separatorBuilder: (context, int) => SizedBox(
-                          height: 35,
-                        ),
-                    scrollDirection: Axis.vertical,
-                    itemCount: filteredSearch.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SubjectScreen(
-                                      text: filteredSearch[index]['name'],
-                                    ))),
-                        child: Text(
-                          toBeginningOfSentenceCase(
-                              filteredSearch[index]['name']),
-                          style: textExtraLightBlack.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: theme.status ? whiteColor : blackColor),
-                        ),
-                      );
-                    }),
+      child: FutureHelper(
+        task: widget.route == 'topics' ? futureTopic : futureSubject,
+        loader: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [circularProgressIndicator()],
+        ),
+        builder: (context, _) => Padding(
+          padding: defaultVHPadding,
+          child: Column(
+            children: [
+              XButton(
+                onTap: () => Navigator.pushNamed(context, AppLayout.id),
+                color: theme.status ? whiteColor : greyColor,
               ),
-            )
-          ],
+              SizedBox(height: 15),
+              SearchBox(
+                type: 'search',
+                size: 5.0,
+                placeholder: widget.route == 'topics'
+                    ? 'Search for Topic'
+                    : 'Search for Subject',
+                nameController: _nameController,
+              ),
+              kLargeHeight,
+              Expanded(
+                child: Padding(
+                  padding: defaultPadding.copyWith(left: 65),
+                  child: ListView.separated(
+                      separatorBuilder: (context, int) => SizedBox(
+                            height: 35,
+                          ),
+                      scrollDirection: Axis.vertical,
+                      itemCount: widget.route == 'topics'
+                          ? topic.length
+                          : subject.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SubjectScreen(
+                                        text: widget.route == 'topics'
+                                            ? topic[index].title
+                                            : subject[index].name,
+                                      ))),
+                          child: Text(
+                            toBeginningOfSentenceCase(widget.route == 'topics'
+                                ? topic[index].title
+                                : subject[index].name),
+                            style: textExtraLightBlack.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: theme.status ? whiteColor : blackColor),
+                          ),
+                        );
+                      }),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     ));

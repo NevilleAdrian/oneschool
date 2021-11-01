@@ -68,32 +68,63 @@ class _ChildRegistrationState extends State<ChildRegistration> {
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      try {
-        setState(() {
-          AuthProvider.auth(context).setIsLoading(true);
-        });
+      if (widget.user == 'child') {
+        print('yes');
+        try {
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(true);
+          });
 
-        var result = await AuthProvider.auth(context).registerParent(
-            widget.email ?? _controllerEmail.text,
-            widget.phoneNo,
-            widget.fullName ?? _controllerName.text,
-            widget.password ?? _controllerPassword.text,
-            _controllerName.text,
-            age.replaceAll(' years', ''),
-            childClassName);
-        if (result != null) {
-          Navigator.pushNamed(context, Login.id);
-          showFlush(context, 'Registration Successful', primaryColor);
+          var result = await AuthProvider.auth(context).addUser(
+              _controllerName.text,
+              int.parse(age?.replaceAll(' years', '') ?? '5'),
+              childClassName ?? '6155798b81cc3265b9efaa9c');
+          if (result != null) {
+            await AuthProvider.auth(context).getChildren();
+            Navigator.pushNamed(context, AppLayout.id);
+            showFlush(context, 'Child Added Successfully', primaryColor);
 
+            setState(() {
+              AuthProvider.auth(context).setIsLoading(false);
+            });
+          }
+        } catch (ex) {
+          showFlush(context, ex.toString(), primaryColor);
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
           });
         }
-      } catch (ex) {
-        showFlush(context, ex.toString(), primaryColor);
-        setState(() {
-          AuthProvider.auth(context).setIsLoading(false);
-        });
+      } else {
+        try {
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(true);
+          });
+
+          var result = await AuthProvider.auth(context).register(
+              widget.email ?? _controllerEmail.text,
+              widget.phoneNo,
+              widget.fullName ?? _controllerName.text,
+              widget.password ?? _controllerPassword.text,
+              _controllerName.text,
+              age?.replaceAll(' years', '') ?? '5',
+              childClassName ?? '6155798b81cc3265b9efaa9c',
+              widget.user == 'parent'
+                  ? 'auth/user/register'
+                  : 'auth/parent/register');
+          if (result != null) {
+            Navigator.pushNamed(context, Login.id);
+            showFlush(context, 'Registration Successful', primaryColor);
+
+            setState(() {
+              AuthProvider.auth(context).setIsLoading(false);
+            });
+          }
+        } catch (ex) {
+          showFlush(context, ex.toString(), primaryColor);
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+        }
       }
     }
   }
@@ -337,12 +368,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                         ),
                         kLargeHeight,
                         LargeButton(
-                          submit: () => widget.user == 'child'
-                              ? addChild(child: {
-                                  "name": _controllerName.text,
-                                  "image_url": "assets/images/picture.png",
-                                })
-                              : nextPage(),
+                          submit: () => nextPage(),
                           color: primaryColor,
                           name:
                               widget.user == 'child' ? 'Add Child' : 'Sign Up',

@@ -1,7 +1,9 @@
-import 'package:cliqlite/screens/app_layout/applayout.dart';
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/screens/account/account.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/large_button.dart';
+import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
@@ -33,17 +35,49 @@ class _ChangePasswordState extends State<ChangePassword> {
   bool autoValidate = false;
 
   //Route to next page
-  nextPage() {
+  nextPage() async {
     final FormState form = formKey.currentState;
+    AuthProvider auth = AuthProvider.auth(context);
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      Navigator.pushNamed(context, AppLayout.id);
+      if (_newPassword.text == _confirmPassword.text) {
+        try {
+          setState(() {
+            auth.setIsLoading(true);
+          });
+          var result;
+          if (auth.user.role == 'parent') {
+            result = await auth.changePassword(_oldPassword.text,
+                _confirmPassword.text, 'auth/parent/updatepassword');
+          } else {
+            result = await auth.changePassword(_oldPassword.text,
+                _confirmPassword.text, 'auth/user/updatepassword');
+          }
+          if (result != null) {
+            Navigator.pushNamed(context, Account.id);
+            showFlush(context, 'Successfully Changed Password', primaryColor);
+
+            setState(() {
+              auth.setIsLoading(false);
+            });
+          }
+        } catch (ex) {
+          showFlush(context, ex.toString(), primaryColor);
+          setState(() {
+            auth.setIsLoading(false);
+          });
+        }
+      } else {
+        showFlush(context, "Password don't match", primaryColor);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider auth = AuthProvider.auth(context);
+
     return BackgroundImage(
       child: SafeArea(
         child: Padding(
@@ -151,6 +185,14 @@ class _ChangePasswordState extends State<ChangePassword> {
                         submit: () => nextPage(),
                         color: primaryColor,
                         name: 'Save Changes',
+                        loader: auth.isLoading
+                            ? CircularProgressIndicator()
+                            : Text(
+                                'Save Changes',
+                                style: headingWhite.copyWith(
+                                  color: secondaryColor,
+                                ),
+                              ),
                         buttonColor: secondaryColor,
                       ),
                     ],

@@ -52,7 +52,7 @@ class SearchBox extends StatelessWidget {
                       controller: nameController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(vertical: 0),
-                        hintText: 'Search for Subject',
+                        hintText: 'Search ',
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),

@@ -1,3 +1,4 @@
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/account/account.dart';
 import 'package:cliqlite/screens/analytics/analytics.dart';
 import 'package:cliqlite/screens/home/home.dart';
@@ -40,12 +41,11 @@ class _AppLayoutState extends State<AppLayout> {
 
   @override
   void initState() {
-    // _pageController = PageController(
-    //   initialPage: widget.index ?? 0,
-    // );
-    // _selectedIndex = widget.index ?? 0;
-    // // _pageController.jumpToPage(widget.index ?? 0);
-    // Auth.authProvider(context).setPageController(_pageController);
+    _pageController = PageController(
+      initialPage: widget.index ?? 0,
+    );
+    _selectedIndex = widget.index ?? 0;
+    AuthProvider.auth(context).setPageController(_pageController);
     super.initState();
   }
 
@@ -61,6 +61,7 @@ class _AppLayoutState extends State<AppLayout> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: _onTapped,
         backgroundColor: primaryColor,
+        currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         iconSize: 20,
         items: [

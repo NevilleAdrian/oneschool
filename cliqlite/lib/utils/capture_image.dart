@@ -32,14 +32,6 @@ Future<File> cropImage(File file, BuildContext context) async {
     cropStyle: CropStyle.circle,
   );
 
-  // String _imageEncoded = base64Encode(croppedImageFile.readAsBytesSync());
-
-  //setState(() {
-  //var results = [croppedImageFile,];
-  // = croppedImageFile;
-  // _networkImage = _imageEncoded;
-  // profilePix = null;
-  // });
   return croppedImageFile;
 }
 

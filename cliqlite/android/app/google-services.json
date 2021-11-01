@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "545158885373",
+    "project_id": "cliqlite-a8402",
+    "storage_bucket": "cliqlite-a8402.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545158885373:android:6b06844ddf8de61fa93394",
+        "android_client_info": {
+          "package_name": "com.cliqlite.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545158885373-6g2dnch18m3rh49i465f954hufv776ol.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqMiD6dzwW4zuci9mSk7H_ahRICClcF7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545158885373-6g2dnch18m3rh49i465f954hufv776ol.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

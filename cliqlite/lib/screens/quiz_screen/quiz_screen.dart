@@ -1,10 +1,10 @@
-import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_result.dart';
 import 'package:cliqlite/themes/style.dart';
+import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/outline_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
@@ -13,6 +13,10 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class QuizScreen extends StatefulWidget {
   static String id = 'quiz';
+
+  QuizScreen({this.topicId});
+  final String topicId;
+
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
@@ -20,14 +24,39 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int indexNo;
   String selected;
+  int score = 0;
 
   List<dynamic> expectedValues = [];
   List<dynamic> usersOption = [];
-  List<dynamic> quizData = [];
+  List<dynamic> quizData;
+  List<dynamic> quizResult;
+
+  Future<List<dynamic>> futureQuiz;
+
+  Future<List<dynamic>> futureTask() async {
+    //Initialize provider
+    QuizProvider quiz = QuizProvider.quizProvider(context);
+
+    //Make call to get topics
+    var result = await quiz.getQuiz(
+      topicId: widget.topicId,
+    );
+
+    setState(() {
+      quizResult = result;
+    });
+    expectedList(context);
+    quizData = quizResult;
+
+    print('result:${result[0]['resource']['type'][0]}');
+
+    //Return future value
+    return Future.value(result);
+  }
 
   void expectedList(BuildContext context) {
     QuizProvider quiz = QuizProvider.quizProvider(context);
-    expectedValues = (quizTypes[quiz.number]['questions'] as List)
+    expectedValues = (quizResult[quiz.number]['resource']['questions'] as List)
         ?.where((element) => !element['active'])
         ?.toList();
     print('expectedV: $expectedValues');
@@ -36,9 +65,8 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    expectedList(context);
-    quizData = quizTypes;
 
+    futureQuiz = futureTask();
     super.initState();
   }
 
@@ -47,22 +75,20 @@ class _QuizScreenState extends State<QuizScreen> {
     // Question Number
     QuizProvider quiz = QuizProvider.quizProvider(context);
 
-    String type = quizTypes[quiz.number]['type'];
-
     ThemeProvider theme = ThemeProvider.themeProvider(context);
 
     //Quiz type generator
     Widget getTestType(String type) {
       switch (type) {
-        case 'optionType':
+        case 'trivia':
           return Column(
             children: [
-              Image.asset(quizTypes[quiz.number]['image']),
+              Image.asset(quizResult[quiz.number]['resource']['image'][0]),
               SizedBox(
                 height: 40,
               ),
               Text(
-                quizTypes[quiz.number]['description'],
+                quizResult[quiz.number]['resource']['description'][0],
                 style: theme.status
                     ? textStyleWhite
                     : textLightBlack.copyWith(fontWeight: FontWeight.w600),
@@ -88,12 +114,14 @@ class _QuizScreenState extends State<QuizScreen> {
                           setState(() {
                             expectedList(context);
                             indexNo = index;
-                            selected =
-                                quizTypes[quiz.number]['option${index + 1}'];
+
+                            selected = quizResult[quiz.number]['resource']
+                                ['option${index + 1}'][0];
                           });
 
                           if (selected ==
-                              quizTypes[quiz.number]['correctAnswer']) {
+                              quizResult[quiz.number]['resource']
+                                  ['correctAnswer'][0]) {
                             Future.delayed(Duration(milliseconds: 700), () {
                               dialogBox(
                                   context,
@@ -117,13 +145,23 @@ class _QuizScreenState extends State<QuizScreen> {
                                   ), onTap: () {
                                 Navigator.pop(context);
                                 setState(() {
-                                  if (quiz.number + 1 >= quizTypes.length) {
+                                  if (quiz.number + 1 >= quizResult.length) {
                                     QuizProvider.quizProvider(context)
                                         .setNumber(0);
-                                    Navigator.pushNamed(context, QuizResult.id);
+                                    score = score + 1;
+
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => QuizResult(
+                                                score: score,
+                                                aggregate: quizResult.length,
+                                                topicId: widget.topicId)));
                                   } else {
                                     QuizProvider.quizProvider(context)
                                         .setNumber(quiz.number + 1);
+                                    score = score + 1;
+
                                     expectedList(context);
                                   }
                                 });
@@ -157,8 +195,14 @@ class _QuizScreenState extends State<QuizScreen> {
                                   ), onTap: () {
                                 Navigator.pop(context);
                                 setState(() {
-                                  if (quiz.number + 1 >= quizTypes.length) {
-                                    Navigator.pushNamed(context, QuizResult.id);
+                                  if (quiz.number + 1 >= quizResult.length) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => QuizResult(
+                                                score: score,
+                                                aggregate: quizResult.length,
+                                                topicId: widget.topicId)));
                                     QuizProvider.quizProvider(context)
                                         .setNumber(0);
                                   } else {
@@ -166,7 +210,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         .setNumber(quiz.number + 1);
                                     expectedList(context);
                                     print('numberQuiz:${quiz.number}');
-                                    print('quizTypes:${quizTypes.length}');
+                                    print('quizResult:${quizResult.length}');
                                   }
                                 });
                                 indexNo = null;
@@ -191,7 +235,8 @@ class _QuizScreenState extends State<QuizScreen> {
                               borderRadius: BorderRadius.circular(30)),
                           child: Center(
                             child: Text(
-                              quizTypes[quiz.number]['option${index + 1}'],
+                              quizResult[quiz.number]['resource']
+                                  ['option${index + 1}'][0],
                               style: textLightBlack.copyWith(
                                   fontWeight: FontWeight.w400,
                                   color: indexNo == index
@@ -208,20 +253,19 @@ class _QuizScreenState extends State<QuizScreen> {
               )
             ],
           );
-        case 'completeType':
+        case 'gaps':
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // SvgPicture.asset(quizTypes[quiz.number]['image']),
               kSmallHeight,
               Column(
                 children: [
-                  Image.asset(quizData[quiz.number]['image']),
+                  Image.asset(quizData[quiz.number]['resource']['image'][0]),
                   SizedBox(
                     height: 20,
                   ),
                   Text(
-                    quizData[quiz.number]['description'],
+                    quizData[quiz.number]['resource']['description'][0],
                     style: textLightBlack.copyWith(
                         fontWeight: FontWeight.w600,
                         color: theme.status ? whiteColor : blackColor),
@@ -233,18 +277,21 @@ class _QuizScreenState extends State<QuizScreen> {
                   Container(
                     height: 50,
                     child: GridView.builder(
-                        itemCount: quizData[quiz.number]['questions'].length,
+                        itemCount: quizData[quiz.number]['resource']
+                                ['questions']
+                            .length,
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:
-                              quizTypes[quiz.number]['questions'].length,
+                          crossAxisCount: quizResult[quiz.number]['resource']
+                                  ['questions']
+                              .length,
                           // childAspectRatio: 1,
                           crossAxisSpacing: 20,
                           mainAxisSpacing: 30,
                         ),
                         itemBuilder: (context, index) {
-                          var quizType =
-                              quizData[quiz.number]['questions'][index];
+                          var quizType = quizData[quiz.number]['resource']
+                              ['questions'][index];
                           return Container(
                             padding: EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -274,7 +321,9 @@ class _QuizScreenState extends State<QuizScreen> {
                   Container(
                     height: 500,
                     child: GridView.builder(
-                        itemCount: quizTypes[quiz.number]['options'].length,
+                        itemCount: quizResult[quiz.number]['resource']
+                                ['options']
+                            .length,
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
@@ -283,14 +332,14 @@ class _QuizScreenState extends State<QuizScreen> {
                           mainAxisSpacing: 30,
                         ),
                         itemBuilder: (context, index) {
-                          var quizName =
-                              quizTypes[quiz.number]['options'][index]['name'];
+                          var quizName = quizResult[quiz.number]['resource']
+                              ['options'][index]['name'];
                           return InkWell(
                             onTap: () {
                               setState(() {
                                 indexNo = index;
-                                selected = quizTypes[quiz.number]['options']
-                                    [index]['name'];
+                                selected = quizResult[quiz.number]['resource']
+                                    ['options'][index]['name'];
                                 expectedList(context);
                                 usersOption = [...usersOption, selected];
                                 var currentLength = usersOption.length - 1;
@@ -325,22 +374,30 @@ class _QuizScreenState extends State<QuizScreen> {
                                       Navigator.pop(context);
                                       setState(() {
                                         if (quiz.number + 1 >=
-                                            quizTypes.length) {
+                                            quizResult.length) {
                                           print('numberQuiz:${quiz.number}');
                                           print(
-                                              'quizTypes:${quizTypes.length}');
+                                              'quizResult:${quizResult.length}');
                                           QuizProvider.quizProvider(context)
                                               .setNumber(0);
 
-                                          Navigator.pushNamed(
-                                              context, QuizResult.id);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      QuizResult(
+                                                          score: score,
+                                                          aggregate:
+                                                              quizResult.length,
+                                                          topicId:
+                                                              widget.topicId)));
                                         } else {
                                           QuizProvider.quizProvider(context)
                                               .setNumber(quiz.number + 1);
                                           expectedList(context);
                                           print('numberQuiz:${quiz.number}');
                                           print(
-                                              'quizTypes:${quizTypes.length}');
+                                              'quizResult:${quizResult.length}');
                                         }
                                       });
                                       indexNo = null;
@@ -349,18 +406,23 @@ class _QuizScreenState extends State<QuizScreen> {
                                   });
                                   print('wrong answer');
                                 } else {
+                                  var data = quizData
+                                      .map(
+                                        (e) => {
+                                          ...e['resource'],
+                                          "questions": (e['resource']
+                                                  ["questions"])
+                                              ?.map((f) => f["id"] ==
+                                                      expectedValues[
+                                                          currentLength]["id"]
+                                                  ? {...f, "active": true}
+                                                  : f)
+                                              ?.toList()
+                                        },
+                                      )
+                                      ?.first;
                                   quizData = quizData
-                                      .map((e) => {
-                                            ...e,
-                                            "questions": (e["questions"]
-                                                    as List)
-                                                ?.map((f) => f["id"] ==
-                                                        expectedValues[
-                                                            currentLength]["id"]
-                                                    ? {...f, "active": true}
-                                                    : f)
-                                                ?.toList()
-                                          })
+                                      .map((e) => {...e, "resource": data})
                                       ?.toList();
                                   if (usersOption.length ==
                                       expectedValues.length) {
@@ -390,14 +452,25 @@ class _QuizScreenState extends State<QuizScreen> {
                                         Navigator.pop(context);
                                         setState(() {
                                           if (quiz.number + 1 >=
-                                              quizTypes.length) {
+                                              quizResult.length) {
                                             QuizProvider.quizProvider(context)
                                                 .setNumber(0);
-                                            Navigator.pushNamed(
-                                                context, QuizResult.id);
+                                            score = score + 1;
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        QuizResult(
+                                                            score: score,
+                                                            aggregate:
+                                                                quizResult
+                                                                    .length,
+                                                            topicId: widget
+                                                                .topicId)));
                                           } else {
                                             QuizProvider.quizProvider(context)
                                                 .setNumber(quiz.number + 1);
+                                            score = score + 1;
                                             expectedList(context);
                                           }
                                         });
@@ -410,9 +483,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                 }
                                 print('expectedValues: $expectedValues');
                                 print('usersOption: $usersOption');
-
                                 print('selected: $selected');
                                 print('indexNo: $indexNo');
+                                print('score: $score');
                               });
                             },
                             child: Container(
@@ -456,85 +529,94 @@ class _QuizScreenState extends State<QuizScreen> {
     }
 
     return BackgroundImage(
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            padding: defaultVHPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          dialogBox(
-                              context,
-                              Container(
-                                padding: defaultPadding,
-                                height: 280,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Are you sure you want to end the quiz ',
-                                      textAlign: TextAlign.center,
-                                      style: textExtraLightBlack,
-                                    ),
-                                    kLargeHeight,
-                                    LargeButton(
-                                      name: 'Keep Playing',
-                                      color: primaryColor,
-                                      buttonColor: secondaryColor,
-                                      submit: () => Navigator.pop(context),
-                                    ),
-                                    kSmallHeight,
-                                    LineButton(
-                                      text: 'End',
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AppLayout()));
-                                        quiz.setNumber(0);
-                                      },
-                                    )
-                                  ],
+      child: FutureHelper<List<dynamic>>(
+        task: futureQuiz,
+        loader: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [circularProgressIndicator()],
+        ),
+        builder: (context, _) => SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: defaultVHPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            dialogBox(
+                                context,
+                                Container(
+                                  padding: defaultPadding,
+                                  height: 280,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Are you sure you want to end the quiz ',
+                                        textAlign: TextAlign.center,
+                                        style: textExtraLightBlack,
+                                      ),
+                                      kLargeHeight,
+                                      LargeButton(
+                                        name: 'Keep Playing',
+                                        color: primaryColor,
+                                        buttonColor: secondaryColor,
+                                        submit: () => Navigator.pop(context),
+                                      ),
+                                      kSmallHeight,
+                                      LineButton(
+                                        text: 'End',
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AppLayout()));
+                                          quiz.setNumber(0);
+                                        },
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              onTap: () => Navigator.pop(context));
-                        },
-                        child: Text(
-                          'End Quiz',
-                          style: theme.status ? textStyleWhite : textLightBlack,
-                        )),
-                  ],
-                ),
-                kSmallHeight,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Text(
-                            'Question ${quiz.number + 1}/${quizTypes.length}',
-                            style: theme.status
-                                ? textStyleWhite
-                                : textLightBlack)),
-                  ],
-                ),
-                kSmallHeight,
-                StepProgressIndicator(
-                  totalSteps: quizTypes.length,
-                  currentStep: quiz.number + 1,
-                  selectedColor: theme.status ? secondaryColor : primaryColor,
-                  unselectedColor: theme.status ? whiteColor : greyColor2,
-                  roundedEdges: Radius.circular(20),
-                ),
-                SizedBox(height: 40),
-                getTestType(quizTypes[quiz.number]['type']),
-              ],
+                                onTap: () => Navigator.pop(context));
+                          },
+                          child: Text(
+                            'End Quiz',
+                            style:
+                                theme.status ? textStyleWhite : textLightBlack,
+                          )),
+                    ],
+                  ),
+                  kSmallHeight,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Text(
+                              'Question ${quiz.number + 1}/${quizResult.length}',
+                              style: theme.status
+                                  ? textStyleWhite
+                                  : textLightBlack)),
+                    ],
+                  ),
+                  kSmallHeight,
+                  StepProgressIndicator(
+                    totalSteps: quizResult.length,
+                    currentStep: quiz.number + 1,
+                    selectedColor: theme.status ? secondaryColor : primaryColor,
+                    unselectedColor: theme.status ? whiteColor : greyColor2,
+                    roundedEdges: Radius.circular(20),
+                  ),
+                  SizedBox(height: 40),
+                  getTestType(quizResult[quiz.number]['resource']['type'][0]),
+                ],
+              ),
             ),
           ),
         ),

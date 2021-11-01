@@ -1,8 +1,17 @@
+import 'package:cliqlite/models/app_model/app_model.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
-import 'package:cliqlite/models/children_model/children.dart';
+import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/grades/grades.dart';
+import 'package:cliqlite/models/subject/grade/grade.dart';
+import 'package:cliqlite/models/subject/subject.dart';
+import 'package:cliqlite/models/topic/topic.dart';
+import 'package:cliqlite/models/users_model/users.dart';
+import 'package:cliqlite/models/video_model/video_model.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
+import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
+import 'package:cliqlite/providers/video_provider/video_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/login.dart';
@@ -50,25 +59,47 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   _prepareAppState() async {
-    await HiveRepository.openHives([kUser, kFirst, kGrades, kChildren]);
+    await HiveRepository.openHives([
+      kUser,
+      kFirst,
+      kGrades,
+      kUsers,
+      kAppDataName,
+      kSubject,
+      kSingleGrade,
+      kTopic,
+      kVideo,
+      kIndex
+    ]);
+    AppModel appModel;
     AuthUser user;
     FirstTime first;
     List<Grades> grades;
-    List<Children> children;
+    List<Users> users;
+    List<Subject> subject;
+    Grade singleGrade;
+    List<Topic> topic;
+    List<Video> video;
+    ChildIndex index;
 
     try {
       user = _hiveRepository.get<AuthUser>(key: 'user', name: kUser);
-      children =
-          _hiveRepository.get<List<Children>>(key: 'children', name: kChildren);
+      appModel =
+          _hiveRepository.get<AppModel>(key: 'appModel', name: kAppDataName);
+      users = _hiveRepository.get<List<Users>>(key: 'users', name: kUsers);
       grades = _hiveRepository.get<List<Grades>>(key: 'grades', name: kGrades);
+      subject =
+          _hiveRepository.get<List<Subject>>(key: 'subject', name: kSubject);
+      topic = _hiveRepository.get<List<Topic>>(key: 'topic', name: kTopic);
+      video = _hiveRepository.get<List<Video>>(key: 'video', name: kVideo);
     } catch (ex) {
       print(ex);
     }
     first = _hiveRepository.get<FirstTime>(key: 'first', name: kFirst);
+    singleGrade =
+        _hiveRepository.get<Grade>(key: 'singleGrade', name: kSingleGrade);
     AuthProvider.auth(context).setFirst(first);
-    print('grades:$grades');
-    print('user:$user');
-    print('children:$children');
+    index = _hiveRepository.get<ChildIndex>(key: 'index', name: kIndex);
 
     if (first == null) {
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -80,7 +111,13 @@ class _SplashScreenState extends State<SplashScreen>
       } else {
         AuthProvider.auth(context).setUser(user);
         AuthProvider.auth(context).setGrades(grades);
-        AuthProvider.auth(context).setChildren(children);
+        AuthProvider.auth(context).setToken(appModel.token);
+        AuthProvider.auth(context).setUsers(users);
+        SubjectProvider.subject(context).setSubject(subject);
+        SubjectProvider.subject(context).setGrade(singleGrade);
+        TopicProvider.topic(context).setTopic(topic);
+        VideoProvider.video(context).setVideo(video);
+        SubjectProvider.subject(context).setIndex(index);
         Navigator.of(context).pushNamedAndRemoveUntil(
             AppLayout.id, (Route<dynamic> route) => false);
       }

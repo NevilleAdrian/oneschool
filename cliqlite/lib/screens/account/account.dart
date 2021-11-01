@@ -3,6 +3,7 @@ import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/account/billing_details/billing_details.dart';
 import 'package:cliqlite/screens/account/change_password/change_password.dart';
 import 'package:cliqlite/screens/account/edit_chid.dart';
+import 'package:cliqlite/screens/account/support/support.dart';
 import 'package:cliqlite/screens/auth/login.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
@@ -10,6 +11,7 @@ import 'package:cliqlite/utils/dialog_box.dart';
 import 'package:flutter/material.dart';
 
 class Account extends StatefulWidget {
+  static String id = 'account';
   @override
   _AccountState createState() => _AccountState();
 }
@@ -164,23 +166,23 @@ class _AccountState extends State<Account> {
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Manage Payment Info",
-                        style:
-                            theme.status ? textStyleWhite : textExtraLightBlack,
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: theme.status ? whiteColor : blackColor,
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Text(
+                  //       "Manage Payment Info",
+                  //       style:
+                  //           theme.status ? textStyleWhite : textExtraLightBlack,
+                  //     ),
+                  //     Icon(
+                  //       Icons.chevron_right,
+                  //       color: theme.status ? whiteColor : blackColor,
+                  //     )
+                  //   ],
+                  // ),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
                   InkWell(
                     onTap: () => Navigator.push(
                         context,
@@ -205,19 +207,23 @@ class _AccountState extends State<Account> {
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Support",
-                        style:
-                            theme.status ? textStyleWhite : textExtraLightBlack,
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: theme.status ? whiteColor : blackColor,
-                      )
-                    ],
+                  InkWell(
+                    onTap: () => Navigator.pushNamed(context, Support.id),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Support",
+                          style: theme.status
+                              ? textStyleWhite
+                              : textExtraLightBlack,
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: theme.status ? whiteColor : blackColor,
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),

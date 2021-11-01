@@ -30,7 +30,8 @@ class _LiveTutorState extends State<LiveTutor> {
     dialogBox(
         context,
         Container(
-          height: 300,
+          height: 320,
+          width: 300,
           child: CalendarCarousel(
             onDayPressed: (DateTime date, List<Event> events) {
               this.setState(() => selectedDate = date);

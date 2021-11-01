@@ -2,7 +2,8 @@ var data = [
   {"name": "MUSIC", "image": "assets/images/pic-1.png"},
   {"name": "WRITING", "image": "assets/images/pic-2.png"},
   {"name": "SCIENCE", "image": "assets/images/pic-3.png"},
-  {"name": "ENGLISH", "image": "assets/images/pic-1.png"}
+  {"name": "ENGLISH", "image": "assets/images/pic-1.png"},
+  {"name": "ENGLISH", "image": "assets/images/pic-1.png"},
 ];
 
 var billingData = [

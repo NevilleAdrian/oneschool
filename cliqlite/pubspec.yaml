@@ -45,6 +45,14 @@ dependencies:
   flushbar: ^1.10.4
   hive: ^2.0.4
   hive_flutter: ^1.0.0
+  modal_progress_hud: ^0.1.3
+  better_player: ^0.0.66
+  firebase_auth: ^1.1.2
+  firebase_core: ^1.0.4
+  firebase_storage: ^8.1.0
+  expandable: ^5.0.1
+
+
 
 
 

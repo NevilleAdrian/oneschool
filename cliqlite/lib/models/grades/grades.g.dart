@@ -23,15 +23,14 @@ class GradesAdapter extends TypeAdapter<Grades> {
       photo: fields[3] as String,
       createdAt: fields[4] as DateTime,
       v: fields[5] as int,
-      subjects: (fields[6] as List)?.cast<Subject>(),
-      gradeId: fields[7] as String,
+      gradeId: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Grades obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -45,8 +44,6 @@ class GradesAdapter extends TypeAdapter<Grades> {
       ..writeByte(5)
       ..write(obj.v)
       ..writeByte(6)
-      ..write(obj.subjects)
-      ..writeByte(7)
       ..write(obj.gradeId);
   }
 

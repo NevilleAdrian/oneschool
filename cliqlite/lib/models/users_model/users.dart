@@ -2,29 +2,16 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 
-part 'children.g.dart';
+part 'users.g.dart';
 
-List<Children> childrenFromJson(String str) =>
-    List<Children>.from(json.decode(str).map((x) => Children.fromJson(x)));
+List<Users> usersFromJson(String str) =>
+    List<Users>.from(json.decode(str).map((x) => Users.fromJson(x)));
 
-String childrenToJson(List<Children> data) =>
+String usersToJson(List<Users> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 @HiveType(typeId: 4)
-class Children {
-  Children({
-    this.id,
-    this.name,
-    this.email,
-    this.age,
-    this.parent,
-    this.isSubscribed,
-    this.grade,
-    this.role,
-    this.photo,
-    this.createdAt,
-  });
-
+class Users {
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -46,7 +33,20 @@ class Children {
   @HiveField(9)
   DateTime createdAt;
 
-  factory Children.fromJson(Map<String, dynamic> json) => Children(
+  Users({
+    this.id,
+    this.name,
+    this.email,
+    this.age,
+    this.parent,
+    this.isSubscribed,
+    this.grade,
+    this.role,
+    this.photo,
+    this.createdAt,
+  });
+
+  factory Users.fromJson(Map<String, dynamic> json) => Users(
         id: json["id"],
         name: json["name"],
         email: json["email"],
