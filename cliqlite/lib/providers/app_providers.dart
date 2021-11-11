@@ -1,5 +1,8 @@
+import 'package:cliqlite/providers/analytics_provider/analytics_provider.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
+import 'package:cliqlite/providers/livestream_provider/livestream_provider.dart';
+import 'package:cliqlite/providers/notification_provider/notifction_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
@@ -23,4 +26,11 @@ List<SingleChildWidget> appProviders = [
       create: (context) => SubscriptionProvider()),
   ChangeNotifierProvider<SupportProvider>(
       create: (context) => SupportProvider()),
+  ChangeNotifierProvider<VideoProvider>(create: (context) => VideoProvider()),
+  ChangeNotifierProvider<NotificationProvider>(
+      create: (context) => NotificationProvider()),
+  ChangeNotifierProvider<AnalyticsProvider>(
+      create: (context) => AnalyticsProvider()),
+  ChangeNotifierProvider<LiveStreamProvider>(
+      create: (context) => LiveStreamProvider())
 ];

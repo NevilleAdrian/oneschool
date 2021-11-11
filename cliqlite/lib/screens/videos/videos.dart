@@ -44,7 +44,12 @@ class _VideosState extends State<Videos> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
-                    onTap: () => Navigator.pushNamed(context, SearchScreen.id),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchScreen(
+                                  route: 'videos',
+                                ))),
                     child: SearchBox(
                       type: 'route',
                       width: MediaQuery.of(context).size.width / 1.4,

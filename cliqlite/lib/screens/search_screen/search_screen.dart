@@ -1,9 +1,11 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/models/subject/subject.dart';
 import 'package:cliqlite/models/topic/topic.dart';
+import 'package:cliqlite/models/video_model/video_model.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
+import 'package:cliqlite/providers/video_provider/video_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/subject_screen/subject_screen.dart';
@@ -30,6 +32,9 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<List<Topic>> futureTopic;
   List<Topic> topic;
 
+  Future<List<Video>> futureVideo;
+  List<Video> video;
+
   TextEditingController _nameController = TextEditingController();
   List<dynamic> filteredSearch = [];
 
@@ -53,10 +58,21 @@ class _SearchScreenState extends State<SearchScreen> {
     return Future.value(result);
   }
 
+  Future<List<Video>> futureVideoTask() async {
+    List<Video> result =
+        await VideoProvider.video(context).getVideosBySearch(description: '');
+    print('result: $result');
+    setState(() {
+      video = result;
+    });
+    return Future.value(result);
+  }
+
   onSearch() async {
     print('text is ${_nameController.text}');
     List<Subject> result;
     List<Topic> topicResult;
+    List<Video> videoResult;
     if (widget.route == 'topics') {
       if (_nameController.text.length > 1) {
         topicResult = await TopicProvider.topic(context)
@@ -67,6 +83,17 @@ class _SearchScreenState extends State<SearchScreen> {
       }
       setState(() {
         topic = topicResult;
+      });
+    } else if (widget.route == 'videos') {
+      if (_nameController.text.length > 1) {
+        videoResult = await VideoProvider.video(context)
+            .getVideosBySearch(description: _nameController.text.toLowerCase());
+      } else {
+        videoResult = await VideoProvider.video(context)
+            .getVideosBySearch(description: '');
+      }
+      setState(() {
+        video = videoResult;
       });
     } else {
       if (_nameController.text.length > 1) {
@@ -88,6 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _nameController.addListener(onSearch);
     futureSubject = futureSubjectTask();
     futureTopic = futureTopicTask();
+    futureVideo = futureVideoTask();
     super.initState();
   }
 
@@ -99,7 +127,11 @@ class _SearchScreenState extends State<SearchScreen> {
     return BackgroundImage(
         child: SafeArea(
       child: FutureHelper(
-        task: widget.route == 'topics' ? futureTopic : futureSubject,
+        task: widget.route == 'topics'
+            ? futureTopic
+            : widget.route == 'videos'
+                ? futureVideo
+                : futureSubject,
         loader: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [circularProgressIndicator()],
@@ -118,7 +150,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 size: 5.0,
                 placeholder: widget.route == 'topics'
                     ? 'Search for Topic'
-                    : 'Search for Subject',
+                    : widget.route == 'videos'
+                        ? 'Search for Videos'
+                        : 'Search for Subject',
                 nameController: _nameController,
               ),
               kLargeHeight,
@@ -132,22 +166,31 @@ class _SearchScreenState extends State<SearchScreen> {
                       scrollDirection: Axis.vertical,
                       itemCount: widget.route == 'topics'
                           ? topic.length
-                          : subject.length,
+                          : widget.route == 'videos'
+                              ? video.length
+                              : subject.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SubjectScreen(
-                                        text: widget.route == 'topics'
-                                            ? topic[index].title
-                                            : subject[index].name,
-                                      ))),
+                                  builder: (context) => widget.route == 'videos'
+                                      ? AppLayout(
+                                          index: 2,
+                                        )
+                                      : SubjectScreen(
+                                          text: widget.route == 'topics'
+                                              ? topic[index].title
+                                              : subject[index].name,
+                                          subjectId: subject[index].id,
+                                        ))),
                           child: Text(
                             toBeginningOfSentenceCase(widget.route == 'topics'
                                 ? topic[index].title
-                                : subject[index].name),
+                                : widget.route == 'videos'
+                                    ? video[index].title
+                                    : subject[index].name),
                             style: textExtraLightBlack.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: theme.status ? whiteColor : blackColor),

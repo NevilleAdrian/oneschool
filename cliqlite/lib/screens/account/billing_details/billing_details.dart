@@ -1,5 +1,5 @@
-import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/models/subscription_model/subscription_model.dart';
+import 'package:cliqlite/models/transactions/transactions.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
@@ -14,15 +14,16 @@ class BillingDetails extends StatefulWidget {
 }
 
 class _BillingDetailsState extends State<BillingDetails> {
-  Future<Subscription> futureSubscriptions;
+  Future<List<Transactions>> futureTransactions;
 
-  Future<Subscription> futureTask() async {
+  Future<List<Transactions>> futureTask() async {
     //Initialize provider
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
 
     //Make call to get videos
     try {
-      var result = await subscription.getSubscription();
+      await subscription.getSubscription();
+      var result = await subscription.getTransactions();
 
       setState(() {});
 
@@ -36,6 +37,8 @@ class _BillingDetailsState extends State<BillingDetails> {
   Widget subscriptionScreen() {
     Subscription subscription =
         SubscriptionProvider.subscribe(context).subscription;
+    List<Transactions> transactions =
+        SubscriptionProvider.subscribe(context).transactions;
 
     return SafeArea(
       child: Padding(
@@ -78,14 +81,18 @@ class _BillingDetailsState extends State<BillingDetails> {
             ),
             Expanded(
               child: ListView.builder(
-                  itemCount: billingData.length,
+                  itemCount: transactions.length,
                   itemBuilder: (context, index) {
-                    var billing = billingData[index];
+                    var transaction = transactions[index];
                     return BillingDescription(
-                      date: billing['date'],
-                      timeStamp: billing['timeStamp'],
-                      number: billing['card_number'],
-                      amount: billing['amount'],
+                      date: DateFormat("dd MMM y")
+                          .format(transaction.createdAt)
+                          .toString(),
+                      timeStamp: DateFormat("h: mma")
+                          .format(transaction.createdAt)
+                          .toString(),
+                      // number: transaction['card_number'],
+                      amount: transaction.amount.toString(),
                     );
                   }),
             )
@@ -97,7 +104,7 @@ class _BillingDetailsState extends State<BillingDetails> {
 
   @override
   void initState() {
-    futureSubscriptions = futureTask();
+    futureTransactions = futureTask();
     super.initState();
   }
 
@@ -105,7 +112,7 @@ class _BillingDetailsState extends State<BillingDetails> {
   Widget build(BuildContext context) {
     return BackgroundImage(
       child: FutureHelper(
-        task: futureSubscriptions,
+        task: futureTransactions,
         loader: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -153,16 +160,16 @@ class BillingDescription extends StatelessWidget {
                   style: textExtraLightBlack.copyWith(fontSize: 16),
                 ),
                 kSmallHeight,
-                Row(
-                  children: [
-                    Image.asset('assets/images/visa.png'),
-                    kVerySmallWidth,
-                    Text(
-                      number,
-                      style: textExtraLightBlack.copyWith(fontSize: 16),
-                    ),
-                  ],
-                )
+                // Row(
+                //   children: [
+                //     Image.asset('assets/images/visa.png'),
+                //     kVerySmallWidth,
+                //     Text(
+                //       number,
+                //       style: textExtraLightBlack.copyWith(fontSize: 16),
+                //     ),
+                //   ],
+                // )
               ],
             ),
             Text(

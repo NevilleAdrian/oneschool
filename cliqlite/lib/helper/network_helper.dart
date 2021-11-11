@@ -112,6 +112,14 @@ class NetworkHelper {
     return result['data'];
   }
 
+  //Get Children
+  Future<dynamic> getChildUser(
+      BuildContext context, String id, String token) async {
+    final result =
+        await getRequest(url: 'users/$id', context: context, token: token);
+    return result['data'];
+  }
+
   //Get Subject
   Future<dynamic> getSubject(
       BuildContext context, String gradeId, String token) async {
@@ -170,7 +178,19 @@ class NetworkHelper {
       BuildContext context, String topicId, String token) async {
     final result = await getRequest(
         url: 'topics/$topicId/quizzes', context: context, token: token);
-    return result['data'][0]['questions'];
+    return result['data'];
+  }
+
+  //Submit Quiz
+  Future<dynamic> submitQuiz(int score, String childId, String quizId,
+      String token, BuildContext context) async {
+    var body = {"score": score, "childId": childId};
+
+    return await postRequest(
+        body: body,
+        url: 'quizzes/$quizId/submit',
+        token: token,
+        context: context);
   }
 
   //Get a Subscription
@@ -178,6 +198,15 @@ class NetworkHelper {
       BuildContext context, String childId, String token) async {
     final result = await getRequest(
         url: 'users/subscriptions/$childId', context: context, token: token);
+    print('result:$result');
+    return result['data'];
+  }
+
+  //Get a Subscription
+  Future<dynamic> getTransactions(
+      BuildContext context, String childId, String token) async {
+    final result = await getRequest(
+        url: 'users/$childId/transactions', context: context, token: token);
     return result['data'];
   }
 
@@ -193,6 +222,61 @@ class NetworkHelper {
   Future<dynamic> getSupport(BuildContext context, String token) async {
     final result =
         await getRequest(url: 'faqs', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Notification
+  Future<dynamic> getNotification(BuildContext context, String token) async {
+    final result =
+        await getRequest(url: 'notifications', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Analytics Subject
+  Future<dynamic> getAnalyticsSubject(
+      BuildContext context, String id, String token) async {
+    final result = await getRequest(
+        url: 'users/$id/dashboard/subjects', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Analytics Topic
+  Future<dynamic> getAnalyticsTopic(
+      BuildContext context, String id, String token) async {
+    final result = await getRequest(
+        url: 'users/$id/dashboard/topics', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Analytics Subject
+  Future<dynamic> getLiveStream(
+      BuildContext context, String grade, String token) async {
+    var params = {"grade": grade};
+
+    final result = await getParamRequest(
+        url: 'livestreams', params: params, context: context, token: token);
+    return result['data'];
+  }
+
+  //Add Subscription
+  Future<dynamic> addSubscription(
+      String subId, String childId, String token, BuildContext context) async {
+    var body = {"childId": childId};
+
+    return await postRequest(
+        body: body,
+        url: 'users/$subId/subscribe',
+        token: token,
+        context: context);
+  }
+
+  //Verify Subscription
+  Future<dynamic> verifySubscription(
+      String id, String ref, BuildContext context, String token) async {
+    final result = await getRequest(
+        url: 'users/transaction/$id/verify/$ref',
+        context: context,
+        token: token);
     return result['data'];
   }
 

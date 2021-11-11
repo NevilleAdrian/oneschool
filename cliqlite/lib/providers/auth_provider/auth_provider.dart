@@ -5,6 +5,7 @@ import 'package:cliqlite/helper/network_helper.dart';
 import 'package:cliqlite/models/app_model/app_model.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/models/subject/grade/grade.dart';
 import 'package:cliqlite/models/subject/subject.dart';
@@ -31,6 +32,7 @@ class AuthProvider extends ChangeNotifier {
   FirstTime _first;
   List<Grades> _grades;
   List<Users> _users;
+  MainChildUser _mainChildUser;
   PageController _pageController;
 
   bool get isLoading => _isLoading;
@@ -39,6 +41,7 @@ class AuthProvider extends ChangeNotifier {
   FirstTime get first => _first;
   List<Grades> get grades => _grades;
   List<Users> get users => _users;
+  MainChildUser get mainChildUser => _mainChildUser;
   PageController get pageController => _pageController;
 
   setIsLoading(bool isLoading) => _isLoading = isLoading;
@@ -47,6 +50,8 @@ class AuthProvider extends ChangeNotifier {
   setFirst(FirstTime first) => _first = first;
   setGrades(List<Grades> grades) => _grades = grades;
   setUsers(List<Users> users) => _users = users;
+  setMainChildUser(MainChildUser mainChildUser) =>
+      _mainChildUser = mainChildUser;
   setPageController(PageController controller) => _pageController = controller;
 
   Future<dynamic> register(emailAddress, phone, fullName, password, childName,
@@ -150,6 +155,21 @@ class AuthProvider extends ChangeNotifier {
     setUsers(data);
     notifyListeners();
     _hiveRepository.add<List<Users>>(name: kUsers, key: 'users', item: data);
+    return data;
+  }
+
+  Future<MainChildUser> getMainChild() async {
+    //Get children
+    var data = await _helper.getChildUser(_context, user.id, token);
+    print('childUser: $data');
+
+    data = MainChildUser.fromJson(data);
+
+    //Save Children users in local storage
+    setMainChildUser(data);
+    notifyListeners();
+    _hiveRepository.add<MainChildUser>(
+        name: kMainUser, key: 'mainUser', item: data);
     return data;
   }
 

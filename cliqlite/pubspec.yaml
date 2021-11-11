@@ -51,10 +51,8 @@ dependencies:
   firebase_core: ^1.0.4
   firebase_storage: ^8.1.0
   expandable: ^5.0.1
-
-
-
-
+  flutter_paystack: ^1.0.5+1
+  video_player: ^2.2.0
 
 
 

@@ -1,4 +1,6 @@
+import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/forgot_password.dart';
 import 'package:cliqlite/screens/background/background.dart';
@@ -63,6 +65,8 @@ class _LoginState extends State<Login> {
           Navigator.pushNamed(context, AppLayout.id);
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
+            ChildIndex childIndex = ChildIndex.fromJson({"index": 0});
+            SubjectProvider.subject(context).setIndex(childIndex);
           });
         }
       } catch (ex) {
@@ -90,7 +94,7 @@ class _LoginState extends State<Login> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => Navigator.pushNamed(context, GetStarted.id),
                       child: Icon(
                         Icons.clear,
                         color: blackColor,

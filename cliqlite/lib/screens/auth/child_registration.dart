@@ -63,6 +63,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
 
   //Route to next page
   nextPage() async {
+    AuthProvider auth = AuthProvider.auth(context);
+
     print('hey');
     final FormState form = formKey.currentState;
     if (!form.validate()) {
@@ -80,7 +82,12 @@ class _ChildRegistrationState extends State<ChildRegistration> {
               int.parse(age?.replaceAll(' years', '') ?? '5'),
               childClassName ?? '6155798b81cc3265b9efaa9c');
           if (result != null) {
-            await AuthProvider.auth(context).getChildren();
+            if (auth.user.role != 'user') {
+              await AuthProvider.auth(context).getChildren();
+            } else {
+              AuthProvider.auth(context).getMainChild();
+            }
+
             Navigator.pushNamed(context, AppLayout.id);
             showFlush(context, 'Child Added Successfully', primaryColor);
 
@@ -206,66 +213,62 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                     ),
                     kVerySmallHeight,
                     Expanded(
-                      child: SingleChildScrollView(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(40.0),
+                                topRight: Radius.circular(40.0)),
+                            color: lightPrimaryColor),
+                        height: 500.0,
                         child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(40.0),
-                                  topRight: Radius.circular(40.0)),
-                              color: lightPrimaryColor),
-                          height: 500.0,
-                          child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 40, horizontal: 20),
-                              child: ListView.builder(
-                                  itemCount: type == 'age'
-                                      ? childYears.length
-                                      : grades.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        children: [
-                                          Radio(
-                                              value: type == 'age'
-                                                  ? childYears[index]['years']
-                                                  : toBeginningOfSentenceCase(
-                                                      grades[index].name),
-                                              groupValue: type == 'age'
-                                                  ? val
-                                                  : classVal,
-                                              activeColor: primaryColor,
-                                              onChanged: (var value) {
-                                                setModalState(() {
-                                                  setState(() {});
-                                                  if (type == 'age') {
-                                                    val = value;
-                                                    age = childYears[index]
-                                                        ['name'];
-                                                  } else {
-                                                    classVal = value;
-                                                    childClassName =
-                                                        grades[index].gradeId;
-                                                    print(
-                                                        'classNme:$childClassName');
-                                                    print('classNme:$classVal');
-                                                  }
-                                                });
-                                              }),
-                                          // kSmallWidth,
-                                          Text(
-                                            type == 'age'
-                                                ? childYears[index]['name']
+                            padding: EdgeInsets.symmetric(
+                                vertical: 40, horizontal: 20),
+                            child: ListView.builder(
+                                itemCount: type == 'age'
+                                    ? childYears.length
+                                    : grades.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                            value: type == 'age'
+                                                ? childYears[index]['years']
                                                 : toBeginningOfSentenceCase(
                                                     grades[index].name),
-                                            style: textLightBlack,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  })),
-                        ),
+                                            groupValue:
+                                                type == 'age' ? val : classVal,
+                                            activeColor: primaryColor,
+                                            onChanged: (var value) {
+                                              setModalState(() {
+                                                setState(() {});
+                                                if (type == 'age') {
+                                                  val = value;
+                                                  age =
+                                                      childYears[index]['name'];
+                                                } else {
+                                                  classVal = value;
+                                                  childClassName =
+                                                      grades[index].gradeId;
+                                                  print(
+                                                      'classNme:$childClassName');
+                                                  print('classNme:$classVal');
+                                                }
+                                              });
+                                            }),
+                                        // kSmallWidth,
+                                        Text(
+                                          type == 'age'
+                                              ? childYears[index]['name']
+                                              : toBeginningOfSentenceCase(
+                                                  grades[index].name),
+                                          style: textLightBlack,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                })),
                       ),
                     )
                   ],

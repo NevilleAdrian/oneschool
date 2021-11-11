@@ -1,8 +1,12 @@
+import 'package:cliqlite/models/analytics/analytics_subject/analytics_subject.dart';
+import 'package:cliqlite/models/analytics/analytics_topic/analytics_topic.dart';
 import 'package:cliqlite/models/app_model/app_model.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
+import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/grades/grades.dart';
+import 'package:cliqlite/models/livestream_model/livestream_model.dart';
 import 'package:cliqlite/models/subject/grade/grade.dart';
 import 'package:cliqlite/models/subject/subject.dart';
 import 'package:cliqlite/models/topic/topic.dart';
@@ -55,6 +59,10 @@ _openHive() async {
   Hive.registerAdapter(TopicAdapter());
   Hive.registerAdapter(VideoAdapter());
   Hive.registerAdapter(ChildIndexAdapter());
+  Hive.registerAdapter(AnalyticSubjectAdapter());
+  Hive.registerAdapter(AnalyticTopicAdapter());
+  Hive.registerAdapter(LiveStreamAdapter());
+  Hive.registerAdapter(MainChildUserAdapter());
 }
 
 class MyApp extends StatelessWidget {

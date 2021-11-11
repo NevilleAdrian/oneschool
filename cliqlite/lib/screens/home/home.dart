@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
+import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/mock_data/mock_data.dart';
-import 'package:cliqlite/models/subject/grade/grade.dart';
 import 'package:cliqlite/models/subject/subject.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/models/video_model/video_model.dart';
@@ -39,14 +39,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String profilePic;
   Future<List<Subject>> futureSubjects;
+  var childUser;
 
   Future<List<Subject>> futureTask() async {
     //Initialize provider
     SubjectProvider subject = SubjectProvider.subject(context);
     AuthProvider auth = AuthProvider.auth(context);
-
-    print('gradee:${subject?.grade?.grade}');
-    print('auth-gradee:${auth.user.toJson()}');
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
 
     //Make call to get grades
     await AuthProvider.auth(context).getGrades();
@@ -65,8 +64,8 @@ class _HomeState extends State<Home> {
         id: auth.user.grade,
         name: auth.user.fullname,
       );
+      childUser = await AuthProvider.auth(context).getMainChild();
     }
-
     setState(() {
       if (data != null) {
         subject.setSpinner(false);
@@ -75,7 +74,9 @@ class _HomeState extends State<Home> {
 
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
-    profilePic = users[childIndex.index ?? 0].photo;
+    profilePic = users != null
+        ? users[childIndex?.index ?? 0]?.photo
+        : mainChildUser?.photo;
     //Return future value
     return Future.value(data);
   }
@@ -84,12 +85,9 @@ class _HomeState extends State<Home> {
     List<dynamic> mockChildren = ChildProvider.childProvider(context).children;
     AuthUser user = AuthProvider.auth(context).user;
     List<Subject> subject = SubjectProvider.subject(context).subjects;
-    Grade grade = SubjectProvider.subject(context).grade;
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
-    profilePic = users[childIndex.index ?? 0].photo;
-
-    print('photo:${users[childIndex.index ?? 0].photo}');
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
 
     return ModalProgressHUD(
       inAsyncCall: SubjectProvider.subject(context).spinner,
@@ -124,7 +122,7 @@ class _HomeState extends State<Home> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                              'Hello ${toBeginningOfSentenceCase(grade.name ?? children[0].name) ?? mockChildren[0]['name']}',
+                              'Hello ${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].name : mainChildUser.name)}',
                               style: headingWhite.copyWith(fontSize: 24)),
                           SizedBox(
                             height: 15,
@@ -147,7 +145,8 @@ class _HomeState extends State<Home> {
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Notifications())),
+                                    builder: (context) =>
+                                        NotificationScreen())),
                             child: SvgPicture.asset(
                               'assets/images/svg/bell.svg',
                             ),
@@ -173,7 +172,8 @@ class _HomeState extends State<Home> {
                                         borderRadius:
                                             BorderRadius.circular(10.0),
                                         child: CachedNetworkImage(
-                                          imageUrl: profilePic,
+                                          imageUrl: profilePic ??
+                                              mockChildren[0]['image_url'],
                                           width: 35.0,
                                           height: 35.0,
                                           fit: BoxFit.cover,
@@ -206,7 +206,7 @@ class _HomeState extends State<Home> {
                     data: data,
                     subject: subject,
                     text:
-                        "Subjects based on ${toBeginningOfSentenceCase(grade.name ?? children[0].name) ?? mockChildren[0]['name']}'s class",
+                        "Subjects based on ${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].name : mainChildUser.name)}'s class",
                   ),
                 ),
                 Container(
@@ -236,7 +236,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     futureSubjects = futureTask();
-
     super.initState();
   }
 
@@ -244,7 +243,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     List<Users> users = AuthProvider.auth(context).users;
     List<Subject> subject = SubjectProvider.subject(context).subjects;
-    print('spinner:${SubjectProvider.subject(context).spinner}');
     return BackgroundImage(
       child: FutureHelper(
           task: futureSubjects,
@@ -338,11 +336,11 @@ class _DialogBodyState extends State<DialogBody> {
                                     Expanded(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                            border: children[index].grade ==
+                                            border: children[index].name ==
                                                     SubjectProvider.subject(
                                                             context)
                                                         ?.grade
-                                                        ?.grade
+                                                        ?.name
                                                 ? Border.all(
                                                     color: primaryColor,
                                                     width: 2.0)
@@ -430,8 +428,10 @@ class GroupedWidgets extends StatelessWidget {
     ThemeProvider theme = ThemeProvider.themeProvider(context);
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
-    print('subscribed: ${users[childIndex.index ?? 0].isSubscribed}');
-    bool subscribed = users[childIndex.index ?? 0].isSubscribed;
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+    bool subscribed = users != null
+        ? users[childIndex?.index ?? 0].isSubscribed
+        : mainChildUser.isSubscribed;
 
     onTap(String name, String subjectId) {
       if (subscribed) {

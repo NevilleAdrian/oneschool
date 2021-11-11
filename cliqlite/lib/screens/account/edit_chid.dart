@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
@@ -69,6 +70,9 @@ class _EditChildDetailsState extends State<EditChildDetails> {
   addUser({String imageUrl}) async {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> children = AuthProvider.auth(context).users;
+    AuthProvider auth = AuthProvider.auth(context);
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+
     try {
       setState(() {
         AuthProvider.auth(context).setIsLoading(true);
@@ -78,7 +82,15 @@ class _EditChildDetailsState extends State<EditChildDetails> {
           int.parse(age?.replaceAll(' years', '') ?? '5'),
           imageUrl,
           childClassName ?? '6155798b81cc3265b9efaa9c',
-          children[childIndex.index ?? 0].id);
+          children != null
+              ? children[childIndex?.index ?? 0]?.id
+              : mainChildUser?.id);
+      if (auth.user.role != 'user') {
+        await AuthProvider.auth(context).getChildren();
+      } else {
+        AuthProvider.auth(context).getMainChild();
+      }
+
       if (result != null) {
         setState(() {
           AuthProvider.auth(context).setIsLoading(false);
@@ -121,7 +133,11 @@ class _EditChildDetailsState extends State<EditChildDetails> {
       } else {
         List<Users> children = AuthProvider.auth(context).users;
         ChildIndex childIndex = SubjectProvider.subject(context).index;
-        addUser(imageUrl: children[childIndex.index ?? 0].photo);
+        MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+        addUser(
+            imageUrl: children != null
+                ? children[childIndex?.index ?? 0].photo
+                : mainChildUser.id);
       }
     }
   }
@@ -273,7 +289,6 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
 
-    print('userImge: ${users[childIndex.index ?? 0].photo}');
     if (croppedImage != null) {
       return Container(
         height: 60.0,
@@ -316,8 +331,12 @@ class _EditChildDetailsState extends State<EditChildDetails> {
   void initState() {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+
     setState(() {
-      profilePix = users[childIndex.index ?? 0].photo;
+      profilePix = users != null
+          ? users[childIndex?.index ?? 0].photo
+          : mainChildUser.photo;
     });
     super.initState();
   }
@@ -328,6 +347,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
     AuthProvider auth = AuthProvider.auth(context);
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
 
     return BackgroundImage(
       child: SingleChildScrollView(
@@ -376,8 +396,9 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                                 height: 8,
                               ),
                               Text(
-                                toBeginningOfSentenceCase(
-                                    users[childIndex.index ?? 0].name),
+                                toBeginningOfSentenceCase(users != null
+                                    ? users[childIndex?.index ?? 0].name
+                                    : mainChildUser.name),
                                 style: textLightBlack.copyWith(fontSize: 12),
                               )
                             ],
@@ -409,14 +430,15 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                         MyTextForm(
                             controllerName: _controllerName,
                             validations: validations.validateName,
-                            hintText: toBeginningOfSentenceCase(
-                                    users[childIndex.index ?? 0].name) ??
+                            hintText: toBeginningOfSentenceCase(users != null
+                                    ? users[childIndex?.index ?? 0].name
+                                    : mainChildUser.name) ??
                                 "Child's Name"),
                         kSmallHeight,
                         DropDown(
                             onTap: () => bottomSheet(context, 'age'),
                             text: age ??
-                                ('${toBeginningOfSentenceCase(users[childIndex.index ?? 0].age.toString())} Years' ??
+                                ('${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].age.toString() : mainChildUser.age.toString())} Years' ??
                                     "Child's Age")),
                         kSmallHeight,
                         DropDown(
