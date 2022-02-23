@@ -17,46 +17,52 @@ class TopicAdapter extends TypeAdapter<Topic> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Topic(
-      id: fields[0] as String,
-      title: fields[1] as String,
-      description: fields[2] as String,
-      tags: (fields[3] as List)?.cast<String>(),
-      subject: fields[4] as String,
-      status: fields[5] as String,
-      tutor: fields[6] as String,
-      createdAt: fields[7] as DateTime,
-      slug: fields[8] as String,
-      v: fields[9] as int,
-      topicId: fields[10] as String,
+      video: fields[0] as VideoClass,
+      id: fields[1] as String,
+      name: fields[2] as String,
+      description: fields[3] as String,
+      grade: fields[4] as GradeClass,
+      subject: fields[5] as GradeClass,
+      icon: fields[6] as String,
+      primaryColor: fields[7] as String,
+      secondaryColor: fields[8] as String,
+      isVerified: fields[9] as bool,
+      createdAt: fields[10] as DateTime,
+      updatedAt: fields[11] as DateTime,
+      v: fields[12] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Topic obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(13)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.video)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.id)
       ..writeByte(2)
-      ..write(obj.description)
+      ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.tags)
+      ..write(obj.description)
       ..writeByte(4)
-      ..write(obj.subject)
+      ..write(obj.grade)
       ..writeByte(5)
-      ..write(obj.status)
+      ..write(obj.subject)
       ..writeByte(6)
-      ..write(obj.tutor)
+      ..write(obj.icon)
       ..writeByte(7)
-      ..write(obj.createdAt)
+      ..write(obj.primaryColor)
       ..writeByte(8)
-      ..write(obj.slug)
+      ..write(obj.secondaryColor)
       ..writeByte(9)
-      ..write(obj.v)
+      ..write(obj.isVerified)
       ..writeByte(10)
-      ..write(obj.topicId);
+      ..write(obj.createdAt)
+      ..writeByte(11)
+      ..write(obj.updatedAt)
+      ..writeByte(12)
+      ..write(obj.v);
   }
 
   @override

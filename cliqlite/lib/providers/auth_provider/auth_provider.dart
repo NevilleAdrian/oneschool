@@ -12,6 +12,7 @@ import 'package:cliqlite/models/subject/subject.dart';
 import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/models/video_model/video_model.dart';
+import 'package:cliqlite/providers/analytics_provider/analytics_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/providers/video_provider/video_provider.dart';
@@ -82,15 +83,19 @@ class AuthProvider extends ChangeNotifier {
       var data = await _helper.loginUser(emailAddress, password, url, _context);
 
       //Decode token and save user
-      setUser(AuthUser.fromJson(parseJwtPayLoad(data['token'])));
+      setUser(AuthUser.fromJson(parseJwtPayLoad(data['data'])));
 
       //Save decoded user in local storage
       _hiveRepository.add<AuthUser>(name: kUser, key: 'user', item: user);
 
+      //Make call to get grades
+      await getGrades();
+
       //Save token in local storage
-      setToken(data['token']);
+      setToken(data['data']);
 
       print('token:$token');
+      print('user:${user.toJson()}');
       _hiveRepository.add<AppModel>(
           name: kAppDataName, key: 'appModel', item: AppModel(token: token));
 
@@ -110,6 +115,39 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<dynamic> verifyAccount(int token, {String url}) async {
+    try {
+      //Call verify Account
+      var data = await _helper.verifyAccount(token, _context, url: url);
+      return data;
+    } catch (ex) {
+      print('dataz:$ex');
+      throw ApiFailureException(ex);
+    }
+  }
+
+  Future<dynamic> resetPassword(
+      int token, String password, String confirmPassword) async {
+    try {
+      //Call reset Password
+      var data = await _helper.resetPassword(
+          token, password, confirmPassword, _context);
+      return data;
+    } catch (ex) {
+      throw ApiFailureException(ex);
+    }
+  }
+
+  Future<dynamic> resendOtp(String email) async {
+    try {
+      //Call reset Password
+      var data = await _helper.resendOTP(email, _context);
+      return data;
+    } catch (ex) {
+      throw ApiFailureException(ex);
+    }
+  }
+
   Future<dynamic> changePassword(
       String currentPassword, String newPassword, String url) async {
     try {
@@ -123,10 +161,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<dynamic> addUser(String name, int age, String grade) async {
+  Future<dynamic> addUser(
+      String name, int age, String image, String grade) async {
     try {
       //Add child user
-      var data = await _helper.addUser(name, age, grade, token, _context);
+      var data =
+          await _helper.addUser(name, age, image, grade, token, _context);
       return data;
     } catch (ex) {
       throw ApiFailureException(ex);
@@ -135,6 +175,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<dynamic> updateUser(
       String name, int age, String imgUrl, String grade, String childId) async {
+    print('gradeId: $grade');
     try {
       //Add child user
       var data = await _helper.updateUser(
@@ -150,6 +191,7 @@ class AuthProvider extends ChangeNotifier {
     var data = await _helper.getChildren(_context, token);
     print('childrenData: $data');
     data = (data as List).map((e) => Users.fromJson(e)).toList();
+    print('modifiedData: ${data[0].toJson()}');
 
     //Save Children users in local storage
     setUsers(data);
@@ -160,7 +202,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<MainChildUser> getMainChild() async {
     //Get children
-    var data = await _helper.getChildUser(_context, user.id, token);
+    var data = await _helper.getChildUser(_context, token);
     print('childUser: $data');
 
     data = MainChildUser.fromJson(data);
@@ -176,6 +218,7 @@ class AuthProvider extends ChangeNotifier {
   Future<List<Grades>> getGrades() async {
     //Get grades
     var data = await _helper.getGrades(_context);
+    print('grades:$data');
 
     data = (data as List).map((e) => Grades.fromJson(e)).toList();
 
@@ -193,10 +236,11 @@ class AuthProvider extends ChangeNotifier {
     setUsers(null);
 
     SubjectProvider.subject(_context).setSubject(null);
-    SubjectProvider.subject(_context).setSubject(null);
     SubjectProvider.subject(_context).setGrade(null);
     TopicProvider.topic(_context).setTopic(null);
     VideoProvider.video(_context).setVideo(null);
+    AnalyticsProvider.analytics(_context).setTopic(null);
+    AnalyticsProvider.analytics(_context).setSubject(null);
 
     _hiveRepository.clear<AuthUser>(name: kUser);
     _hiveRepository.clear<AppModel>(name: kAppDataName);

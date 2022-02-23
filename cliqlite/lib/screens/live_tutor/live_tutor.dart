@@ -3,16 +3,17 @@ import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/providers/livestream_provider/livestream_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/home/home.dart';
+import 'package:cliqlite/screens/home/notifications.dart';
 import 'package:cliqlite/screens/live_tutor/live_video.dart';
+import 'package:cliqlite/screens/videos/videos.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
-import 'package:cliqlite/utils/dialog_box.dart';
+import 'package:cliqlite/utils/back_arrow.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:indexed/indexed.dart';
 
 class LiveTutor extends StatefulWidget {
   @override
@@ -23,6 +24,8 @@ enum Type { all, subject, online, scheduled }
 
 class _LiveTutorState extends State<LiveTutor> {
   Type type = Type.all;
+
+  String val = 'All';
 
   Future<List<LiveStream>> futureLiveStream;
 
@@ -100,31 +103,53 @@ class _LiveTutorState extends State<LiveTutor> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            BackArrow(
+              text: 'Live Tutor',
+            ),
             Padding(
-              padding: defaultVHPadding,
+              padding: defaultPadding,
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Tutors',
-                        textAlign: TextAlign.center,
-                        style: textStyleSmall.copyWith(
-                            fontSize: 21.0,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                theme.status ? secondaryColor : primaryColor),
-                      ),
-                      InkWell(
-                        onTap: () => onTap(context),
-                        child: Image.asset(
-                          'assets/images/picture.png',
-                        ),
-                      )
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Text(
+                  //       'Tutors',
+                  //       textAlign: TextAlign.center,
+                  //       style: textStyleSmall.copyWith(
+                  //           fontSize: 21.0,
+                  //           fontWeight: FontWeight.w700,
+                  //           color:
+                  //               theme.status ? secondaryColor : primaryColor),
+                  //     ),
+                  //     profilePicture(context)
+                  //   ],
+                  // ),
+
                   kSmallHeight,
+                  Container(
+                    height: 40,
+                    child: ListView.separated(
+                      separatorBuilder: (context, _) => kSmallWidth,
+                      itemCount: liveData.length,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        String name = liveData[index]['name'];
+                        return MenuTabs(
+                          text: name,
+                          groupVal: name,
+                          value: val,
+                          onTap: () {
+                            setState(() {
+                              val = name;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
                   // Row(
                   //   children: [
                   //     SubMenu(
@@ -209,6 +234,46 @@ class _LiveTutorState extends State<LiveTutor> {
                 ],
               ),
             ),
+            kSmallHeight,
+            Divider(
+              thickness: 3,
+            ),
+            kSmallHeight,
+            Padding(
+              padding: defaultPadding,
+              child: Column(
+                children: [
+                  SearchCard(),
+                  kLargeHeight,
+                  Container(
+                    child: ListView.separated(
+                        separatorBuilder: (context, _) => kSmallHeight,
+                        itemCount: 4,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return SwipeItems(
+                            widget: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                    child: SwipeChild(
+                                      height: 150,
+                                      widget: YellowButton(
+                                        text: 'Join Session',
+                                      ),
+                                    ),
+                                    onTap: () => Navigator.pushNamed(
+                                        context, VideoApp.id))
+                              ],
+                            ),
+                          );
+                        }),
+                  )
+                ],
+              ),
+            ),
+
             // kSmallHeight,
             // Padding(
             //   padding: defaultPadding,
@@ -237,113 +302,134 @@ class _LiveTutorState extends State<LiveTutor> {
             //   ),
             // ),
             // kSmallHeight,
-            Padding(
-              padding: defaultPadding,
-              child: Indexer(
-                children: [
-                  Indexed(
-                    index: 3,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        show
-                            ? Positioned(
-                                bottom: -190,
-                                child: Material(
-                                  elevation: 1,
-                                  borderRadius: BorderRadius.circular(30.0),
-                                  color: Colors.white,
-                                  shadowColor: Colors.black,
-                                  child: Container(
-                                    padding: defaultVHPadding.copyWith(
-                                        top: 20, bottom: 20),
-                                    width: 200,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Maths'),
-                                        kSmallHeight,
-                                        Text('English'),
-                                        kSmallHeight,
-                                        Text('Chemistry'),
-                                      ],
-                                    ),
-                                  ),
-                                ))
-                            : Container(),
-                      ],
-                    ),
-                  ),
-                  kSmallHeight,
-                  Container(
-                    height: MediaQuery.of(context).size.height,
-                    child: ListView.separated(
-                        separatorBuilder: (context, int) => kSmallHeight,
-                        itemCount: liveList.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) => InkWell(
-                              onTap: () => liveList[index].tutor.isOnline
-                                  ? onLive(url: liveList[index].broadcastUrl)
-                                  : onPressed(
-                                      startDate:
-                                          liveList[index].appointment.start,
-                                      endDate: liveList[index].appointment.end),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 10),
-                                color: Colors.white,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Image.asset(selectPicture(
-                                            liveList[index].tutor.photo)),
-                                        kSmallWidth,
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              liveList[index].tutor.fullname,
-                                              style: textLightBlack,
-                                            ),
-                                            kSmallHeight,
-                                            Text(
-                                              liveList[index].subject.name,
-                                              style: textExtraLightBlack,
-                                            ),
-                                            kSmallHeight,
-                                            Text(
-                                              liveList[index].tutor.isOnline
-                                                  ? 'Online'
-                                                  : 'Offline',
-                                              style: textExtraLightBlack,
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        liveList[index].tutor.isOnline
-                                            ? SvgPicture.asset(
-                                                'assets/images/svg/tutor-circle.svg')
-                                            : Container()
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )),
-                  )
-                ],
-              ),
-            ),
+            // liveList.isEmpty
+            //     ? Column(
+            //         crossAxisAlignment: CrossAxisAlignment.center,
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           Text(
+            //             'No data available',
+            //           )
+            //         ],
+            //       )
+            //     : Padding(
+            //         padding: defaultPadding,
+            //         child: Indexer(
+            //           children: [
+            //             Indexed(
+            //               index: 3,
+            //               child: Row(
+            //                 mainAxisAlignment: MainAxisAlignment.start,
+            //                 children: [
+            //                   show
+            //                       ? Positioned(
+            //                           bottom: -190,
+            //                           child: Material(
+            //                             elevation: 1,
+            //                             borderRadius:
+            //                                 BorderRadius.circular(30.0),
+            //                             color: Colors.white,
+            //                             shadowColor: Colors.black,
+            //                             child: Container(
+            //                               padding: defaultVHPadding.copyWith(
+            //                                   top: 20, bottom: 20),
+            //                               width: 200,
+            //                               child: Column(
+            //                                 crossAxisAlignment:
+            //                                     CrossAxisAlignment.start,
+            //                                 children: [
+            //                                   Text('Maths'),
+            //                                   kSmallHeight,
+            //                                   Text('English'),
+            //                                   kSmallHeight,
+            //                                   Text('Chemistry'),
+            //                                 ],
+            //                               ),
+            //                             ),
+            //                           ))
+            //                       : Container(),
+            //                 ],
+            //               ),
+            //             ),
+            //             kSmallHeight,
+            //             Container(
+            //               height: MediaQuery.of(context).size.height,
+            //               child: ListView.separated(
+            //                   separatorBuilder: (context, int) => kSmallHeight,
+            //                   itemCount: liveList.length,
+            //                   physics: NeverScrollableScrollPhysics(),
+            //                   itemBuilder: (context, index) => InkWell(
+            //                         onTap: () => liveList[index].tutor.isOnline
+            //                             ? onLive(
+            //                                 url: liveList[index].broadcastUrl)
+            //                             : onPressed(
+            //                                 startDate: liveList[index]
+            //                                     .appointment
+            //                                     .start,
+            //                                 endDate: liveList[index]
+            //                                     .appointment
+            //                                     .end),
+            //                         child: Container(
+            //                           padding: EdgeInsets.symmetric(
+            //                               vertical: 10, horizontal: 10),
+            //                           color: Colors.white,
+            //                           child: Row(
+            //                             mainAxisAlignment:
+            //                                 MainAxisAlignment.spaceBetween,
+            //                             children: [
+            //                               Row(
+            //                                 children: [
+            //                                   Image.asset(selectPicture(
+            //                                       liveList[index].tutor.photo)),
+            //                                   kSmallWidth,
+            //                                   Column(
+            //                                     crossAxisAlignment:
+            //                                         CrossAxisAlignment.start,
+            //                                     children: [
+            //                                       Text(
+            //                                         liveList[index]
+            //                                             .tutor
+            //                                             .fullname,
+            //                                         style: textLightBlack,
+            //                                       ),
+            //                                       kSmallHeight,
+            //                                       Text(
+            //                                         liveList[index]
+            //                                             .subject
+            //                                             .name,
+            //                                         style: textExtraLightBlack,
+            //                                       ),
+            //                                       kSmallHeight,
+            //                                       Text(
+            //                                         liveList[index]
+            //                                                 .tutor
+            //                                                 .isOnline
+            //                                             ? 'Online'
+            //                                             : 'Offline',
+            //                                         style: textExtraLightBlack,
+            //                                       ),
+            //                                     ],
+            //                                   )
+            //                                 ],
+            //                               ),
+            //                               Column(
+            //                                 mainAxisAlignment:
+            //                                     MainAxisAlignment.start,
+            //                                 children: [
+            //                                   liveList[index].tutor.isOnline
+            //                                       ? SvgPicture.asset(
+            //                                           'assets/images/svg/tutor-circle.svg')
+            //                                       : Container()
+            //                                 ],
+            //                               )
+            //                             ],
+            //                           ),
+            //                         ),
+            //                       )),
+            //             )
+            //           ],
+            //         ),
+            //       ),
           ],
         ),
       ),

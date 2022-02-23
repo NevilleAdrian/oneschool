@@ -17,11 +17,11 @@ class HaveAccount extends StatelessWidget {
         children: [
           Text(
             text ?? 'Already have an account?',
-            style: smallPrimaryColor.copyWith(color: blackColor),
+            style: smallPrimaryColor.copyWith(color: greyColor),
           ),
           Text(
-            subText ?? ' Login',
-            style: smallPrimaryColor.copyWith(fontWeight: FontWeight.w700),
+            subText ?? ' Log in',
+            style: smallAccentColor.copyWith(fontWeight: FontWeight.w500),
           )
         ],
       ),

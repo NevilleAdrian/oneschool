@@ -22,12 +22,23 @@ class VideoProvider extends ChangeNotifier {
     var data =
         await _helper.getVideo(_context, AuthProvider.auth(_context).token);
 
-    print('topicsss:$data');
+    print('Videos:$data');
     data = (data as List).map((e) => Video.fromJson(e)).toList();
 
     //Save Topics in local storage
     setVideo(data);
     _hiveRepository.add<List<Video>>(name: kVideo, key: 'video', item: data);
+
+    return data;
+  }
+
+  Future<List<Video>> getTopicVideos(String topicID) async {
+    //Get videos
+    var data = await _helper.getTopicVideos(
+        topicID, _context, AuthProvider.auth(_context).token);
+
+    print('Video Topic Data:$data');
+    data = (data as List).map((e) => Video.fromJson(e)).toList();
 
     return data;
   }

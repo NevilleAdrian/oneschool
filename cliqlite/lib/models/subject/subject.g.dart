@@ -21,18 +21,21 @@ class SubjectAdapter extends TypeAdapter<Subject> {
       id: fields[1] as String,
       name: fields[2] as String,
       description: fields[3] as String,
-      grade: fields[4] as String,
+      grade: fields[4] as Grades,
       createdAt: fields[5] as DateTime,
       slug: fields[6] as String,
       v: fields[7] as int,
       subjectId: fields[8] as String,
+      icon: fields[9] as String,
+      primaryColor: fields[10] as String,
+      secondaryColor: fields[11] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subject obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.photo)
       ..writeByte(1)
@@ -50,7 +53,13 @@ class SubjectAdapter extends TypeAdapter<Subject> {
       ..writeByte(7)
       ..write(obj.v)
       ..writeByte(8)
-      ..write(obj.subjectId);
+      ..write(obj.subjectId)
+      ..writeByte(9)
+      ..write(obj.icon)
+      ..writeByte(10)
+      ..write(obj.primaryColor)
+      ..writeByte(11)
+      ..write(obj.secondaryColor);
   }
 
   @override

@@ -1,19 +1,23 @@
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
+import 'package:cliqlite/models/quiz_active/quiz_active.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
+import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/forgot_password.dart';
+import 'package:cliqlite/screens/auth/verify_account.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/get_started/get_started.dart';
 import 'package:cliqlite/themes/style.dart';
-import 'package:cliqlite/utils/google_button.dart';
+import 'package:cliqlite/utils/constants.dart';
 import 'package:cliqlite/utils/have_account.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
+import 'package:cliqlite/utils/top_bar.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class Login extends StatefulWidget {
   static String id = 'Login';
@@ -31,6 +35,7 @@ class _LoginState extends State<Login> {
   TextEditingController _controllerPassword = new TextEditingController();
   final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   Validations validations = new Validations();
+  HiveRepository _hiveRepository = HiveRepository();
 
   bool isFieldsValid() {
     if (_controllerEmail.text.isNotEmpty && _controllerPassword.text.isNotEmpty)
@@ -65,15 +70,48 @@ class _LoginState extends State<Login> {
           Navigator.pushNamed(context, AppLayout.id);
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
+
             ChildIndex childIndex = ChildIndex.fromJson({"index": 0});
+            QuizActive quizActive = QuizActive.fromJson({"active": true});
+
+            //set bool
             SubjectProvider.subject(context).setIndex(childIndex);
+            QuizProvider.quizProvider(context).setQuizActive(quizActive);
+
+            //Save status in hive
+            _hiveRepository.add<ChildIndex>(
+                name: kIndex, key: 'index', item: childIndex);
+            _hiveRepository.add<QuizActive>(
+                name: kQuizActive, key: 'quizActive', item: quizActive);
+
+            print('${QuizProvider.quizProvider(context).quizActive}');
+            print('${SubjectProvider.subject(context).index.index}');
           });
         }
       } catch (ex) {
         showFlush(context, ex.toString(), primaryColor);
-        setState(() {
-          AuthProvider.auth(context).setIsLoading(false);
-        });
+
+        if (ex.toString() ==
+            'Sorry kindly verify your account before logging in.') {
+          print("hye it's me");
+          var result =
+              await AuthProvider.auth(context).resendOtp(_controllerEmail.text);
+          if (result != null) {
+            setState(() {
+              AuthProvider.auth(context).setIsLoading(false);
+            });
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => VerifyAccount(
+                          email: _controllerEmail.text,
+                        )));
+          }
+        } else {
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+        }
       }
     }
   }
@@ -90,27 +128,30 @@ class _LoginState extends State<Login> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pushNamed(context, GetStarted.id),
-                      child: Icon(
-                        Icons.clear,
-                        color: blackColor,
-                      ),
-                    )
-                  ],
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     InkWell(
+                //       onTap: () => Navigator.pushNamed(context, GetStarted.id),
+                //       child: Icon(
+                //         Icons.clear,
+                //         color: blackColor,
+                //       ),
+                //     )
+                //   ],
+                // ),
+                // kLargeHeight,
+                TopBar(
+                  text: 'Log in',
                 ),
-                kLargeHeight,
-                Text(
-                  'Log in',
-                  textAlign: TextAlign.center,
-                  style: textStyleSmall.copyWith(
-                      fontSize: 21.0,
-                      fontWeight: FontWeight.w700,
-                      color: primaryColor),
-                ),
+                // Text(
+                //   'Log in',
+                //   textAlign: TextAlign.center,
+                //   style: textStyleSmall.copyWith(
+                //       fontSize: 21.0,
+                //       fontWeight: FontWeight.w700,
+                //       color: primaryColor),
+                // ),
                 kLargeHeight,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +159,7 @@ class _LoginState extends State<Login> {
                     TabMenu(
                       text: 'As a Parent',
                       style: type == Type.parent
-                          ? heading18Black
+                          ? smallPrimaryColor.copyWith(fontSize: 18)
                           : headingBigGreyColor,
                       onTap: () {
                         setState(() {
@@ -138,7 +179,7 @@ class _LoginState extends State<Login> {
                     TabMenu(
                       text: 'As a Child',
                       style: type == Type.child
-                          ? heading18Black
+                          ? smallPrimaryColor.copyWith(fontSize: 18)
                           : headingBigGreyColor,
                       onTap: () {
                         setState(() {
@@ -184,10 +225,14 @@ class _LoginState extends State<Login> {
                                 padding: EdgeInsets.only(right: 15),
                                 alignment: Alignment.centerRight,
                                 child: _visible
-                                    ? SvgPicture.asset(
-                                        'assets/images/svg/eye-off.svg')
-                                    : SvgPicture.asset(
-                                        'assets/images/svg/eye.svg'),
+                                    ? Text(
+                                        'Hide',
+                                        style: smallAccentColor,
+                                      )
+                                    : Text(
+                                        'Show',
+                                        style: smallAccentColor,
+                                      ),
                               )),
                         ),
                         kSmallHeight,
@@ -211,60 +256,55 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         kLargeHeight,
-                        LargeButton(
+                        GreenButton(
                           submit: () {
                             nextPage(context);
                           },
                           color: primaryColor,
                           name: 'Log In',
                           buttonColor: secondaryColor,
-                          loader: auth.isLoading
-                              ? CircularProgressIndicator()
-                              : Text(
-                                  'Log In',
-                                  style: headingWhite.copyWith(
-                                    color: secondaryColor,
-                                  ),
-                                ),
+                          loader: auth.isLoading,
                         ),
                         kSmallHeight,
-                        type == Type.parent
-                            ? Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      color: greyColor,
-                                      thickness: 0.5,
-                                    ),
-                                  ),
-                                  kSmallWidth,
-                                  Text(
-                                    'or login with',
-                                    style: textExtraLightBlack,
-                                  ),
-                                  kSmallWidth,
-                                  Expanded(
-                                    child: Divider(
-                                      color: greyColor,
-                                      thickness: 0.5,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Container(),
+                        // type == Type.parent
+                        //     ? Row(
+                        //         children: [
+                        //           Expanded(
+                        //             child: Divider(
+                        //               color: greyColor,
+                        //               thickness: 0.5,
+                        //             ),
+                        //           ),
+                        //           kSmallWidth,
+                        //           Text(
+                        //             'or login with',
+                        //             style: textExtraLightBlack,
+                        //           ),
+                        //           kSmallWidth,
+                        //           Expanded(
+                        //             child: Divider(
+                        //               color: greyColor,
+                        //               thickness: 0.5,
+                        //             ),
+                        //           ),
+                        //         ],
+                        //       )
+                        //     : Container(),
+                        // kSmallHeight,
+                        // type == Type.parent
+                        //     ? GoogleButton(
+                        //         text: 'Log in with Google',
+                        //       )
+                        //     : Container(),
+                        // type == Type.parent ? kLargeHeight :
                         kSmallHeight,
-                        type == Type.parent
-                            ? GoogleButton(
-                                text: 'Log in with Google',
-                              )
-                            : Container(),
-                        type == Type.parent ? kLargeHeight : kSmallHeight,
+
                         HaveAccount(
                           text: "Don't have an account?",
                           subText: " Sign Up",
                           onPressed: () =>
                               Navigator.pushNamed(context, GetStarted.id),
-                        )
+                        ),
                       ],
                     ))
               ],

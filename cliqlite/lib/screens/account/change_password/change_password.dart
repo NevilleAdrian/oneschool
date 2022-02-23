@@ -1,5 +1,5 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
-import 'package:cliqlite/screens/account/account.dart';
+import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/large_button.dart';
@@ -55,7 +55,12 @@ class _ChangePasswordState extends State<ChangePassword> {
                 _confirmPassword.text, 'auth/user/updatepassword');
           }
           if (result != null) {
-            Navigator.pushNamed(context, Account.id);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AppLayout(
+                          index: 3,
+                        )));
             showFlush(context, 'Successfully Changed Password', primaryColor);
 
             setState(() {
@@ -181,18 +186,11 @@ class _ChangePasswordState extends State<ChangePassword> {
                             )),
                       ),
                       kLargeHeight,
-                      LargeButton(
+                      GreenButton(
                         submit: () => nextPage(),
                         color: primaryColor,
                         name: 'Save Changes',
-                        loader: auth.isLoading
-                            ? CircularProgressIndicator()
-                            : Text(
-                                'Save Changes',
-                                style: headingWhite.copyWith(
-                                  color: secondaryColor,
-                                ),
-                              ),
+                        loader: auth.isLoading,
                         buttonColor: secondaryColor,
                       ),
                     ],

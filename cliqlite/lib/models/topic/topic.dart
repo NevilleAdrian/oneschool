@@ -13,66 +13,192 @@ String topicToJson(List<Topic> data) =>
 @HiveType(typeId: 8)
 class Topic {
   Topic({
+    this.video,
     this.id,
-    this.title,
+    this.name,
     this.description,
-    this.tags,
+    this.grade,
     this.subject,
-    this.status,
-    this.tutor,
+    this.icon,
+    this.primaryColor,
+    this.secondaryColor,
+    this.isVerified,
     this.createdAt,
-    this.slug,
+    this.updatedAt,
     this.v,
-    this.topicId,
   });
   @HiveField(0)
-  String id;
+  VideoClass video;
   @HiveField(1)
-  String title;
+  String id;
   @HiveField(2)
-  String description;
+  String name;
   @HiveField(3)
-  List<String> tags;
+  String description;
   @HiveField(4)
-  String subject;
+  GradeClass grade;
   @HiveField(5)
-  String status;
+  GradeClass subject;
   @HiveField(6)
-  String tutor;
+  String icon;
   @HiveField(7)
-  DateTime createdAt;
+  String primaryColor;
   @HiveField(8)
-  String slug;
+  String secondaryColor;
   @HiveField(9)
-  int v;
+  bool isVerified;
   @HiveField(10)
-  String topicId;
+  DateTime createdAt;
+  @HiveField(11)
+  DateTime updatedAt;
+  @HiveField(12)
+  int v;
 
   factory Topic.fromJson(Map<String, dynamic> json) => Topic(
+        video: VideoClass.fromJson(json["video"]),
         id: json["_id"],
-        title: json["title"],
+        name: json["name"],
         description: json["description"],
-        tags: List<String>.from(json["tags"].map((x) => x)),
-        subject: json["subject"],
-        status: json["status"],
-        tutor: json["tutor"],
+        grade: GradeClass.fromJson(json["grade"]),
+        subject: GradeClass.fromJson(json["subject"]),
+        isVerified: json["isVerified"],
+        icon: json["icon"],
+        primaryColor: json["primaryColor"],
+        secondaryColor: json["secondaryColor"],
         createdAt: DateTime.parse(json["createdAt"]),
-        slug: json["slug"],
+        updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
-        topicId: json["id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "video": video.toJson(),
+        "_id": id,
+        "name": name,
+        "description": description,
+        "grade": grade.toJson(),
+        "subject": subject.toJson(),
+        "isVerified": isVerified,
+        "icon": icon,
+        "primaryColor": primaryColor,
+        "secondaryColor": secondaryColor,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "__v": v,
+      };
+}
+
+class VideoClass {
+  VideoClass({
+    this.name,
+    this.url,
+  });
+
+  String name;
+  String url;
+
+  factory VideoClass.fromJson(Map<String, dynamic> json) => VideoClass(
+        name: json["name"],
+        url: json["url"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "url": url,
+      };
+}
+
+class GradeClass {
+  GradeClass({
+    this.id,
+    this.name,
+    this.description,
+  });
+
+  String id;
+  String name;
+  String description;
+
+  factory GradeClass.fromJson(Map<String, dynamic> json) => GradeClass(
+        id: json["_id"],
+        name: json["name"],
+        description: json["description"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
-        "title": title,
+        "name": name,
         "description": description,
-        "tags": List<dynamic>.from(tags.map((x) => x)),
-        "subject": subject,
-        "status": status,
-        "tutor": tutor,
+      };
+}
+
+class TopicSubject {
+  TopicSubject({
+    this.id,
+    this.name,
+    this.photo,
+    this.description,
+    this.grade,
+    this.createdAt,
+    this.slug,
+    this.v,
+    this.subjectId,
+  });
+
+  String id;
+  String name;
+  String photo;
+  String description;
+  String grade;
+  DateTime createdAt;
+  String slug;
+  int v;
+  String subjectId;
+
+  factory TopicSubject.fromJson(Map<String, dynamic> json) => TopicSubject(
+        id: json["_id"],
+        name: json["name"],
+        photo: json["photo"],
+        description: json["description"],
+        grade: json["grade"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        slug: json["slug"],
+        v: json["__v"],
+        subjectId: json["id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "name": name,
+        "photo": photo,
+        "description": description,
+        "grade": grade,
         "createdAt": createdAt.toIso8601String(),
         "slug": slug,
         "__v": v,
-        "id": topicId,
+        "id": subjectId,
+      };
+}
+
+class TopicTutor {
+  TopicTutor({
+    this.id,
+    this.fullname,
+    this.tutorId,
+  });
+
+  String id;
+  String fullname;
+  String tutorId;
+
+  factory TopicTutor.fromJson(Map<String, dynamic> json) => TopicTutor(
+        id: json["_id"],
+        fullname: json["fullname"],
+        tutorId: json["id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "fullname": fullname,
+        "id": tutorId,
       };
 }

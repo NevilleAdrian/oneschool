@@ -7,7 +7,6 @@ import 'package:cliqlite/models/transactions/transactions.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
-import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,21 +18,22 @@ class SubscriptionProvider extends ChangeNotifier {
   NetworkHelper _helper = NetworkHelper();
   static BuildContext _context;
 
-  Subscription _subscription;
+  List<Subscription> _subscription;
   List<AllSubscriptions> _allSubscription;
   List<Transactions> _transactions;
 
-  Subscription get subscription => _subscription;
+  List<Subscription> get subscription => _subscription;
   List<AllSubscriptions> get allSubscription => _allSubscription;
   List<Transactions> get transactions => _transactions;
 
-  setSubscription(Subscription subscription) => _subscription = subscription;
+  setSubscription(List<Subscription> subscription) =>
+      _subscription = subscription;
   setAllSubscription(List<AllSubscriptions> allSubscription) =>
       _allSubscription = allSubscription;
   setTransactions(List<Transactions> transactions) =>
       _transactions = transactions;
 
-  Future<Subscription> getSubscription() async {
+  Future<List<Subscription>> getSubscription() async {
     //initialize childIndex and users
     ChildIndex childIndex = SubjectProvider.subject(_context).index;
     List<Users> children = AuthProvider.auth(_context).users;
@@ -47,7 +47,8 @@ class SubscriptionProvider extends ChangeNotifier {
               : mainChildUser.id,
           AuthProvider.auth(_context).token);
 
-      data = Subscription.fromJson(data);
+      // data = Subscription.fromJson(data);
+      data = (data as List).map((e) => Subscription.fromJson(e)).toList();
 
       print('subscribedData: $data');
 
@@ -56,13 +57,13 @@ class SubscriptionProvider extends ChangeNotifier {
       return data;
     } catch (ex) {
       print('ex: $ex');
-      Navigator.push(
-          _context,
-          MaterialPageRoute(
-              builder: (context) => AppLayout(
-                    index: 4,
-                  )));
-      showFlush(_context, ex.toString(), primaryColor);
+      // Navigator.push(
+      //     _context,
+      //     MaterialPageRoute(
+      //         builder: (context) => AppLayout(
+      //               index: 4,
+      //             )));
+      // showFlush(_context, ex.toString(), primaryColor);
     }
   }
 
@@ -112,6 +113,7 @@ class SubscriptionProvider extends ChangeNotifier {
   //add Subscription
   Future<dynamic> addSubscription(String subId, String childId) async {
     // add a subscription
+
     try {
       var data = await _helper.addSubscription(
           subId, childId, AuthProvider.auth(_context).token, _context);
@@ -120,8 +122,6 @@ class SubscriptionProvider extends ChangeNotifier {
       print('ex:$ex');
       showFlush(
           _context, toBeginningOfSentenceCase(ex.toString()), primaryColor);
-
-      AuthProvider.auth(_context).setIsLoading(false);
     }
   }
 

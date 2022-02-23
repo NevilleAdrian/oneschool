@@ -1,5 +1,5 @@
 ///alpha
-const String kUrl = 'cliq-lite.herokuapp.com';
+const String kUrl = 'cliqlit.herokuapp.com';
 const String kAppUrl = '/api/v1';
 Map<String, String> _headers(String token) {
   return {'Content-type': 'application/json', 'Authorization': 'Bearer $token'};
@@ -18,11 +18,13 @@ const String kSubject = 'subject';
 const String kIndex = 'index';
 const String kSingleGrade = 'singleGrade';
 const String kTopic = 'topic';
+const String kRecent = 'recentTopics';
 const String kVideo = 'video';
 const String kQuiz = 'quiz';
 const String kAnalyticsSubject = 'analyticsSubject';
 const String kAnalyticsTopic = 'analyticsTopic';
 const String kLiveStream = 'liveStream';
+const String kQuizActive = 'quizActive';
 
 class ConstantKey {
   static const String PAYSTACK_KEY =

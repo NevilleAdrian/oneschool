@@ -40,6 +40,8 @@ class LiveStreamProvider extends ChangeNotifier {
 
       data = (data as List).map((e) => LiveStream.fromJson(e)).toList();
 
+      print('streamm:$data');
+
       //Save LiveStream in local storage
       setLiveStream(data);
       _hiveRepository.add<List<LiveStream>>(

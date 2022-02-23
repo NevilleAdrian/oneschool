@@ -1,17 +1,15 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/auth/child_registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
-import 'package:cliqlite/screens/get_started/get_started.dart';
 import 'package:cliqlite/themes/style.dart';
-import 'package:cliqlite/utils/back_arrow.dart';
-import 'package:cliqlite/utils/google_button.dart';
 import 'package:cliqlite/utils/have_account.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
+import 'package:cliqlite/utils/top_bar.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class Registration extends StatefulWidget {
   static String id = 'registration';
@@ -49,6 +47,7 @@ class _RegistrationState extends State<Registration> {
                         email: _controllerEmail.text,
                         phoneNo: _controllerPhone.text,
                         password: _controllerPassword.text,
+                        type: 'parent',
                       )));
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
@@ -73,41 +72,38 @@ class _RegistrationState extends State<Registration> {
           child: Padding(
             padding: defaultVHPadding,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                BackArrow(
-                  onTap: () => Navigator.pushNamed(context, GetStarted.id),
+                TopBar(
+                  text: 'Personal details',
                 ),
                 kSmallHeight,
-                Text(
-                  '01/02',
-                  style: textLightBlack.copyWith(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    LinearPercentIndicator(
+                      lineHeight: 5.0,
+                      percent: 0.5,
+                      progressColor: Color(0xFF09AC2C),
+                    ),
+                  ],
                 ),
-                kSmallHeight,
-                Text(
-                  'Fill in your personal details',
-                  textAlign: TextAlign.center,
-                  style: textStyleSmall.copyWith(
-                      fontSize: 21.0,
-                      fontWeight: FontWeight.w700,
-                      color: primaryColor),
-                ),
-                kSmallHeight,
+                kLargeHeight,
                 Form(
                     key: formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         MyTextForm(
                           controllerName: _controllerName,
                           validations: validations.validateName,
-                          hintText: 'Full Name',
+                          hintText: 'Name',
                         ),
                         kSmallHeight,
                         MyTextForm(
                           controllerName: _controllerEmail,
                           validations: validations.validateEmail,
-                          hintText: 'Email Address',
+                          hintText: 'Email',
                         ),
                         kSmallHeight,
                         MyTextForm(
@@ -134,53 +130,49 @@ class _RegistrationState extends State<Registration> {
                                 padding: EdgeInsets.only(right: 15),
                                 alignment: Alignment.centerRight,
                                 child: _visible
-                                    ? SvgPicture.asset(
-                                        'assets/images/svg/eye-off.svg')
-                                    : SvgPicture.asset(
-                                        'assets/images/svg/eye.svg'),
+                                    ? Text(
+                                        'Hide',
+                                        style: smallAccentColor,
+                                      )
+                                    : Text(
+                                        'Show',
+                                        style: smallAccentColor,
+                                      ),
                               )),
                         ),
                         kSmallHeight,
-                        LargeButton(
+                        GreenButton(
                           submit: () => nextPage(),
                           color: primaryColor,
-                          name: 'Next',
-                          buttonColor: secondaryColor,
-                          loader: auth.isLoading
-                              ? CircularProgressIndicator()
-                              : Text(
-                                  'Next',
-                                  style: headingWhite.copyWith(
-                                    color: secondaryColor,
-                                  ),
-                                ),
+                          name: 'Sign Up',
+                          loader: auth.isLoading,
                         ),
                         kSmallHeight,
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: greyColor,
-                                thickness: 0.5,
-                              ),
-                            ),
-                            kSmallWidth,
-                            Text(
-                              'or sign up with',
-                              style: textExtraLightBlack,
-                            ),
-                            kSmallWidth,
-                            Expanded(
-                              child: Divider(
-                                color: greyColor,
-                                thickness: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        kSmallHeight,
-                        GoogleButton(),
-                        kSmallHeight,
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: Divider(
+                        //         color: greyColor,
+                        //         thickness: 0.5,
+                        //       ),
+                        //     ),
+                        //     kSmallWidth,
+                        //     Text(
+                        //       'or sign up with',
+                        //       style: textExtraLightBlack,
+                        //     ),
+                        //     kSmallWidth,
+                        //     Expanded(
+                        //       child: Divider(
+                        //         color: greyColor,
+                        //         thickness: 0.5,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // kSmallHeight,
+                        // GoogleButton(),
+                        // kSmallHeight,
                         HaveAccount()
                       ],
                     ))

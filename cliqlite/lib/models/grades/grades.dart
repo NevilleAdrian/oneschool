@@ -16,10 +16,9 @@ class Grades {
     this.id,
     this.name,
     this.description,
-    this.photo,
-    this.createdAt,
-    this.v,
-    this.gradeId,
+    // this.photo,
+    // this.createdAt,
+    // this.v,
   });
 
   @HiveField(0)
@@ -28,32 +27,28 @@ class Grades {
   String name;
   @HiveField(2)
   String description;
-  @HiveField(3)
-  String photo;
-  @HiveField(4)
-  DateTime createdAt;
-  @HiveField(5)
-  int v;
-  @HiveField(6)
-  String gradeId;
+  // @HiveField(3)
+  // String photo;
+  // @HiveField(4)
+  // DateTime createdAt;
+  // @HiveField(5)
+  // int v;
 
   factory Grades.fromJson(Map<String, dynamic> json) => Grades(
-        id: json["_id"],
-        name: json["name"],
-        description: json["description"],
-        photo: json["photo"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        v: json["__v"],
-        gradeId: json["id"],
+        id: json["_id"] ?? '',
+        name: json["name"] ?? '',
+        description: json["description"] ?? '',
+        // photo: json["photo"] ?? '',
+        //   createdAt: DateTime.parse(json["createdAt"]) ?? DateTime.now(),
+        //   v: json["__v"] ?? 0,
+        // );
       );
-
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
         "description": description,
-        "photo": photo,
-        "createdAt": createdAt.toIso8601String(),
-        "__v": v,
-        "id": gradeId,
+        // "photo": photo,
+        // "createdAt": createdAt.toIso8601String(),
+        // "__v": v,
       };
 }

@@ -3,6 +3,7 @@ import 'package:cliqlite/models/analytics/analytics_subject/analytics_subject.da
 import 'package:cliqlite/models/analytics/analytics_topic/analytics_topic.dart';
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
+import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
@@ -17,13 +18,13 @@ class AnalyticsProvider extends ChangeNotifier {
   HiveRepository _hiveRepository = HiveRepository();
 
   List<AnalyticSubject> _subject = [];
-  List<AnalyticTopic> _topic = [];
+  AnalyticTopic _topic;
 
   List<AnalyticSubject> get subject => _subject;
-  List<AnalyticTopic> get topic => _topic;
+  AnalyticTopic get topic => _topic;
 
   setSubject(List<AnalyticSubject> subject) => _subject = subject;
-  setTopic(List<AnalyticTopic> topic) => _topic = topic;
+  setTopic(AnalyticTopic topic) => _topic = topic;
 
   Future<List<AnalyticSubject>> getSubject() async {
     //ChildIndex and Users
@@ -53,7 +54,7 @@ class AnalyticsProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<AnalyticTopic>> getTopic() async {
+  Future<AnalyticTopic> getTopic() async {
     try {
       //ChildIndex and Users
       ChildIndex childIndex = SubjectProvider.subject(_context).index;
@@ -68,11 +69,15 @@ class AnalyticsProvider extends ChangeNotifier {
 
       print('Topics:$data');
 
-      data = (data as List).map((e) => AnalyticTopic.fromJson(e)).toList();
+      if (data?.isEmpty ?? true) {
+        data = AnalyticTopic.fromJson(analyticData);
+      } else {
+        data = AnalyticTopic.fromJson(data);
+      }
 
       //Save Topics in local storage
       setTopic(data);
-      _hiveRepository.add<List<AnalyticTopic>>(
+      _hiveRepository.add<AnalyticTopic>(
           name: kAnalyticsTopic, key: 'analyticsTopic', item: data);
 
       return data;

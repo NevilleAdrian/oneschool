@@ -1,14 +1,21 @@
+import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/home/home.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
+import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/outline_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
+import 'package:cliqlite/utils/text_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class QuizResult extends StatefulWidget {
@@ -40,11 +47,19 @@ class _QuizResultState extends State<QuizResult> {
 
   @override
   void initState() {
+    print('topicID:${widget.topicId}');
     super.initState();
   }
 
   submitQuiz({bool type}) async {
-    //Set Loader
+    // if (type) {
+    //   //Route to home page
+    //   newQuiz();
+    // } else {
+    //   //Take Quiz again
+    //   retakeQuiz();
+    // }
+    // Set Loader
     setState(() {
       AuthProvider.auth(context).setIsLoading(true);
     });
@@ -73,10 +88,23 @@ class _QuizResultState extends State<QuizResult> {
     }
   }
 
+  int calculateScore() {
+    return ((widget.score / widget.aggregate) * 100).ceil();
+  }
+
+  bool showPass() {
+    if (calculateScore() > 50) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeProvider theme = ThemeProvider.themeProvider(context);
     AuthProvider auth = AuthProvider.auth(context);
+    List<Topic> _topic = TopicProvider.topic(context).topics;
 
     return BackgroundImage(
       child: ModalProgressHUD(
@@ -88,74 +116,161 @@ class _QuizResultState extends State<QuizResult> {
         child: SingleChildScrollView(
           child: SafeArea(
             child: Padding(
-              padding: defaultVHPadding.copyWith(left: 60, right: 60),
+              padding: defaultVHPadding,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Image.asset(
+                      'assets/images/${showPass() ? 'pass' : 'fail'}.png'),
+                  kSmallHeight,
                   Text(
-                    'Quiz Result',
+                    showPass() ? 'Congratulations' : 'You can do better!',
                     textAlign: TextAlign.center,
                     style: textStyleSmall.copyWith(
                         fontSize: 21.0,
                         fontWeight: FontWeight.w700,
-                        color: theme.status ? secondaryColor : primaryColor),
-                  ),
-                  kLargeHeight,
-                  Image.asset('assets/images/trophy.png'),
-                  kSmallHeight,
-                  Text(
-                    'Congratulations!',
-                    style: textLightBlack.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 21,
-                        color: theme.status ? whiteColor : blackColor),
-                    textAlign: TextAlign.center,
-                  ),
-                  kSmallHeight,
-                  Text(
-                    'Lorem ipsum dolor sit ame, consectr adipisc ing elit.',
-                    style: textExtraLightBlack.copyWith(
-                        fontSize: 18.0,
-                        color: theme.status ? whiteColor : blackColor),
-                    textAlign: TextAlign.center,
+                        color: showPass() ? primaryColor : redColor),
                   ),
                   kSmallHeight,
                   Container(
-                    height: 1,
-                    width: 25.0,
-                    color: secondaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: showPass() ? secondaryColor : lightRedColor),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Your score',
+                          textAlign: TextAlign.center,
+                          style: textStyleSmall.copyWith(
+                              fontSize: 21.0,
+                              fontWeight: FontWeight.w700,
+                              color: showPass() ? primaryColor : redColor),
+                        ),
+                        kSmallHeight,
+                        Text(
+                          '${calculateScore()}%',
+                          textAlign: TextAlign.center,
+                          style: smallAccentColor.copyWith(
+                              fontSize: 36.0,
+                              color: showPass() ? accentColor : redColor),
+                        )
+                      ],
+                    ),
                   ),
                   kSmallHeight,
-                  Text(
-                    'YOUR SCORE',
-                    style: textExtraLightBlack.copyWith(
-                        fontSize: 18.0,
-                        color: theme.status ? whiteColor : blackColor),
-                    textAlign: TextAlign.center,
-                  ),
-                  kSmallHeight,
-                  Text(
-                    '${widget.score} / ${widget.aggregate}',
-                    textAlign: TextAlign.center,
-                    style: textStyleSmall.copyWith(
-                        fontSize: 26.0,
-                        fontWeight: FontWeight.w700,
-                        color: primaryColor),
+                  Padding(
+                    padding: defaultPadding,
+                    child: RichText(
+                      text: TextSpan(
+                          text: 'Summary: ',
+                          style: headingSmallGreyColor.copyWith(
+                              color: greyishColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text:
+                                  'You answered ${widget.score} question(s) correctly out of ${widget.aggregate} attempted questions',
+                              style:
+                                  headingSmallGreyColor.copyWith(fontSize: 14),
+                            )
+                          ]),
+                    ),
                   ),
                   kLargeHeight,
-                  LargeButton(
-                    submit: () => submitQuiz(type: true),
+                  GreenButton(
+                    submit: () => submitQuiz(type: false),
                     color: primaryColor,
                     name: 'Take new quiz',
                     height: 45,
                     buttonColor: secondaryColor,
+                    loader: false,
                   ),
                   kSmallHeight,
-                  LineButton(
-                    onPressed: () => submitQuiz(type: false),
-                    height: 45.0,
-                    text: 'Retake',
-                  )
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      BorderButton(
+                        onTap: () => submitQuiz(type: true),
+                        height: 15,
+                        text: 'Return to lesson',
+                      ),
+                    ],
+                  ),
+                  kLargeHeight,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      TextBox(
+                        text: 'More lessons to help you',
+                      ),
+                    ],
+                  ),
+                  kSmallHeight,
+                  _topic == null
+                      ? Container()
+                      : Container(
+                          height: 140,
+                          child: ListView.separated(
+                              separatorBuilder: (context, _) => kSmallWidth,
+                              itemCount: _topic?.length,
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return SwipeItems(
+                                  borderHeight: 80,
+                                  borderWidth: 90,
+                                  primaryColor: Color(int.parse(
+                                      '0XFF${_topic[index].primaryColor}')),
+                                  secondaryColor: Color(int.parse(
+                                      '0XFF${_topic[index].secondaryColor}')),
+                                  widget: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                          child: SwipeChild(
+                                            height: 120,
+                                            subject: _topic[index].subject.name,
+                                            time:
+                                                '${DateFormat('mm').format(_topic[0].createdAt)} mins',
+                                            slug: _topic[index].icon,
+                                            topic: _topic[index].name,
+                                          ),
+                                          onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VideoFullScreen(
+                                                        topic: _topic[index],
+                                                      ))))
+                                    ],
+                                  ),
+                                );
+                              }),
+                        )
+
+                  // Container(
+                  //   height: 140,
+                  //   child: ListView.separated(
+                  //       separatorBuilder: (context, _) => kSmallWidth,
+                  //       itemCount: 4,
+                  //       shrinkWrap: true,
+                  //       scrollDirection: Axis.horizontal,
+                  //       itemBuilder: (context, index) {
+                  //         return InkWell(
+                  //           onTap: () => submitQuiz(type: true),
+                  //           child: SwipeItems(
+                  //             widget: Column(
+                  //               mainAxisAlignment: MainAxisAlignment.center,
+                  //               children: [SwipeChild()],
+                  //             ),
+                  //           ),
+                  //         );
+                  //       }),
+                  // ),
                 ],
               ),
             ),

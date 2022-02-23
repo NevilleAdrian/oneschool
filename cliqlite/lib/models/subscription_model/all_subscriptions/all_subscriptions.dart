@@ -14,44 +14,36 @@ String allSubscriptionsToJson(List<AllSubscriptions> data) =>
 class AllSubscriptions {
   AllSubscriptions({
     this.id,
-    this.title,
-    this.description,
-    this.amount,
-    this.duration,
+    this.type,
+    this.price,
     this.createdAt,
-    this.slug,
+    this.updatedAt,
     this.v,
   });
 
   String id;
-  String title;
-  String description;
-  int amount;
-  String duration;
+  String type;
+  int price;
   DateTime createdAt;
-  String slug;
+  DateTime updatedAt;
   int v;
 
   factory AllSubscriptions.fromJson(Map<String, dynamic> json) =>
       AllSubscriptions(
         id: json["_id"],
-        title: json["title"],
-        description: json["description"],
-        amount: json["amount"],
-        duration: json["duration"],
+        type: json["name"],
+        price: json["price"],
         createdAt: DateTime.parse(json["createdAt"]),
-        slug: json["slug"],
+        updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
-        "title": title,
-        "description": description,
-        "amount": amount,
-        "duration": duration,
+        "type": type,
+        "price": price,
         "createdAt": createdAt.toIso8601String(),
-        "slug": slug,
+        "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };
 }

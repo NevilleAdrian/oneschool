@@ -28,116 +28,121 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundImage(
-      child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: PageView(
-                  controller: pageViewController,
-                  onPageChanged: (page) {
-                    setState(() {
-                      _currentPage = page;
-                    });
-                  },
+    return OnBoardingBackground(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: _currentPage >= 2
+            ? CrossAxisAlignment.stretch
+            : CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            height: 500,
+            child: PageView(
+              controller: pageViewController,
+              onPageChanged: (page) {
+                setState(() {
+                  _currentPage = page;
+                });
+              },
+              children: <Widget>[
+                OnboardItem(
+                  image: "assets/images/svg/Learn_From_Home_1_.svg",
+                  title:
+                      "Access a Video Library of Your Favorite School Subjects",
+                  description:
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                ),
+                OnboardItem(
+                  image: "assets/images/svg/Online_Courses_1_.svg",
+                  title: "Learn From The Best Lesson Tutors ",
+                  description:
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                ),
+                OnboardItem(
+                  image: "assets/images/svg/Student_Desk_1_.svg",
+                  title: "Test Yourself With The In-App Quiz",
+                  description:
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 9),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
                   children: <Widget>[
-                    OnboardItem(
-                      image: "assets/images/svg/onboarding-1.svg",
-                      title: "Lorem Ipsum Dolor",
-                      description:
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                    PageNavIndicator(
+                      active: _currentPage == 0,
                     ),
-                    OnboardItem(
-                      image: "assets/images/svg/onboarding-3.svg",
-                      title: "Lorem Ipsum Dolor",
-                      description:
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                    SizedBox(width: 5),
+                    PageNavIndicator(
+                      active: _currentPage == 1,
                     ),
-                    OnboardItem(
-                      image: "assets/images/svg/onboarding-2.svg",
-                      title: "Lorem Ipsum Dolor",
-                      description:
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                    SizedBox(width: 5),
+                    PageNavIndicator(
+                      active: _currentPage == 2,
                     ),
                   ],
                 ),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      PageNavIndicator(
-                        active: _currentPage == 0,
-                      ),
-                      SizedBox(width: 5),
-                      PageNavIndicator(
-                        active: _currentPage == 1,
-                      ),
-                      SizedBox(width: 5),
-                      PageNavIndicator(
-                        active: _currentPage == 2,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50, vertical: 20),
-                    child: FlatButton(
-                      // splashColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      onPressed: () {
-                        if (_currentPage >= 2) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GetStarted()),
-                          );
-                          first = AuthProvider.auth(context)
-                              .myFirst(FirstTime.fromJson({"bool": true}));
-                          _hiveRepository.add<FirstTime>(
-                              name: kFirst, key: 'first', item: first);
-                          return;
-                        }
-                        pageViewController.nextPage(
-                          curve: Curves.easeIn,
-                          duration: Duration(milliseconds: 250),
-                        );
-                      },
-                      color:
-                          _currentPage >= 2 ? primaryColor : Colors.transparent,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Text(
-                          _currentPage < 2 ? "Skip" : "Get Started",
-                          style: TextStyle(
-                              color: _currentPage >= 2
-                                  ? secondaryColor
-                                  : blackColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
               ],
-            )
-          ],
-        ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+            child: GestureDetector(
+              onTap: () {
+                if (_currentPage >= 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GetStarted()),
+                  );
+                  first = AuthProvider.auth(context)
+                      .myFirst(FirstTime.fromJson({"bool": true}));
+                  _hiveRepository.add<FirstTime>(
+                      name: kFirst, key: 'first', item: first);
+                  return;
+                }
+                pageViewController.nextPage(
+                  curve: Curves.easeIn,
+                  duration: Duration(milliseconds: 250),
+                );
+              },
+              child: Container(
+                // splashColor: Colors.transparent,
+                decoration: BoxDecoration(
+                  color: _currentPage >= 2 ? primaryColor : secondaryColor,
+                  borderRadius: BorderRadius.circular(15),
+                  gradient: _currentPage >= 2
+                      ? const LinearGradient(
+                          colors: [
+                            Color(0XFF07AB2C),
+                            Color(0XFF69E905),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  child: Text(
+                    _currentPage < 2 ? "Skip" : "Get Started",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color:
+                            _currentPage >= 2 ? secondaryColor : accentColor),
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -157,7 +162,7 @@ class PageNavIndicator extends StatelessWidget {
       duration: Duration(milliseconds: 200),
       curve: Curves.easeIn,
       decoration: BoxDecoration(
-        color: active ? primaryColor : Color(0xFFDFDFDF),
+        color: active ? accentColor : Color(0xFFDFDFDF),
         borderRadius: new BorderRadius.circular(8.0),
         // border: new Border.all(
         //   width: 2.0,
@@ -184,44 +189,46 @@ class OnboardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              child: SvgPicture.asset(
-                image,
-                // height: 350.0,
-                // width: double.infinity,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.center,
+            child: SvgPicture.asset(
+              image,
+              width: 235,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: textStyleSmall.copyWith(
-                    fontSize: 23.0,
-                    fontWeight: FontWeight.w700,
-                    color: primaryColor),
-              ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(description,
+          ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                ),
+                child: Text(
+                  title,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: blackColor,
-                      fontSize: 17.0,
-                      fontWeight: FontWeight.w400)),
-            ),
-          ],
-        ),
+                  style: textStyleSmall.copyWith(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w600,
+                      color: primaryColor),
+                ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: greyishColor,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w400)),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -13,23 +13,21 @@ class BackArrow extends StatelessWidget {
     ThemeProvider theme = ThemeProvider.themeProvider(context);
 
     return InkWell(
-      onTap: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.arrow_back_ios,
-            color: theme.status ? whiteColor : blackColor,
-            size: 15,
+        onTap: onTap ?? () => Navigator.pop(context),
+        child: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: Icon(
+            Icons.arrow_back_outlined,
+            color: blackColor,
           ),
-          Text(
-            text ?? 'Back',
-            style: theme.status
-                ? textStyleWhite
-                : textLightBlack.copyWith(fontWeight: FontWeight.w400),
-          )
-        ],
-      ),
-    );
+          title: Text(
+            text ?? '',
+            style: textStyleSmall.copyWith(
+                fontSize: 21.0,
+                fontWeight: FontWeight.w600,
+                color: primaryColor),
+          ),
+        ));
   }
 }

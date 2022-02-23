@@ -1,6 +1,5 @@
 import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SearchBox extends StatelessWidget {
   const SearchBox(
@@ -28,24 +27,26 @@ class SearchBox extends StatelessWidget {
       padding: padding ?? defaultPadding,
       child: Material(
         elevation: 1,
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(15.0),
         color: Colors.white,
         shadowColor: Colors.black,
         child: Container(
           padding:
-              defaultVHPadding.copyWith(top: size ?? 15, bottom: size ?? 15),
+              defaultVHPadding.copyWith(top: size ?? 20, bottom: size ?? 20),
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/images/svg/search.svg',
-              ),
-              SizedBox(
-                width: 10,
-              ),
+              // SvgPicture.asset(
+              //   'assets/images/svg/search.svg',
+              // ),
+              // SizedBox(
+              //   width: 10,
+              // ),
               type == 'route'
-                  ? Text(
-                      placeholder ?? 'Search for Subject',
-                      style: headingSmallGreyColor.copyWith(fontSize: 15),
+                  ? Expanded(
+                      child: Text(
+                        placeholder ?? 'Search for Subject',
+                        style: headingSmallGreyColor.copyWith(fontSize: 15),
+                      ),
                     )
                   : Expanded(
                       child: TextFormField(

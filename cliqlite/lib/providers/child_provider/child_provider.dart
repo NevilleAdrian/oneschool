@@ -3,7 +3,11 @@ import 'package:provider/provider.dart';
 
 class ChildProvider extends ChangeNotifier {
   List<dynamic> _children = [
-    {"name": " Dara", "image_url": "assets/images/picture.png"}
+    {
+      "name": " Dara",
+      "image_url":
+          "https://images.pexels.com/photos/8065871/pexels-photo-8065871.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+    }
   ];
   List<dynamic> get children => _children;
 

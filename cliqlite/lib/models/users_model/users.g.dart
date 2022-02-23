@@ -27,13 +27,14 @@ class UsersAdapter extends TypeAdapter<Users> {
       role: fields[7] as String,
       photo: fields[8] as String,
       createdAt: fields[9] as DateTime,
+      isActive: fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Users obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class UsersAdapter extends TypeAdapter<Users> {
       ..writeByte(8)
       ..write(obj.photo)
       ..writeByte(9)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.isActive);
   }
 
   @override

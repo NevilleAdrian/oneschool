@@ -13,7 +13,7 @@ import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 
-enum Attribute { yearly, monthly }
+enum Attribute { yearly, monthly, quaterly }
 
 class MakeSubscription extends StatefulWidget {
   static String id = 'make_subscription';
@@ -26,6 +26,7 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
   String subId;
   String childId;
   int amount;
+  int number = 0;
 
   @override
   void initState() {
@@ -71,7 +72,7 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                 InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Icon(
-                      Icons.chevron_left,
+                      Icons.arrow_back_outlined,
                       color: blackColor,
                     )),
                 Text(
@@ -88,7 +89,7 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
             kLargeHeight,
             Text(
               'Choose your Plan',
-              style: textExtraLightBlack.copyWith(fontSize: 18),
+              style: headingPrimaryColor.copyWith(fontSize: 18),
             ),
             kSmallHeight,
             Expanded(
@@ -98,52 +99,56 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                   itemBuilder: (context, index) {
                     final sub = subscription.allSubscription[index];
                     return SubscriptionBox(
-                        title: sub.title == "Monthly Subscription"
+                        title: sub.type == "monthly"
                             ? 'Monthly'
-                            : 'Yearly',
-                        type: sub.title == "Monthly Subscription"
-                            ? 'month'
-                            : 'year',
+                            : (sub.type == "yearly" ? 'Yearly' : 'Quarterly'),
+                        type: sub.type == "monthly"
+                            ? 'Monthly'
+                            : (sub.type == "yearly" ? 'Yearly' : 'Quarterly'),
                         subTitle: addSeparator(toDecimalPlace(
-                            double.parse(sub.amount.toString()))),
-                        attribute: sub.title == "Monthly Subscription"
+                            int.parse(sub.price.toString()) ?? 0)),
+                        attribute: sub.type == "monthly"
                             ? Attribute.monthly
-                            : Attribute.yearly,
+                            : (sub.type == "yearly"
+                                ? Attribute.yearly
+                                : Attribute.quaterly),
                         groupVal: val,
                         decoration: decoration.copyWith(
-                            borderRadius: BorderRadius.circular(40),
-                            color: whiteColor,
-                            border: Border.all(color: secondaryColor)),
-                        val: sub.title == "Monthly Subscription"
+                            borderRadius: BorderRadius.circular(20),
+                            color: lightPrimaryColor,
+                            border: Border.all(
+                                color: subscription.allSubscription[number] ==
+                                        subscription.allSubscription[index]
+                                    ? accentColor
+                                    : Colors.transparent)),
+                        val: sub.type == "monthly"
                             ? Attribute.monthly
-                            : Attribute.yearly,
+                            : (sub.type == "yearly"
+                                ? Attribute.yearly
+                                : Attribute.quaterly),
                         onChanged: (Attribute value) {
                           setState(() {
                             val = value;
-                            subId = val == Attribute.monthly
-                                ? subscription.allSubscription[1].id
-                                : subscription.allSubscription[0].id;
-                            amount = val == Attribute.monthly
-                                ? subscription.allSubscription[1].amount
-                                : subscription.allSubscription[0].amount;
+                            number = index;
+
+                            print('number:$number');
+                            print('number:$index');
+                            // subId = val == Attribute.monthly
+                            //     ? subscription.allSubscription[1].id
+                            //     : subscription.allSubscription[0].id;
+                            subId = sub.id;
+                            amount = sub.price;
                           });
                         });
                   }),
             ),
             kSmallHeight,
-            LargeButton(
-              submit: () => nextPage(),
+            GreenButton(
+              submit: () => nextPage(context),
               color: primaryColor,
-              name: 'Proceed',
+              name: 'Continue',
               buttonColor: secondaryColor,
-              loader: auth.isLoading
-                  ? CircularProgressIndicator()
-                  : Text(
-                      'Proceed',
-                      style: headingWhite.copyWith(
-                        color: secondaryColor,
-                      ),
-                    ),
+              loader: AuthProvider.auth(context).isLoading,
             ),
           ],
         ),
@@ -151,14 +156,17 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
     );
   }
 
-  nextPage() async {
+  nextPage(BuildContext context) async {
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
+    AuthProvider.auth(context).setIsLoading(true);
     try {
+      setState(() {});
+
       MakePayment(
         ctx: context,
-        amount: amount ?? subscription.allSubscription[0].amount,
+        amount: amount ?? subscription.allSubscription[0].price,
         email: AuthProvider.auth(context).user.email,
-      ).chargeCardAndMakePayment(subId, childId);
+      ).chargeCardAndMakePayment(subId, childId, context);
     } catch (ex) {
       setState(() {
         AuthProvider.auth(context).setIsLoading(false);
@@ -211,42 +219,47 @@ class SubscriptionBox extends StatelessWidget {
     return Material(
       color: Colors.white,
       shadowColor: secondaryColor,
-      elevation: 1,
-      borderRadius: BorderRadius.circular(40),
+      elevation: 0,
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         decoration: decoration,
-        padding: EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 40),
+        padding: EdgeInsets.only(left: 20, right: 10, top: 0, bottom: 40),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: textExtraLightBlack.copyWith(fontSize: 18),
-                ),
-                kSmallHeight,
-                Text(
-                  '₦$subTitle/$type',
-                  style: textLightBlack.copyWith(fontSize: 18),
-                ),
-                kVerySmallHeight,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '1 quiz trial then ₦$subTitle',
-                      style: textExtraLightBlack.copyWith(fontSize: 16),
-                    ),
-                    Text(
-                      'per month. Cancel anytime.',
-                      style: textExtraLightBlack.copyWith(fontSize: 16),
-                    ),
-                  ],
-                )
-              ],
+            Container(
+              padding: EdgeInsets.only(top: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: smallAccentColor.copyWith(fontSize: 16),
+                  ),
+                  kSmallHeight,
+                  Text(
+                    '₦$subTitle/$type',
+                    style: smallPrimaryColor.copyWith(
+                        fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  kSmallHeight,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '1 quiz trial then ₦$subTitle per ',
+                        style: smallPrimaryColor.copyWith(fontSize: 16),
+                      ),
+                      Text(
+                        '$type per child. Cancel anytime.',
+                        style: smallPrimaryColor.copyWith(fontSize: 16),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -255,7 +268,7 @@ class SubscriptionBox extends StatelessWidget {
                 Radio(
                   value: attribute,
                   groupValue: groupVal,
-                  activeColor: secondaryColor,
+                  activeColor: accentColor,
                   onChanged: onChanged,
                 ),
                 Container(

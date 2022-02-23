@@ -17,6 +17,7 @@ class MyTextForm extends StatelessWidget {
     this.fillColor,
     this.enabled,
     this.borderWidth,
+    this.readonly,
   })  : _controllerName = controllerName,
         super(key: key);
 
@@ -33,6 +34,7 @@ class MyTextForm extends StatelessWidget {
   final Color fillColor;
   final Color enabled;
   final double borderWidth;
+  final bool readonly;
 
   @override
   Widget build(BuildContext context) {
@@ -43,24 +45,25 @@ class MyTextForm extends StatelessWidget {
         validator: validations,
         obscureText: obscureText,
         maxLines: area,
+        readOnly: readonly ?? false,
         decoration: InputDecoration(
             floatingLabelBehavior: FloatingLabelBehavior.always,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
-                30.0,
+                8.0,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30.0),
+              borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(
                 color: enabled ?? greyColor,
-                width: borderWidth ?? 1.0,
+                width: borderWidth ?? 0.3,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30.0),
+              borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(
-                color: enabled ?? primaryColor,
+                color: enabled ?? accentColor,
                 width: borderWidth ?? 1.0,
               ),
             ),
@@ -68,7 +71,7 @@ class MyTextForm extends StatelessWidget {
             prefix: prefixIcon,
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             hintText: hintText,
-            fillColor: fillColor ?? Colors.transparent,
+            fillColor: fillColor ?? lightPrimaryColor,
             filled: true,
             labelStyle: TextStyle(color: Colors.grey),
             hintStyle: TextStyle(

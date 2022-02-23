@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoApp extends StatefulWidget {
+  static String id = "video-app";
+
   final String url;
   VideoApp({this.url});
 
@@ -17,7 +19,8 @@ class _VideoAppState extends State<VideoApp> {
   void initState() {
     // 'http://static.france24.com/live/F24_EN_LO_HLS/live_web.m3u8'
     super.initState();
-    _controller = VideoPlayerController.network(widget.url)
+    _controller = VideoPlayerController.network(
+        'http://static.france24.com/live/F24_EN_LO_HLS/live_web.m3u8')
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});

@@ -2,9 +2,9 @@ import 'package:cliqlite/screens/auth/child_registration.dart';
 import 'package:cliqlite/screens/auth/registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
-import 'package:cliqlite/utils/have_account.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class GetStarted extends StatefulWidget {
   static String id = 'get-started';
@@ -34,72 +34,91 @@ class _GetStartedState extends State<GetStarted> {
   Widget build(BuildContext context) {
     return BackgroundImage(
       child: SafeArea(
-        child: Padding(
-          padding: defaultVHPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(Icons.clear, color: blackColor),
-                ],
-              ),
-              kSmallHeight,
-              Text(
-                'Get Started',
-                textAlign: TextAlign.center,
-                style: textStyleSmall.copyWith(
-                    fontSize: 23.0,
-                    fontWeight: FontWeight.w700,
-                    color: primaryColor),
-              ),
-              kLargeHeight,
-              OptionBox(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: defaultVHPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Get Started',
+                  textAlign: TextAlign.center,
+                  style: textStyleSmall.copyWith(
+                      fontSize: 23.0,
+                      fontWeight: FontWeight.w700,
+                      color: primaryColor),
+                ),
+                kLargeHeight,
+                OptionBox(
                   title: 'I am a Parent',
                   subTitle: 'I want to set up my child’s account',
+                  img: 'assets/images/parents.png',
                   attribute: Attribute.parent,
                   groupVal: val,
                   decoration: decoration.copyWith(
-                      borderRadius: BorderRadius.circular(40),
-                      border: Border.all(
-                          color: val == Attribute.parent
-                              ? primaryColor
-                              : greyColor)),
-                  val: Attribute.parent,
-                  onChanged: (Attribute value) {
+                      borderRadius: BorderRadius.circular(8),
+                      color: lightPrimaryColor,
+                      border: Border.all(color: secondaryColor)),
+                  onChanged: () {
                     setState(() {
-                      val = value;
+                      val = Attribute.parent;
                     });
-                  }),
-              kSmallHeight,
-              OptionBox(
-                  title: 'I am a Student/Child',
-                  subTitle: 'I want to set up my own account',
-                  attribute: Attribute.child,
-                  decoration: decoration.copyWith(
-                      borderRadius: BorderRadius.circular(40),
-                      border: Border.all(
-                          color: val == Attribute.child
-                              ? primaryColor
-                              : greyColor)),
-                  groupVal: val,
-                  val: Attribute.child,
-                  onChanged: (Attribute value) {
-                    setState(() {
-                      val = value;
-                    });
-                  }),
-              kLargeHeight,
-              LargeButton(
-                submit: () => nextPage(val),
-                color: primaryColor,
-                name: 'Continue',
-                buttonColor: secondaryColor,
-              ),
-              kLargeHeight,
-              HaveAccount()
-            ],
+                    print('val: $val');
+                  },
+                ),
+                kSmallHeight,
+                OptionBox(
+                    title: 'I am a Student/Child',
+                    subTitle: 'I want to set up my own account',
+                    img: 'assets/images/children 1.png',
+                    attribute: Attribute.child,
+                    decoration: decoration.copyWith(
+                        borderRadius: BorderRadius.circular(8),
+                        color: lightPrimaryColor,
+                        border: Border.all(color: secondaryColor)),
+                    groupVal: val,
+                    onChanged: () {
+                      setState(() {
+                        val = Attribute.child;
+                      });
+                      print('val: $val');
+                    }),
+                kSmallHeight,
+                InkWell(
+                  onTap: () => nextPage(val),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(8),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0XFF07AB2C),
+                            Color(0XFF69E905),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 30),
+                      child: Text(
+                        "Continue",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: secondaryColor),
+                      ),
+                    ),
+                  ),
+                ),
+                // LargeButton(
+                //   submit: () => nextPage(val),
+                //   color: primaryColor,
+                //   name: 'Continue',
+                //   buttonColor: secondaryColor,
+                // ),
+                // kLargeHeight,
+                // HaveAccount()
+              ],
+            ),
           ),
         ),
       ),
@@ -113,55 +132,66 @@ class OptionBox extends StatelessWidget {
       {this.attribute,
       this.title,
       this.subTitle,
-      this.val,
+      this.img,
       this.decoration,
       this.onChanged,
       this.groupVal});
   Attribute attribute;
   String title;
-  Attribute val;
+  String img;
   Attribute groupVal;
   String subTitle;
   Function onChanged;
   BoxDecoration decoration;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: decoration,
-      padding: EdgeInsets.only(right: 20, top: 30, bottom: 30),
-      child: Row(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Radio(
-                value: attribute,
-                groupValue: groupVal,
-                activeColor: primaryColor,
-                onChanged: onChanged,
-              ),
-              Container(
-                height: 14,
-              )
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: textLightBlack,
-              ),
-              kVerySmallHeight,
-              Text(
-                subTitle,
-                style: textExtraLightBlack.copyWith(fontSize: 12),
-              )
-            ],
-          ),
-        ],
+    return InkWell(
+      onTap: onChanged,
+      child: Container(
+        decoration: decoration,
+        padding: EdgeInsets.only(right: 20, top: 10, bottom: 30, left: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                groupVal == attribute
+                    ? SvgPicture.asset(
+                        'assets/images/svg/checked.svg',
+                        height: 25,
+                      )
+                    : SvgPicture.asset(
+                        'assets/images/svg/unchecked.svg',
+                        height: 25,
+                      )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(img),
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: textLightBlack.copyWith(color: primaryColor),
+                ),
+                kVerySmallHeight,
+                Text(
+                  subTitle,
+                  style: textGrey.copyWith(fontSize: 12),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

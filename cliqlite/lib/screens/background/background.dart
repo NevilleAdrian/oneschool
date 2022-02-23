@@ -17,9 +17,36 @@ class _BackgroundImageState extends State<BackgroundImage> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
+        // decoration: BoxDecoration(
+        //   image: DecorationImage(
+        //     image: AssetImage(theme.background),
+        //     fit: BoxFit.cover,
+        //   ),
+        // ),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class OnBoardingBackground extends StatefulWidget {
+  OnBoardingBackground({this.child});
+
+  final Widget child;
+  @override
+  _OnBoardingBackgroundState createState() => _OnBoardingBackgroundState();
+}
+
+class _OnBoardingBackgroundState extends State<OnBoardingBackground> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(theme.background),
+            image: AssetImage('assets/images/onboarding-bg.png'),
             fit: BoxFit.cover,
           ),
         ),

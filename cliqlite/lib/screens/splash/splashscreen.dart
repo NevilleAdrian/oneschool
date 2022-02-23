@@ -7,6 +7,8 @@ import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/models/livestream_model/livestream_model.dart';
+import 'package:cliqlite/models/quiz_active/quiz_active.dart';
+import 'package:cliqlite/models/recent_topics/recent_topics.dart';
 import 'package:cliqlite/models/subject/grade/grade.dart';
 import 'package:cliqlite/models/subject/subject.dart';
 import 'package:cliqlite/models/topic/topic.dart';
@@ -15,6 +17,7 @@ import 'package:cliqlite/models/video_model/video_model.dart';
 import 'package:cliqlite/providers/analytics_provider/analytics_provider.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/livestream_provider/livestream_provider.dart';
+import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/providers/video_provider/video_provider.dart';
@@ -79,7 +82,9 @@ class _SplashScreenState extends State<SplashScreen>
       kAnalyticsSubject,
       kAnalyticsTopic,
       kLiveStream,
-      kMainUser
+      kMainUser,
+      kQuizActive,
+      kRecent
     ]);
     AppModel appModel;
     AuthUser user;
@@ -92,9 +97,11 @@ class _SplashScreenState extends State<SplashScreen>
     List<Video> video;
     ChildIndex index;
     List<AnalyticSubject> analyticsSubject;
-    List<AnalyticTopic> analyticsTopic;
+    AnalyticTopic analyticsTopic;
     List<LiveStream> liveStream;
     MainChildUser mainUser;
+    QuizActive quizActive;
+    List<RecentTopic> recentTopic;
 
     try {
       user = _hiveRepository.get<AuthUser>(key: 'user', name: kUser);
@@ -108,12 +115,14 @@ class _SplashScreenState extends State<SplashScreen>
       video = _hiveRepository.get<List<Video>>(key: 'video', name: kVideo);
       analyticsSubject = _hiveRepository.get<List<AnalyticSubject>>(
           key: 'analyticsSubject', name: kAnalyticsSubject);
-      analyticsTopic = _hiveRepository.get<List<AnalyticTopic>>(
+      analyticsTopic = _hiveRepository.get<AnalyticTopic>(
           key: 'analyticsTopic', name: kAnalyticsTopic);
       liveStream = _hiveRepository.get<List<LiveStream>>(
           key: 'liveStream', name: kLiveStream);
       mainUser =
           _hiveRepository.get<MainChildUser>(key: 'mainUser', name: kMainUser);
+      recentTopic = _hiveRepository.get<List<RecentTopic>>(
+          key: 'recentTopics', name: kRecent);
     } catch (ex) {
       print(ex);
     }
@@ -122,6 +131,8 @@ class _SplashScreenState extends State<SplashScreen>
         _hiveRepository.get<Grade>(key: 'singleGrade', name: kSingleGrade);
     AuthProvider.auth(context).setFirst(first);
     index = _hiveRepository.get<ChildIndex>(key: 'index', name: kIndex);
+    quizActive =
+        _hiveRepository.get<QuizActive>(key: 'quizActive', name: kQuizActive);
 
     print('index:$index');
     if (first == null) {
@@ -145,6 +156,8 @@ class _SplashScreenState extends State<SplashScreen>
         AnalyticsProvider.analytics(context).setTopic(analyticsTopic);
         LiveStreamProvider.liveStream(context).setLiveStream(liveStream);
         AuthProvider.auth(context).setMainChildUser(mainUser);
+        QuizProvider.quizProvider(context).setQuizActive(quizActive);
+        TopicProvider.topic(context).setRecentTopic(recentTopic);
         Navigator.of(context).pushNamedAndRemoveUntil(
             AppLayout.id, (Route<dynamic> route) => false);
       }

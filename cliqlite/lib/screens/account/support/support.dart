@@ -55,7 +55,7 @@ class _SupportState extends State<Support> {
                 InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Icon(
-                      Icons.chevron_left,
+                      Icons.arrow_back_outlined,
                       color: blackColor,
                     )),
                 Text(

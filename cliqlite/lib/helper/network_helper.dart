@@ -32,7 +32,6 @@ class NetworkHelper {
     ).toJson();
 
     return await postRequest(body: body, url: url, context: context);
-    ;
   }
 
   //Forgot Password
@@ -41,6 +40,41 @@ class NetworkHelper {
     var body = ForgotPassword(email: email).toJson();
 
     return await postRequest(body: body, url: url, context: context);
+  }
+
+  //Verify Account
+  Future<dynamic> verifyAccount(int token, BuildContext context,
+      {String url}) async {
+    var body = {"token": token};
+
+    var data = await putRequest(
+        body: body, url: url ?? 'auth/parent/verify', context: context);
+    return data;
+  }
+
+  //Reset OTP
+  Future<dynamic> resendOTP(String email, BuildContext context) async {
+    var body = {
+      "email": email,
+    };
+
+    var data = await postRequest(
+        body: body, url: 'auth/parent/resend', context: context);
+    return data;
+  }
+
+  //Reset Account
+  Future<dynamic> resetPassword(int token, String password,
+      String confirmPassword, BuildContext context) async {
+    var body = {
+      "token": token,
+      "password": password,
+      "retypePassword": confirmPassword
+    };
+
+    var data = await putRequest(
+        body: body, url: 'auth/parent/resetpassword', context: context);
+    return data;
   }
 
   //Change Password
@@ -89,7 +123,7 @@ class NetworkHelper {
       "email": email,
       "name": fullName,
       "password": password,
-      "age": childAge,
+      "age": int.parse(childAge),
       "grade": childClass
     };
     print(body);
@@ -113,10 +147,9 @@ class NetworkHelper {
   }
 
   //Get Children
-  Future<dynamic> getChildUser(
-      BuildContext context, String id, String token) async {
+  Future<dynamic> getChildUser(BuildContext context, String token) async {
     final result =
-        await getRequest(url: 'users/$id', context: context, token: token);
+        await getRequest(url: 'auth/user/me', context: context, token: token);
     return result['data'];
   }
 
@@ -131,18 +164,28 @@ class NetworkHelper {
   //Get Subject by search
   Future<dynamic> getSubjectBySearch(
       BuildContext context, String description, String token) async {
-    var params = {"searchKey": description, "limit": "4"};
+    var params = {"search": description};
 
     final result = await getParamRequest(
-        url: 'subjects/search', params: params, context: context, token: token);
+        url: 'subjects', params: params, context: context, token: token);
     return result['data'];
   }
 
   //Get Topic
-  Future<dynamic> getTopic(
-      BuildContext context, String subjectId, String token) async {
+  Future<dynamic> getTopic(BuildContext context, String subjectId,
+      String childId, String token) async {
     final result = await getRequest(
-        url: 'subjects/$subjectId/topics', context: context, token: token);
+        url: 'topics/subjects/$subjectId/$childId',
+        context: context,
+        token: token);
+    return result['data'];
+  }
+
+  //Get Recent Topic
+  Future<dynamic> getRecentTopic(
+      BuildContext context, String childId, String token) async {
+    final result = await getRequest(
+        url: 'topics/lastviewed/$childId', context: context, token: token);
     return result['data'];
   }
 
@@ -153,6 +196,7 @@ class NetworkHelper {
 
     final result = await getParamRequest(
         url: 'topics/search', params: params, context: context, token: token);
+    print('topicsResult:$result');
     return result['data'];
   }
 
@@ -160,6 +204,14 @@ class NetworkHelper {
   Future<dynamic> getVideo(BuildContext context, String token) async {
     final result =
         await getRequest(url: 'videos', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Topic
+  Future<dynamic> getTopicVideos(
+      String topicId, BuildContext context, String token) async {
+    final result = await getRequest(
+        url: 'topics/$topicId/videos', context: context, token: token);
     return result['data'];
   }
 
@@ -176,8 +228,22 @@ class NetworkHelper {
   //Get Quiz
   Future<dynamic> getQuiz(
       BuildContext context, String topicId, String token) async {
+    // var params = {
+    //   "childId": childId,
+    // };
+
     final result = await getRequest(
-        url: 'topics/$topicId/quizzes', context: context, token: token);
+        url: 'questions/topics/$topicId',
+        // params: params,
+        context: context,
+        token: token);
+    return result['data'];
+  }
+
+  //Get Quiz
+  Future<dynamic> getQuickQuiz(BuildContext context, String token) async {
+    final result =
+        await getRequest(url: 'quizzes/quick', context: context, token: token);
     return result['data'];
   }
 
@@ -193,11 +259,22 @@ class NetworkHelper {
         context: context);
   }
 
+  //Submit Feedback
+  Future<dynamic> submitFeedback(String topicId, String text, double rating,
+      String token, BuildContext context) async {
+    var body = {
+      "message": text,
+    };
+
+    return await postRequest(
+        body: body, url: 'feedbacks', token: token, context: context);
+  }
+
   //Get a Subscription
   Future<dynamic> getSubscription(
       BuildContext context, String childId, String token) async {
     final result = await getRequest(
-        url: 'users/subscriptions/$childId', context: context, token: token);
+        url: 'subscriptions/children/$childId', context: context, token: token);
     print('result:$result');
     return result['data'];
   }
@@ -206,7 +283,7 @@ class NetworkHelper {
   Future<dynamic> getTransactions(
       BuildContext context, String childId, String token) async {
     final result = await getRequest(
-        url: 'users/$childId/transactions', context: context, token: token);
+        url: 'transactions/$childId', context: context, token: token);
     return result['data'];
   }
 
@@ -214,21 +291,28 @@ class NetworkHelper {
   Future<dynamic> getAllSubscriptions(
       BuildContext context, String token) async {
     final result =
-        await getRequest(url: 'subscriptions', context: context, token: token);
+        await getRequest(url: 'plans', context: context, token: token);
     return result['data'];
   }
 
   //Get Support
   Future<dynamic> getSupport(BuildContext context, String token) async {
     final result =
-        await getRequest(url: 'faqs', context: context, token: token);
+        await getRequest(url: 'supports', context: context, token: token);
     return result['data'];
   }
 
   //Get Notification
   Future<dynamic> getNotification(BuildContext context, String token) async {
+    final result = await getRequest(
+        url: 'notifications/me', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Feedback
+  Future<dynamic> getFeedback(BuildContext context, String token) async {
     final result =
-        await getRequest(url: 'notifications', context: context, token: token);
+        await getRequest(url: 'feedbacks', context: context, token: token);
     return result['data'];
   }
 
@@ -242,9 +326,13 @@ class NetworkHelper {
 
   //Get Analytics Topic
   Future<dynamic> getAnalyticsTopic(
-      BuildContext context, String id, String token) async {
-    final result = await getRequest(
-        url: 'users/$id/dashboard/topics', context: context, token: token);
+      BuildContext context, String childId, String token) async {
+    var params = {"status": "month"};
+    final result = await getParamRequest(
+        url: 'users/analysis/$childId',
+        params: params,
+        context: context,
+        token: token);
     return result['data'];
   }
 
@@ -255,19 +343,18 @@ class NetworkHelper {
 
     final result = await getParamRequest(
         url: 'livestreams', params: params, context: context, token: token);
+
+    print('result!!:$result');
     return result['data'];
   }
 
   //Add Subscription
   Future<dynamic> addSubscription(
       String subId, String childId, String token, BuildContext context) async {
-    var body = {"childId": childId};
+    var body = {"plan": subId, "childId": childId};
 
     return await postRequest(
-        body: body,
-        url: 'users/$subId/subscribe',
-        token: token,
-        context: context);
+        body: body, url: 'subscriptions', token: token, context: context);
   }
 
   //Verify Subscription
@@ -281,13 +368,10 @@ class NetworkHelper {
   }
 
   //Add User
-  Future<dynamic> addUser(String name, int age, String grade, String token,
-      BuildContext context) async {
-    var body = AddUser(
-      name: name,
-      age: age,
-      grade: grade,
-    ).toJson();
+  Future<dynamic> addUser(String name, int age, String image, String grade,
+      String token, BuildContext context) async {
+    var body =
+        AddUser(name: name, age: age, grade: grade, image: image).toJson();
 
     return await postRequest(
         body: body, url: 'parents/children', token: token, context: context);
@@ -306,7 +390,7 @@ class NetworkHelper {
       return decoded;
     } else {
       throw ApiFailureException(
-          decoded['message'] ?? response.reasonPhrase ?? 'Unknown error');
+          decoded['msg'] ?? response.reasonPhrase ?? 'Unknown error');
     }
   }
 
@@ -320,7 +404,7 @@ class NetworkHelper {
       return decoded;
     } else {
       throw ApiFailureException(
-          decoded['message'] ?? response.reasonPhrase ?? 'Unknown error');
+          decoded['msg'] ?? response.reasonPhrase ?? 'Unknown error');
     }
   }
 
@@ -333,7 +417,7 @@ class NetworkHelper {
     print(response.body);
     var decoded = jsonDecode(response.body);
     if (response.statusCode.toString().startsWith('2')) {
-      print('data: $decoded');
+      print('decode:$decoded');
       return decoded;
     } else {
       print(

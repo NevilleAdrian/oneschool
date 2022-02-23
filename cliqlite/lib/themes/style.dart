@@ -30,7 +30,7 @@ TextStyle textExtraLightBlack = const TextStyle(
 
 TextStyle textLightBlack = const TextStyle(
   color: const Color(0XFF000000),
-  fontSize: 15.0,
+  fontSize: 16.0,
   fontWeight: FontWeight.w600,
   fontFamily: "Montserrat",
 );
@@ -97,7 +97,7 @@ TextStyle textStyleValidate = const TextStyle(
 
 TextTheme _buildTextTheme(TextTheme base) {
   return base.copyWith(
-    title: base.title.copyWith(
+    headline1: base.headline1.copyWith(
       fontFamily: "Montserrat",
     ),
   );
@@ -110,6 +110,22 @@ TextStyle textGreen = const TextStyle(
   fontFamily: "Montserrat",
 );
 
+const MaterialColor kPrimaryColor = const MaterialColor(
+  0xFF016F56,
+  const <int, Color>{
+    50: const Color(0xFF016F56),
+    100: const Color(0xFF016F56),
+    200: const Color(0xFF016F56),
+    300: const Color(0xFF016F56),
+    400: const Color(0xFF016F56),
+    500: const Color(0xFF016F56),
+    600: const Color(0xFF016F56),
+    700: const Color(0xFF016F56),
+    800: const Color(0xFF016F56),
+    900: const Color(0xFF016F56),
+  },
+);
+
 final ThemeData base = ThemeData.light();
 final ThemeData darkBase = ThemeData.dark();
 
@@ -117,6 +133,7 @@ ThemeData lightTheme = new ThemeData(
   primaryColor: primaryColor,
   buttonColor: primaryColor,
   indicatorColor: Colors.white,
+  primarySwatch: kPrimaryColor,
   fontFamily: "Montserrat",
   splashColor: Colors.white24,
   splashFactory: InkRipple.splashFactory,
@@ -159,18 +176,23 @@ Color textFieldColor = const Color.fromRGBO(168, 160, 149, 0.6);
 const Color whiteColor = const Color(0XFFFFFFFF);
 const Color backgroundColor = const Color(0XFFFDFDF8);
 const Color blackColor = const Color(0XFF242A37);
+const Color greyishColor = const Color(0XFF979797);
 const Color disabledColor = const Color(0XFFF7F8F9);
 const Color greyColor = Colors.grey;
 Color greyColor2 = Colors.grey.withOpacity(0.3);
+Color lightGreyColor = Color(0XFFF6F7F9);
 const Color activeColor = const Color(0xFFF44336);
-const Color redColor = const Color(0xFFFF0000);
+const Color redColor = const Color(0xFFEF0000);
+const Color lightRedColor = const Color(0xFFFDE5E6);
 const Color buttonStop = const Color(0xFFF44336);
 const Color primaryColor = const Color(0xFF016F56);
-const Color lightPrimaryColor = const Color(0xFF80B7AA);
+const Color lightPrimaryColor = const Color(0xFFf2f8f3);
+const Color lighterPrimaryColor = const Color(0xFFE6F7EA);
 const Color veryLightPrimaryColor = const Color(0xFFCCE2DD);
-const Color accentColor = const Color(0xFFB4C304);
+const Color accentColor = const Color(0xFF09AC2C);
 const Color splashBgColor = const Color(0xFF00008B);
-const Color secondaryColor = const Color(0xFFB4C304);
+const Color secondaryColor = const Color(0xFFE6F7EA);
+const Color lightSecondaryColor = const Color(0xFF618B05);
 const Color facebook = const Color(0xFF4267b2);
 const Color googlePlus = const Color(0xFFdb4437);
 const Color yellow = Colors.pinkAccent;
@@ -232,6 +254,12 @@ TextStyle heading18 = new TextStyle(
   fontFamily: "Montserrat",
 );
 
+TextStyle headingSmallBlack = new TextStyle(
+  color: blackColor,
+  fontSize: 16.0,
+  fontWeight: FontWeight.normal,
+  fontFamily: "Montserrat",
+);
 TextStyle heading18Black = new TextStyle(
   color: blackColor,
   fontSize: 18.0,
@@ -256,6 +284,13 @@ TextStyle headingPrimaryColor = new TextStyle(
 TextStyle smallPrimaryColor = new TextStyle(
   color: primaryColor,
   fontSize: 14.0,
+  // fontWeight: FontWeight.w400,
+  fontFamily: "Montserrat",
+);
+
+TextStyle smallAccentColor = new TextStyle(
+  color: accentColor,
+  fontSize: 12.0,
   // fontWeight: FontWeight.w400,
   fontFamily: "Montserrat",
 );
@@ -298,8 +333,9 @@ TextStyle heading35Black = new TextStyle(
 SizedBox kSmallWidth = SizedBox(width: 20.0);
 SizedBox kLargeWidth = SizedBox(width: 50.0);
 SizedBox kVerySmallHeight = SizedBox(height: 5.0);
-SizedBox kVerySmallWidth = SizedBox(width: 5.0);
+SizedBox kVerySmallWidth = SizedBox(width: 15.0);
 SizedBox kSmallHeight = SizedBox(height: 20.0);
+SizedBox kNormalHeight = SizedBox(height: 30.0);
 SizedBox kLargeHeight = SizedBox(height: 50.0);
 
 const Color transparentColor = const Color.fromRGBO(0, 0, 0, 0.2);

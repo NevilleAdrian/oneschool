@@ -1,4 +1,5 @@
 import 'package:cliqlite/helper/network_helper.dart';
+import 'package:cliqlite/models/recent_topics/recent_topics.dart';
 import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
@@ -12,21 +13,59 @@ class TopicProvider extends ChangeNotifier {
   static BuildContext _context;
 
   List<Topic> _topics;
+  List<RecentTopic> _recentTopics;
 
   List<Topic> get topics => _topics;
 
+  List<RecentTopic> get recentTopics => _recentTopics;
+
   setTopic(List<Topic> topics) => _topics = topics;
+  setRecentTopic(List<RecentTopic> recentTopics) =>
+      _recentTopics = recentTopics;
 
-  Future<List<Topic>> getTopics({String subjectId}) async {
+  Future<List<Topic>> getTopics({String subjectId, String childId}) async {
     //Get topics
-    var data = await _helper.getTopic(_context, subjectId, AuthProvider.auth(_context).token);
+    try {
+      var data = await _helper.getTopic(
+          _context, subjectId, childId, AuthProvider.auth(_context).token);
 
-    print('topicsss:$data');
-    data = (data as List).map((e) => Topic.fromJson(e)).toList();
+      print('data:$data');
 
-    //Save Topics in local storage
-    setTopic(data);
-    _hiveRepository.add<List<Topic>>(name: kTopic, key: 'topic', item: data);
+      data = (data as List).map((e) => Topic.fromJson(e)).toList();
+      print('topic:$data');
+
+      //Save Topics in local storage
+      setTopic(data);
+      _hiveRepository.add<List<Topic>>(name: kTopic, key: 'topic', item: data);
+
+      return data;
+    } catch (ex) {
+      print('ex: $ex');
+    }
+  }
+
+  Future<dynamic> submitFeedback(
+      {String topicId, String text, double rating}) async {
+    //Get topics
+    var data = await _helper.submitFeedback(
+        topicId, text, rating, AuthProvider.auth(_context).token, _context);
+
+    return data;
+  }
+
+  Future<List<RecentTopic>> getRecentTopics({String childId}) async {
+    //Get recent topics
+    print('chilid:$childId');
+    var data = await _helper.getRecentTopic(
+        _context, childId, AuthProvider.auth(_context).token);
+
+    print('recent:$data');
+    data = (data as List).map((e) => RecentTopic.fromJson(e)).toList();
+
+    // //Save Topics in local storage
+    setRecentTopic(data);
+    _hiveRepository.add<List<RecentTopic>>(
+        name: kRecent, key: 'recentTopics', item: data);
 
     return data;
   }
@@ -38,6 +77,7 @@ class TopicProvider extends ChangeNotifier {
 
     data = (data as List).map((e) => Topic.fromJson(e)).toList();
 
+    print('DATA:$data');
     return data;
   }
 

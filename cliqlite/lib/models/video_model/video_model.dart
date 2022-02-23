@@ -12,19 +12,19 @@ String videoToJson(List<Video> data) =>
 
 @HiveType(typeId: 9)
 class Video {
-  Video({
-    this.id,
-    this.title,
-    this.originalFilename,
-    this.duration,
-    this.bytes,
-    this.publicId,
-    this.resourceType,
-    this.secureUrl,
-    this.topic,
-    this.createdAt,
-    this.slug,
-  });
+  Video(
+      {this.id,
+      this.title,
+      this.originalFilename,
+      this.duration,
+      this.bytes,
+      this.publicId,
+      this.resourceType,
+      this.secureUrl,
+      this.topic,
+      this.createdAt,
+      this.slug,
+      this.tags});
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -32,7 +32,7 @@ class Video {
   @HiveField(2)
   String originalFilename;
   @HiveField(3)
-  double duration;
+  String duration;
   @HiveField(4)
   int bytes;
   @HiveField(5)
@@ -47,12 +47,14 @@ class Video {
   DateTime createdAt;
   @HiveField(10)
   String slug;
+  @HiveField(11)
+  List<dynamic> tags;
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
         id: json["_id"],
         title: json["title"],
         originalFilename: json["original_filename"],
-        duration: json["duration"]?.toDouble(),
+        duration: json["duration"],
         bytes: json["bytes"],
         publicId: json["public_id"],
         resourceType: json["resource_type"],
@@ -60,6 +62,7 @@ class Video {
         topic: json["topic"],
         createdAt: DateTime.parse(json["createdAt"]),
         slug: json["slug"],
+        tags: json["tags"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -74,5 +77,6 @@ class Video {
         "topic": topic,
         "createdAt": createdAt.toIso8601String(),
         "slug": slug,
+        "tags": tags,
       };
 }

@@ -10,21 +10,21 @@ class UpdateUser {
     this.name,
     this.age,
     this.grade,
-    this.email,
+    // this.email,
     this.photo,
   });
 
   String name;
   int age;
   String grade;
-  String email;
+  // String email;
   String photo;
 
   factory UpdateUser.fromJson(Map<String, dynamic> json) => UpdateUser(
         name: json["name"],
         age: json["age"],
         grade: json["grade"],
-        email: json["email"],
+        // email: json["email"],
         photo: json["photo"],
       );
 
@@ -32,7 +32,7 @@ class UpdateUser {
         "name": name,
         "age": age,
         "grade": grade,
-        "email": email,
+        // "email": email,
         "photo": photo,
       };
 }

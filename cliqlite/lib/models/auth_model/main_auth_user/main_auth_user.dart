@@ -11,19 +11,19 @@ String mainChildUserToJson(MainChildUser data) => json.encode(data.toJson());
 
 @HiveType(typeId: 14)
 class MainChildUser {
-  MainChildUser({
-    this.id,
-    this.name,
-    this.email,
-    this.age,
-    this.isSubscribed,
-    this.grade,
-    this.role,
-    this.photo,
-    this.createdAt,
-    this.v,
-    this.mainChildUserId,
-  });
+  MainChildUser(
+      {this.id,
+      this.name,
+      this.email,
+      this.age,
+      this.isSubscribed,
+      this.grade,
+      this.role,
+      this.photo,
+      this.createdAt,
+      this.v,
+      this.mainChildUserId,
+      this.isActive});
 
   @HiveField(0)
   String id;
@@ -47,6 +47,8 @@ class MainChildUser {
   int v;
   @HiveField(10)
   String mainChildUserId;
+  @HiveField(11)
+  bool isActive;
 
   factory MainChildUser.fromJson(Map<String, dynamic> json) => MainChildUser(
         id: json["_id"],
@@ -54,6 +56,7 @@ class MainChildUser {
         email: json["email"],
         age: json["age"],
         isSubscribed: json["isSubscribed"],
+        isActive: json["isActive"],
         grade: json["grade"],
         role: json["role"],
         photo: json["photo"],
@@ -68,6 +71,7 @@ class MainChildUser {
         "email": email,
         "age": age,
         "isSubscribed": isSubscribed,
+        "isActive": isActive,
         "grade": grade,
         "role": role,
         "photo": photo,

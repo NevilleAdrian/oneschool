@@ -20,7 +20,7 @@ class VideoAdapter extends TypeAdapter<Video> {
       id: fields[0] as String,
       title: fields[1] as String,
       originalFilename: fields[2] as String,
-      duration: fields[3] as double,
+      duration: fields[3] as String,
       bytes: fields[4] as int,
       publicId: fields[5] as String,
       resourceType: fields[6] as String,
@@ -28,13 +28,14 @@ class VideoAdapter extends TypeAdapter<Video> {
       topic: fields[8] as dynamic,
       createdAt: fields[9] as DateTime,
       slug: fields[10] as String,
+      tags: (fields[11] as List)?.cast<dynamic>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Video obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class VideoAdapter extends TypeAdapter<Video> {
       ..writeByte(9)
       ..write(obj.createdAt)
       ..writeByte(10)
-      ..write(obj.slug);
+      ..write(obj.slug)
+      ..writeByte(11)
+      ..write(obj.tags);
   }
 
   @override

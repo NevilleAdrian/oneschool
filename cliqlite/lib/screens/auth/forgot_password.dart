@@ -1,10 +1,11 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
-import 'package:cliqlite/screens/auth/login.dart';
+import 'package:cliqlite/screens/auth/verify_account.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
+import 'package:cliqlite/utils/top_bar.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
 
@@ -42,13 +43,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           AuthProvider.auth(context).setIsLoading(true);
         });
         var result = await AuthProvider.auth(context).forgotPassword(
-            _controllerEmail.text,
-            widget.user == 'parent'
-                ? 'auth/parent/forgotpassword'
-                : 'auth/user/forgotpassword');
+            _controllerEmail.text, 'auth/parent/forgotpassword');
 
         if (result != null) {
-          Navigator.pushNamed(context, Login.id);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => VerifyAccount(
+                        type: 'forgot',
+                      )));
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
           });
@@ -74,26 +77,21 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.clear,
-                        color: blackColor,
-                      ),
-                    )
-                  ],
-                ),
-                kLargeHeight,
-                Text(
-                  'Forgot Password',
-                  textAlign: TextAlign.center,
-                  style: textStyleSmall.copyWith(
-                      fontSize: 21.0,
-                      fontWeight: FontWeight.w700,
-                      color: primaryColor),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     InkWell(
+                //       onTap: () => Navigator.pop(context),
+                //       child: Icon(
+                //         Icons.clear,
+                //         color: blackColor,
+                //       ),
+                //     )
+                //   ],
+                // ),
+                // kLargeHeight,
+                TopBar(
+                  text: 'Forgot Password',
                 ),
                 kLargeHeight,
                 Form(
@@ -106,21 +104,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             type: TextInputType.text,
                             hintText: 'Email Address'),
                         kLargeHeight,
-                        LargeButton(
+                        GreenButton(
                           submit: () {
                             nextPage(context);
                           },
                           color: primaryColor,
                           name: 'Forgot Password',
                           buttonColor: secondaryColor,
-                          loader: auth.isLoading
-                              ? CircularProgressIndicator()
-                              : Text(
-                                  'Forgot Password',
-                                  style: headingWhite.copyWith(
-                                    color: secondaryColor,
-                                  ),
-                                ),
+                          loader: auth.isLoading,
                         ),
                         kSmallHeight,
                       ],

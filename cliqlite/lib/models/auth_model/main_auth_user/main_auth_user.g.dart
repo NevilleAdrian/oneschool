@@ -28,13 +28,14 @@ class MainChildUserAdapter extends TypeAdapter<MainChildUser> {
       createdAt: fields[8] as DateTime,
       v: fields[9] as int,
       mainChildUserId: fields[10] as String,
+      isActive: fields[11] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, MainChildUser obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class MainChildUserAdapter extends TypeAdapter<MainChildUser> {
       ..writeByte(9)
       ..write(obj.v)
       ..writeByte(10)
-      ..write(obj.mainChildUserId);
+      ..write(obj.mainChildUserId)
+      ..writeByte(11)
+      ..write(obj.isActive);
   }
 
   @override

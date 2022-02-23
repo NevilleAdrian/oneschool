@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
+import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/child_provider/child_provider.dart';
@@ -17,7 +17,9 @@ import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -49,16 +51,17 @@ class _EditChildDetailsState extends State<EditChildDetails> {
   bool autoValidate = false;
 
   //Instantiate enum
-  Years val = Years.fifth;
+  String val = '5';
 
   //Instantiate enum
-  Class classVal = Class.first;
+  String classVal = '6';
 
   //Age
   String age;
 
   //Class
   String childClassName;
+  String childClassID;
 
   //File image
   File _croppedImageFile;
@@ -72,16 +75,25 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     List<Users> children = AuthProvider.auth(context).users;
     AuthProvider auth = AuthProvider.auth(context);
     MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+    List<Users> users = AuthProvider.auth(context).users;
 
     try {
       setState(() {
         AuthProvider.auth(context).setIsLoading(true);
       });
+
+      print('imgUrl:$imageUrl');
+
       var result = await AuthProvider.auth(context).updateUser(
-          _controllerName.text,
+          _controllerName.text == ''
+              ? (users != null
+                  ? users[childIndex?.index ?? 0].name
+                  : mainChildUser.name)
+              : _controllerName.text,
           int.parse(age?.replaceAll(' years', '') ?? '5'),
-          imageUrl,
-          childClassName ?? '6155798b81cc3265b9efaa9c',
+          imageUrl ??
+              'https://images.pexels.com/photos/8264629/pexels-photo-8264629.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
+          childClassID ?? AuthProvider.auth(context).grades[0].id,
           children != null
               ? children[childIndex?.index ?? 0]?.id
               : mainChildUser?.id);
@@ -99,7 +111,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
             context,
             MaterialPageRoute(
                 builder: (context) => AppLayout(
-                      index: 4,
+                      index: 3,
                     )));
         showFlush(context, 'Successfully Updated User', primaryColor);
       }
@@ -118,14 +130,20 @@ class _EditChildDetailsState extends State<EditChildDetails> {
       autoValidate = true; // Start validating on every change.
     } else {
       if (_croppedImageFile != null) {
+        setState(() {
+          AuthProvider.auth(context).setIsLoading(true);
+        });
         Reference reference =
             _storage.ref().child("updateProfile" + DateTime.now().toString());
         UploadTask uploadTask = reference.putFile(_croppedImageFile);
-
         uploadTask.whenComplete(() async {
           try {
             imageUrl = await reference.getDownloadURL();
-            addUser(imageUrl: imageUrl);
+            setState(() {});
+            print('url: $imageUrl');
+            if (imageUrl != null) {
+              addUser(imageUrl: imageUrl);
+            }
           } catch (ex) {
             print('ex: $ex');
           }
@@ -137,7 +155,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
         addUser(
             imageUrl: children != null
                 ? children[childIndex?.index ?? 0].photo
-                : mainChildUser.id);
+                : mainChildUser.photo);
       }
     }
   }
@@ -152,12 +170,12 @@ class _EditChildDetailsState extends State<EditChildDetails> {
 
   //Child year data
   var childYears = [
-    {"name": '5 years', "years": Years.fifth},
-    {"name": '6 years', "years": Years.sixth},
-    {"name": '7 years', "years": Years.seventh},
-    {"name": '8 years', "years": Years.eighth},
-    {"name": '9 years', "years": Years.ninth},
-    {"name": '10 years', "years": Years.tenth},
+    {"name": '5', "years": Years.fifth},
+    {"name": '6', "years": Years.sixth},
+    {"name": '7', "years": Years.seventh},
+    {"name": '8', "years": Years.eighth},
+    {"name": '9', "years": Years.ninth},
+    {"name": '10', "years": Years.tenth},
   ];
 
   //Child class data
@@ -172,6 +190,8 @@ class _EditChildDetailsState extends State<EditChildDetails> {
 
   //Modal bottom sheet
   void bottomSheet(BuildContext context, String type) {
+    List<Grades> grades = AuthProvider.auth(context).grades;
+
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -202,9 +222,9 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                         child: Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(40.0),
-                                  topRight: Radius.circular(40.0)),
-                              color: lightPrimaryColor),
+                                  topLeft: Radius.circular(8.0),
+                                  topRight: Radius.circular(8.0)),
+                              color: Colors.white),
                           height: 500.0,
                           child: Container(
                               padding: EdgeInsets.symmetric(
@@ -212,7 +232,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                               child: ListView.builder(
                                   itemCount: type == 'age'
                                       ? childYears.length
-                                      : childClass.length,
+                                      : grades.length,
                                   itemBuilder: (context, index) {
                                     return Padding(
                                       padding:
@@ -221,33 +241,41 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                                         children: [
                                           Radio(
                                               value: type == 'age'
-                                                  ? childYears[index]['years']
-                                                  : childClass[index]['class'],
+                                                  ? childYears[index]['name']
+                                                  : grades[index].name,
                                               groupValue: type == 'age'
                                                   ? val
                                                   : classVal,
-                                              activeColor: primaryColor,
-                                              onChanged: (var value) {
+                                              activeColor: accentColor,
+                                              onChanged: (dynamic value) {
                                                 setModalState(() {
                                                   setState(() {});
                                                   if (type == 'age') {
                                                     val = value;
                                                     age = childYears[index]
                                                         ['name'];
+                                                    print('age:$age');
+                                                    print('age:$value');
                                                   } else {
                                                     classVal = value;
                                                     childClassName =
-                                                        childClass[index]
-                                                            ['name'];
+                                                        grades[index].name;
+                                                    childClassID =
+                                                        grades[index].id;
+                                                    print(
+                                                        'class:$childClassName');
+                                                    print('class:$value');
                                                   }
                                                 });
                                               }),
                                           // kSmallWidth,
                                           Text(
                                             type == 'age'
-                                                ? childYears[index]['name']
-                                                : childClass[index]['name'],
-                                            style: textLightBlack,
+                                                ? '${childYears[index]['name']} years'
+                                                : toBeginningOfSentenceCase(
+                                                    grades[index].name),
+                                            style: smallAccentColor.copyWith(
+                                                fontSize: 16),
                                           ),
                                         ],
                                       ),
@@ -270,18 +298,6 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     setState(() {
       _croppedImageFile = result;
     });
-    Reference reference =
-        _storage.ref().child("updateProfile" + DateTime.now().toString());
-    UploadTask uploadTask = reference.putFile(result);
-    uploadTask.whenComplete(() async {
-      try {
-        imageUrl = await reference.getDownloadURL();
-        setState(() {});
-        print('url: $imageUrl');
-      } catch (ex) {
-        print('ex: $ex');
-      }
-    });
   }
 
   Widget imageDisplay(File croppedImage, String mockImage) {
@@ -291,39 +307,32 @@ class _EditChildDetailsState extends State<EditChildDetails> {
 
     if (croppedImage != null) {
       return Container(
-        height: 60.0,
-        width: 60.0,
+        height: 70.0,
+        width: 70.0,
         decoration: new BoxDecoration(
             //color: Theme.of(context).backgroundColor,
             image: new DecorationImage(
-                image: new FileImage(File(croppedImage.path)),
-                fit: BoxFit.cover),
-            borderRadius: new BorderRadius.all(
-              const Radius.circular(10.0),
-            )),
+              image: new FileImage(File(croppedImage.path)),
+              fit: BoxFit.cover,
+            ),
+            shape: BoxShape.circle
+            // borderRadius: new BorderRadius.all(
+            //   const Radius.circular(10.0),
+            // )
+            ),
       );
     } else if (profilePix != null) {
       return Container(
+        width: 65,
+        height: 65,
         decoration: BoxDecoration(
-          borderRadius: new BorderRadius.all(const Radius.circular(10.0)),
-          //color: Theme.of(context).backgroundColor,
-        ),
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: CachedNetworkImage(
-              imageUrl: profilePix,
-              width: 60.0,
-              height: 60.0,
-              fit: BoxFit.cover,
+            shape: BoxShape.circle,
+            image: DecorationImage(
+              image: NetworkImage(profilePix),
             )),
       );
     } else {
-      return Expanded(
-        child: Image.asset(
-          mockImage,
-          fit: BoxFit.cover,
-        ),
-      );
+      return profilePicture(context, size: 80);
     }
   }
 
@@ -332,7 +341,26 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> users = AuthProvider.auth(context).users;
     MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+    List<Grades> grades = AuthProvider.auth(context).grades;
 
+    age = toBeginningOfSentenceCase(users != null
+        ? users[childIndex?.index ?? 0].age.toString()
+        : mainChildUser.age.toString());
+    val = toBeginningOfSentenceCase(users != null
+        ? users[childIndex?.index ?? 0].age.toString()
+        : mainChildUser.age.toString());
+
+    final grade = grades
+        .where((element) =>
+            element.id ==
+            (users != null
+                ? users[childIndex?.index ?? 0].grade
+                : mainChildUser.grade))
+        .toList();
+    childClassName = grade[0].name;
+    classVal = grade[0].name;
+
+    // print('length:${AuthProvider.auth(context).grades.length}');
     setState(() {
       profilePix = users != null
           ? users[childIndex?.index ?? 0].photo
@@ -367,7 +395,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                           color: blackColor,
                         )),
                     Text(
-                      "Edit Child's details",
+                      "Edit child's details",
                       textAlign: TextAlign.center,
                       style: textStyleSmall.copyWith(
                           fontSize: 21.0,
@@ -379,7 +407,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                 ),
                 kLargeHeight,
                 Container(
-                  height: 90,
+                  height: 100,
                   child: ListView.separated(
                       separatorBuilder: (context, int) => kSmallWidth,
                       scrollDirection: Axis.horizontal,
@@ -390,46 +418,40 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              imageDisplay(_croppedImageFile,
-                                  children[index]['image_url']),
-                              SizedBox(
-                                height: 8,
+                              InkWell(
+                                onTap: () async {
+                                  await getImage(ImageSource.gallery);
+                                },
+                                child: Stack(
+                                  overflow: Overflow.visible,
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    imageDisplay(_croppedImageFile,
+                                        children[index]['image_url']),
+                                    Positioned(
+                                      top: 30,
+                                      right: -30,
+                                      // left: 50,
+                                      child: Container(
+                                        child: SvgPicture.asset(
+                                            'assets/images/svg/cam.svg'),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                              Text(
-                                toBeginningOfSentenceCase(users != null
-                                    ? users[childIndex?.index ?? 0].name
-                                    : mainChildUser.name),
-                                style: textLightBlack.copyWith(fontSize: 12),
-                              )
                             ],
                           ),
                         );
                       }),
                 ),
                 kSmallHeight,
-                InkWell(
-                  onTap: () async {
-                    await getImage(ImageSource.gallery);
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Change Picture',
-                        style: textExtraLightBlack.copyWith(
-                            decoration: TextDecoration.underline),
-                      )
-                    ],
-                  ),
-                ),
-                kLargeHeight,
                 Form(
                     key: formKey,
                     child: Column(
                       children: [
                         MyTextForm(
                             controllerName: _controllerName,
-                            validations: validations.validateName,
                             hintText: toBeginningOfSentenceCase(users != null
                                     ? users[childIndex?.index ?? 0].name
                                     : mainChildUser.name) ??
@@ -437,26 +459,20 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                         kSmallHeight,
                         DropDown(
                             onTap: () => bottomSheet(context, 'age'),
-                            text: age ??
+                            text: '$age years' ??
                                 ('${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].age.toString() : mainChildUser.age.toString())} Years' ??
                                     "Child's Age")),
                         kSmallHeight,
                         DropDown(
                             onTap: () => bottomSheet(context, 'class'),
-                            text: childClassName ?? "Child's Class"),
+                            text: toBeginningOfSentenceCase(childClassName) ??
+                                "Grade 1"),
                         kLargeHeight,
-                        LargeButton(
+                        GreenButton(
                           submit: () => nextPage(),
                           color: primaryColor,
                           name: 'Save Changes',
-                          loader: auth.isLoading
-                              ? CircularProgressIndicator()
-                              : Text(
-                                  'Save Changes',
-                                  style: headingWhite.copyWith(
-                                    color: secondaryColor,
-                                  ),
-                                ),
+                          loader: AuthProvider.auth(context).isLoading,
                           buttonColor: secondaryColor,
                         ),
                       ],

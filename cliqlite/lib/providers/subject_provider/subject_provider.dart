@@ -38,11 +38,13 @@ class SubjectProvider extends ChangeNotifier {
           name: kIndex, key: 'index', item: childIndex);
     }
 
+    // print('token:${AuthProvider.auth(_context).token}');
     //get subject
     var data = await _helper.getSubject(
         _context, grade?.grade ?? id, AuthProvider.auth(_context).token);
 
     print('subject: $data');
+
     data = (data as List).map((e) => Subject.fromJson(e)).toList();
 
     //Save subject in local storage

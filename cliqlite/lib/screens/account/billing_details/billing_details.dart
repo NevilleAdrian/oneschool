@@ -14,16 +14,16 @@ class BillingDetails extends StatefulWidget {
 }
 
 class _BillingDetailsState extends State<BillingDetails> {
-  Future<List<Transactions>> futureTransactions;
+  Future<List<Subscription>> futureTransactions;
 
-  Future<List<Transactions>> futureTask() async {
+  Future<List<Subscription>> futureTask() async {
     //Initialize provider
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
 
     //Make call to get videos
     try {
-      await subscription.getSubscription();
-      var result = await subscription.getTransactions();
+      var result = await subscription.getSubscription();
+      await subscription.getTransactions();
 
       setState(() {});
 
@@ -35,10 +35,12 @@ class _BillingDetailsState extends State<BillingDetails> {
   }
 
   Widget subscriptionScreen() {
-    Subscription subscription =
+    List<Subscription> subscription =
         SubscriptionProvider.subscribe(context).subscription;
     List<Transactions> transactions =
         SubscriptionProvider.subscribe(context).transactions;
+
+    print('subscription:$subscription');
 
     return SafeArea(
       child: Padding(
@@ -52,7 +54,7 @@ class _BillingDetailsState extends State<BillingDetails> {
                 InkWell(
                     onTap: () => Navigator.pop(context),
                     child: Icon(
-                      Icons.chevron_left,
+                      Icons.arrow_back_outlined,
                       color: blackColor,
                     )),
                 Text(
@@ -67,35 +69,92 @@ class _BillingDetailsState extends State<BillingDetails> {
               ],
             ),
             kLargeHeight,
-            BillingPlan(
-              text: 'Your Plan',
-              subText:
-                  'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription.subscription.amount.toString())))}month',
-              addedText: '1 Child',
+            // subscription == null
+            //     ? Text('No Billing Information')
+            //     :
+            subscription.isEmpty
+                ? Container(
+                    child: Text(
+                      'No Subscription Found ',
+                      style: smallPrimaryColor,
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // BillingPlan(
+                      //   text: 'Your Plan',
+                      //   subText:
+                      //       'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].subscription.amount.toString())))}month',
+                      //   addedText: '1 Child',
+                      // ),
+                      // kLargeHeight,
+                      // BillingPlan(
+                      //   text: 'Your next bill',
+                      //   subText:
+                      //       '${DateFormat("d MMM h:mma").format(subscription[0].user.subscriptionDueDate).toString() ?? ''}',
+                      // ),
+                      BillingPlan(
+                        text: 'Your Plan',
+                        subText:
+                            'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].plan.price.toString())))}month',
+                        addedText: '${subscription.length.toString()} Child',
+                      ),
+                      kLargeHeight,
+                      BillingPlan(
+                        text: 'Your next billing date',
+                        subText:
+                            '${DateFormat("d MMM h:mma").format(subscription[0].createdAt)}',
+                      ),
+                    ],
+                  ),
+            kSmallHeight,
+            // Expanded(
+            //   child: ListView.builder(
+            //       itemCount: transactions.length,
+            //       itemBuilder: (context, index) {
+            //         var transaction = transactions[index];
+            //         return BillingDescription(
+            //           date: DateFormat("dd MMM y")
+            //               .format(transaction.createdAt)
+            //               .toString(),
+            //           timeStamp: DateFormat("h: mma")
+            //               .format(transaction.createdAt)
+            //               .toString(),
+            //           // number: transaction['card_number'],
+            //           amount: transaction.amount.toString(),
+            //         );
+            //       }),
+            // )
+            Divider(
+              height: 5,
+              thickness: 0.6,
+              color: greyColor,
             ),
-            kLargeHeight,
-            BillingPlan(
-              text: 'Your next bill',
-              subText:
-                  '${DateFormat("d MMM h:mma").format(subscription.user.subscriptionDueDate).toString() ?? ''}',
-            ),
-            Expanded(
-              child: ListView.builder(
-                  itemCount: transactions.length,
-                  itemBuilder: (context, index) {
-                    var transaction = transactions[index];
-                    return BillingDescription(
-                      date: DateFormat("dd MMM y")
-                          .format(transaction.createdAt)
-                          .toString(),
-                      timeStamp: DateFormat("h: mma")
-                          .format(transaction.createdAt)
-                          .toString(),
-                      // number: transaction['card_number'],
-                      amount: transaction.amount.toString(),
-                    );
-                  }),
-            )
+            transactions.isEmpty
+                ? Container(
+                    child: Text(
+                      'No Transaction Found ',
+                      style: smallPrimaryColor,
+                    ),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                        itemCount: 5,
+                        itemBuilder: (context, index) {
+                          var transaction = transactions[index];
+                          return BillingDescription(
+                            date: DateFormat("dd MMM y")
+                                .format(DateTime.now())
+                                .toString(),
+                            timeStamp: DateFormat("h: mma")
+                                .format(DateTime.now())
+                                .toString(),
+                            // number: transaction['card_number'],
+                            amount: '500',
+                          );
+                        }),
+                  )
           ],
         ),
       ),
@@ -151,13 +210,13 @@ class BillingDescription extends StatelessWidget {
               children: [
                 Text(
                   date,
-                  style: smallPrimaryColor.copyWith(
-                      fontSize: 18, fontWeight: FontWeight.w700),
+                  style: smallAccentColor.copyWith(
+                      fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 kSmallHeight,
                 Text(
                   timeStamp,
-                  style: textExtraLightBlack.copyWith(fontSize: 16),
+                  style: smallPrimaryColor.copyWith(fontSize: 16),
                 ),
                 kSmallHeight,
                 // Row(
@@ -174,7 +233,7 @@ class BillingDescription extends StatelessWidget {
             ),
             Text(
               '₦$amount',
-              style: textExtraLightBlack.copyWith(fontSize: 18),
+              style: headingPrimaryColor.copyWith(fontSize: 18),
             )
           ],
         ),
@@ -202,17 +261,17 @@ class BillingPlan extends StatelessWidget {
       children: [
         Text(
           text,
-          style: textGrey,
+          style: smallAccentColor.copyWith(fontSize: 16),
         ),
         kVerySmallHeight,
         Text(
           subText,
-          style: textLightBlack,
+          style: headingPrimaryColor.copyWith(fontSize: 16),
         ),
         kVerySmallHeight,
         Text(
           addedText ?? '',
-          style: textLightBlack,
+          style: headingPrimaryColor.copyWith(fontSize: 16),
         ),
       ],
     );

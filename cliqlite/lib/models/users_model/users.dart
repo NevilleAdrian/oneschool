@@ -32,27 +32,30 @@ class Users {
   String photo;
   @HiveField(9)
   DateTime createdAt;
+  @HiveField(10)
+  bool isActive;
 
-  Users({
-    this.id,
-    this.name,
-    this.email,
-    this.age,
-    this.parent,
-    this.isSubscribed,
-    this.grade,
-    this.role,
-    this.photo,
-    this.createdAt,
-  });
+  Users(
+      {this.id,
+      this.name,
+      this.email,
+      this.age,
+      this.parent,
+      this.isSubscribed,
+      this.grade,
+      this.role,
+      this.photo,
+      this.createdAt,
+      this.isActive});
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
-        id: json["id"],
+        id: json["_id"],
         name: json["name"],
         email: json["email"],
         age: json["age"],
         parent: json["parent"],
         isSubscribed: json["isSubscribed"],
+        isActive: json["isActive"],
         grade: json["grade"],
         role: json["role"],
         photo: json["photo"],
@@ -66,6 +69,7 @@ class Users {
         "age": age,
         "parent": parent,
         "isSubscribed": isSubscribed,
+        "isActive": isActive,
         "grade": grade,
         "role": role,
         "photo": photo,

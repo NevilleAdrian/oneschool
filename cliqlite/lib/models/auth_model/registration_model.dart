@@ -31,7 +31,7 @@ class Register {
         fullName: json["fullname"],
         password: json["password"],
         phone: json["phone"],
-        childName: json["childname"],
+        childName: json["childName"],
         childAge: json["age"],
         childClass: json["grade"],
       );
@@ -41,7 +41,7 @@ class Register {
         "fullname": fullName,
         "phone": phone,
         "password": password,
-        "childname": childName,
+        "childName": childName,
         "age": childAge,
         "grade": childClass
       };

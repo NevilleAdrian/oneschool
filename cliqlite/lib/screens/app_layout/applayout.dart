@@ -25,7 +25,7 @@ class _AppLayoutState extends State<AppLayout> {
     Home(),
     Analytics(),
     Videos(),
-    LiveTutor(),
+    // LiveTutor(),
     Account(),
   ];
 
@@ -60,92 +60,72 @@ class _AppLayoutState extends State<AppLayout> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _onTapped,
-        backgroundColor: primaryColor,
+        backgroundColor: whiteColor,
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         iconSize: 20,
         items: [
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/home.svg",
-                color: _selectedIndex == 0
-                    ? secondaryColor
-                    : secondaryColor.withOpacity(0.4)),
+                color: _selectedIndex == 0 ? accentColor : greyColor),
             title: Padding(
               padding: const EdgeInsets.symmetric(vertical: 3.0),
               child: Text('Home',
                   style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 0
-                          ? secondaryColor
-                          : secondaryColor.withOpacity(0.4))),
+                      color: _selectedIndex == 0 ? accentColor : greyColor)),
             ),
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/trending-up.svg",
-                color: _selectedIndex == 1
-                    ? secondaryColor
-                    : secondaryColor.withOpacity(0.4)),
+                color: _selectedIndex == 1 ? accentColor : greyColor),
             title: Padding(
               padding: const EdgeInsets.symmetric(vertical: 3.0),
               child: Text('Analytics',
                   style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 1
-                          ? secondaryColor
-                          : secondaryColor.withOpacity(0.4))),
+                      color: _selectedIndex == 1 ? accentColor : greyColor)),
             ),
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/video.svg",
                 height: 20.0,
-                color: _selectedIndex == 2
-                    ? secondaryColor
-                    : secondaryColor.withOpacity(0.4)),
+                color: _selectedIndex == 2 ? accentColor : greyColor),
             title: Padding(
               padding: const EdgeInsets.symmetric(vertical: 3.0),
               child: Text('Videos',
                   style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 2
-                          ? secondaryColor
-                          : secondaryColor.withOpacity(0.4))),
+                      color: _selectedIndex == 2 ? accentColor : greyColor)),
             ),
           ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset("assets/images/svg/play.svg",
-                height: 20.0,
-                color: _selectedIndex == 3
-                    ? secondaryColor
-                    : secondaryColor.withOpacity(0.4)),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Text('Live Tutor',
-                  style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 3
-                          ? secondaryColor
-                          : secondaryColor.withOpacity(0.4))),
-            ),
-          ),
+          // BottomNavigationBarItem(
+          //   icon: SvgPicture.asset("assets/images/svg/play.svg",
+          //       height: 20.0,
+          //       color: _selectedIndex == 3 ? accentColor : greyColor),
+          //   title: Padding(
+          //     padding: const EdgeInsets.symmetric(vertical: 3.0),
+          //     child: Text('Live Tutor',
+          //         style: TextStyle(
+          //             fontSize: 11.0,
+          //             fontWeight: FontWeight.w600,
+          //             color: _selectedIndex == 3 ? accentColor : greyColor)),
+          //   ),
+          // ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/user.svg",
                 height: 20.0,
-                color: _selectedIndex == 4
-                    ? secondaryColor
-                    : secondaryColor.withOpacity(0.4)),
+                color: _selectedIndex == 3 ? accentColor : greyColor),
             title: Padding(
               padding: const EdgeInsets.symmetric(vertical: 3.0),
               child: Text('Account',
                   style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 4
-                          ? secondaryColor
-                          : secondaryColor.withOpacity(0.4))),
+                      color: _selectedIndex == 3 ? accentColor : greyColor)),
             ),
           ),
         ],

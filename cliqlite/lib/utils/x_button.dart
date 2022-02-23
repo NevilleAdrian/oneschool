@@ -17,7 +17,7 @@ class XButton extends StatelessWidget {
           onTap: onTap,
           child: Icon(
             Icons.clear,
-            color: color ?? blackColor,
+            color: color ?? primaryColor,
           ),
         )
       ],

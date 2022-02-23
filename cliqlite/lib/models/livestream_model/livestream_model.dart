@@ -52,7 +52,12 @@ class LiveStream {
         broadcast: json["broadcast"],
         broadcastUrl: json["broadcastUrl"],
         tutor: Tutor.fromJson(json["tutor"]),
-        appointment: Appointment.fromJson(json["appointment"]),
+        appointment: Appointment.fromJson(json["appointment"] ??
+            {
+              "id": "",
+              "start": "2021-11-11T13:50:18.232Z",
+              "end": "2021-11-11T13:50:18.232Z"
+            }),
         subject: ChildGrade.fromJson(json["subject"]),
         grade: ChildGrade.fromJson(json["grade"]),
         createdAt: DateTime.parse(json["createdAt"]),

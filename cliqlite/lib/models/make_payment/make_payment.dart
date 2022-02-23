@@ -1,7 +1,8 @@
 import 'dart:io';
 
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
-import 'package:cliqlite/screens/app_layout/applayout.dart';
+import 'package:cliqlite/screens/payment/payment_page.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/constants.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
@@ -37,52 +38,71 @@ class MakePayment {
     await payStack.initialize(publicKey: ConstantKey.PAYSTACK_KEY);
   }
 
-  dynamic chargeCardAndMakePayment(String subId, String childId) {
+  dynamic chargeCardAndMakePayment(
+      String subId, String childId, BuildContext context) async {
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(ctx);
-    initializePlugin().then((_) async {
-      Charge charge = Charge()
-        ..amount = amount * 100
-        ..email = email
-        ..reference = _getReference()
-        ..card = _getCardUi();
-
-      CheckoutResponse response = await payStack.checkout(ctx,
-          charge: charge, method: CheckoutMethod.card, fullscreen: false);
-      if (response.status == true) {
-        print('Successful');
-        try {
-          var data = await SubscriptionProvider.subscribe(ctx).addSubscription(
-              subId ?? subscription.allSubscription[0].id, childId);
-          if (data != null) {
-            try {
-              data = await SubscriptionProvider.subscribe(ctx)
-                  .verifySubscription(data['data']['_id'], response.reference);
-              print('dataaa:$data');
-              if (data != null) {
-                showFlush(ctx, 'Subscription successful', primaryColor);
-                Future.delayed(Duration(seconds: 3), () {
-                  Navigator.push(
-                      ctx,
-                      MaterialPageRoute(
-                          builder: (context) => AppLayout(
-                                index: 0,
-                              )));
-                });
-                return data;
-              }
-            } catch (ex) {
-              print('ex...$ex');
-              showFlush(ctx, ex.toString(), primaryColor);
-            }
-          }
-        } catch (ex) {
-          print('new ex...$ex');
-
-          showFlush(ctx, ex.toString(), primaryColor);
-        }
-      } else {
-        print('Failed');
+    try {
+      var data = await SubscriptionProvider.subscribe(ctx).addSubscription(
+          subId ?? subscription.allSubscription[0].id, childId);
+      print('data:$data');
+      if (data != null) {
+        AuthProvider.auth(context).setIsLoading(false);
+        print('loading:${AuthProvider.auth(context).isLoading}');
+        Navigator.push(
+            ctx,
+            MaterialPageRoute(
+                builder: (context) => PaymentPage(
+                      url: data['data']['data']['authorization_url'],
+                    )));
       }
-    });
+    } catch (ex) {
+      print('ex...$ex');
+      showFlush(ctx, ex.toString(), primaryColor);
+    }
+
+    // initializePlugin().then((_) async {
+    //   Charge charge = Charge()
+    //     ..amount = amount * 100
+    //     ..email = email
+    //     ..reference = _getReference()
+    //     ..card = _getCardUi();
+    //
+    //   CheckoutResponse response = await payStack.checkout(ctx,
+    //       charge: charge, method: CheckoutMethod.card, fullscreen: false);
+    //   if (response.status == true) {
+    //     print('Successful');
+    //     try {
+    //       var data = await SubscriptionProvider.subscribe(ctx).addSubscription(subId ?? subscription.allSubscription[0].id, childId);
+    //       if (data != null) {
+    //         try {
+    //           data = await SubscriptionProvider.subscribe(ctx)
+    //               .verifySubscription(data['data']['_id'], response.reference);
+    //           print('dataaa:$data');
+    //           if (data != null) {
+    //             showFlush(ctx, 'Subscription successful', primaryColor);
+    //             Future.delayed(Duration(seconds: 3), () {
+    //               Navigator.push(
+    //                   ctx,
+    //                   MaterialPageRoute(
+    //                       builder: (context) => AppLayout(
+    //                             index: 0,
+    //                           )));
+    //             });
+    //             return data;
+    //           }
+    //         } catch (ex) {
+    //           print('ex...$ex');
+    //           showFlush(ctx, ex.toString(), primaryColor);
+    //         }
+    //       }
+    //     } catch (ex) {
+    //       print('new ex...$ex');
+    //
+    //       showFlush(ctx, ex.toString(), primaryColor);
+    //     }
+    //   } else {
+    //     print('Failed');
+    //   }
+    // });
   }
 }
