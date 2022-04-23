@@ -54,7 +54,7 @@ class Users {
         email: json["email"],
         age: json["age"],
         parent: json["parent"],
-        isSubscribed: json["isSubscribed"],
+        isSubscribed: json["subscribed"],
         isActive: json["isActive"],
         grade: json["grade"],
         role: json["role"],

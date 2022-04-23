@@ -16,6 +16,7 @@ class Subscription {
     this.role,
     this.plan,
     this.status,
+    this.type,
     this.child,
     this.amount,
     this.createdAt,
@@ -28,6 +29,7 @@ class Subscription {
   String role;
   Plan plan;
   String status;
+  String type;
   String child;
   int amount;
   DateTime createdAt;
@@ -40,6 +42,7 @@ class Subscription {
         role: json["role"],
         plan: Plan.fromJson(json["plan"]),
         status: json["status"],
+        type: json["type"],
         child: json["child"],
         amount: json["amount"],
         createdAt: DateTime.parse(json["createdAt"]),
@@ -53,6 +56,7 @@ class Subscription {
         "role": role,
         "plan": plan.toJson(),
         "status": status,
+        "type": type,
         "child": child,
         "amount": amount,
         "createdAt": createdAt.toIso8601String(),

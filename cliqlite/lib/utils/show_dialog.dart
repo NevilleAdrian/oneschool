@@ -30,6 +30,26 @@ dynamic dialogBox(
       });
 }
 
+Future<dynamic> openBottomSheet(BuildContext context, Widget widget) async {
+  return await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 1 / 1.6,
+        decoration: BoxDecoration(
+            color: whiteColor,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30),
+              topLeft: Radius.circular(30),
+            )),
+        child: widget,
+      );
+    },
+  );
+}
+
 void showFlush(BuildContext context, String message, Color color) {
   Flushbar(
     backgroundColor: color == primaryColor ? accentColor : color,
@@ -39,8 +59,8 @@ void showFlush(BuildContext context, String message, Color color) {
   ).show(context);
 }
 
-Widget circularProgressIndicator() => CircularProgressIndicator(
-      strokeWidth: 2,
+Widget circularProgressIndicator([Color color]) => CircularProgressIndicator(
+      strokeWidth: 1,
       backgroundColor: Colors.white,
       valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
     );

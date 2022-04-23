@@ -2,6 +2,7 @@ import 'package:cliqlite/models/analytics/analytics_subject/analytics_subject.da
 import 'package:cliqlite/models/analytics/analytics_topic/analytics_topic.dart';
 import 'package:cliqlite/providers/analytics_provider/analytics_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/screens/analytics/view_details.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/bar_chart.dart';
@@ -88,7 +89,8 @@ class _AnalyticsState extends State<Analytics> {
                     footer: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${topicList.highestPerformingSubject.no.ceil()}%',
+                        Text(
+                            '${topicList.highestPerformingSubject?.no?.ceil().toString()}%',
                             style: headingSmallGreyColor.copyWith(
                                 fontWeight: FontWeight.w600, fontSize: 14)),
                         kVerySmallHeight,
@@ -139,57 +141,61 @@ class _AnalyticsState extends State<Analytics> {
                           border: Border.all(color: greyColor, width: 0.6)),
                       child: Column(
                         children: [
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //   children: [
-                          //     Container(
-                          //       decoration: BoxDecoration(
-                          //           color: Color(0XFFEDEFF2),
-                          //           borderRadius: BorderRadius.circular(30)),
-                          //       height: 40,
-                          //       // width: 80,
-                          //       child: DropdownButtonHideUnderline(
-                          //         child: ButtonTheme(
-                          //           minWidth: 5,
-                          //           // alignedDropdown: true,
-                          //           child: DropdownButton<String>(
-                          //             value: val,
-                          //             items: <String>[
-                          //               'All time',
-                          //               'Last Year',
-                          //               'This Year',
-                          //             ].map((String value) {
-                          //               return DropdownMenuItem<String>(
-                          //                 value: value,
-                          //                 child: Text(
-                          //                   value,
-                          //                   style: textGrey.copyWith(fontSize: 12),
-                          //                 ),
-                          //               );
-                          //             }).toList(),
-                          //             onChanged: (String value) {
-                          //               setState(() => val = value);
-                          //             },
-                          //           ),
-                          //         ),
-                          //       ),
-                          //       padding:
-                          //           EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                          //     ),
-                          //     InkWell(
-                          //       onTap: () =>
-                          //           Navigator.pushNamed(context, ViewDetails.id),
-                          //       child: Text(
-                          //         'View Details',
-                          //         style: smallPrimaryColor.copyWith(
-                          //           fontSize: 12,
-                          //           fontWeight: FontWeight.w400,
-                          //           decoration: TextDecoration.underline,
-                          //         ),
-                          //       ),
-                          //     )
-                          //   ],
-                          // ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Analytics',
+                                style: textGrey.copyWith(fontSize: 12),
+                              ),
+                              // Container(
+                              //   decoration: BoxDecoration(
+                              //       color: Color(0XFFEDEFF2),
+                              //       borderRadius: BorderRadius.circular(30)),
+                              //   height: 40,
+                              //   // width: 80,
+                              //   child: DropdownButtonHideUnderline(
+                              //     child: ButtonTheme(
+                              //       minWidth: 5,
+                              //       // alignedDropdown: true,
+                              //       child: DropdownButton<String>(
+                              //         value: val,
+                              //         items: <String>[
+                              //           'All time',
+                              //           'Last Year',
+                              //           'This Year',
+                              //         ].map((String value) {
+                              //           return DropdownMenuItem<String>(
+                              //             value: value,
+                              //             child: Text(
+                              //               value,
+                              //               style: textGrey.copyWith(fontSize: 12),
+                              //             ),
+                              //           );
+                              //         }).toList(),
+                              //         onChanged: (String value) {
+                              //           setState(() => val = value);
+                              //         },
+                              //       ),
+                              //     ),
+                              //   ),
+                              //   padding:
+                              //       EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                              // ),
+                              InkWell(
+                                onTap: () => Navigator.pushNamed(
+                                    context, ViewDetails.id),
+                                child: Text(
+                                  'View Details',
+                                  style: smallPrimaryColor.copyWith(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                           // kVerySmallHeight,
                           Container(
                             height: 250,
@@ -273,7 +279,7 @@ class AnalyticsBox extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(number,
+                    Text(number.toString(),
                         style: headingSmallGreyColor.copyWith(
                             fontWeight: FontWeight.w600, fontSize: 26)),
                   ],

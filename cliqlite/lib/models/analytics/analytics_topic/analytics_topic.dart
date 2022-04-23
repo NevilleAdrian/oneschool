@@ -29,9 +29,9 @@ class AnalyticTopic {
   factory AnalyticTopic.fromJson(Map<String, dynamic> json) => AnalyticTopic(
         highestPerformingSubject:
             HighestPerformingSubject.fromJson(json["highestPerformingSubject"]),
-        videosWatched: json["videosWatched"],
-        quizCompleted: json["quizCompleted"],
-        graph: List<Graph>.from(json["graph"].map((x) => Graph.fromJson(x))),
+        videosWatched: json["videosWatched"] ?? '0',
+        quizCompleted: json["quizCompleted"] ?? '0',
+        graph: List<Graph>.from(json["graph"]?.map((x) => Graph.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -99,8 +99,8 @@ class HighestPerformingSubject {
 
   factory HighestPerformingSubject.fromJson(Map<String, dynamic> json) =>
       HighestPerformingSubject(
-        name: json["name"],
-        no: json["no"],
+        name: json["name"] ?? '',
+        no: json["no"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

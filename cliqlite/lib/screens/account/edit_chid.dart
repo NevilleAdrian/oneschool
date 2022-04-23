@@ -99,8 +99,10 @@ class _EditChildDetailsState extends State<EditChildDetails> {
               : mainChildUser?.id);
       if (auth.user.role != 'user') {
         await AuthProvider.auth(context).getChildren();
+        profilePix = null;
       } else {
         AuthProvider.auth(context).getMainChild();
+        profilePix = null;
       }
 
       if (result != null) {

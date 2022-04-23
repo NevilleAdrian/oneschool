@@ -280,6 +280,14 @@ class NetworkHelper {
   }
 
   //Get a Subscription
+  Future<dynamic> getCards(BuildContext context, String token) async {
+    final result =
+        await getRequest(url: 'cards', context: context, token: token);
+    print('result:$result');
+    return result['data'];
+  }
+
+  //Get a Subscription
   Future<dynamic> getTransactions(
       BuildContext context, String childId, String token) async {
     final result = await getRequest(
@@ -336,6 +344,14 @@ class NetworkHelper {
     return result['data'];
   }
 
+  //Get Analytics Topic
+  Future<dynamic> getTestResults(
+      BuildContext context, String childId, String token) async {
+    final result = await getRequest(
+        url: 'users/results/$childId', context: context, token: token);
+    return result['data'];
+  }
+
   //Get Analytics Subject
   Future<dynamic> getLiveStream(
       BuildContext context, String grade, String token) async {
@@ -349,12 +365,38 @@ class NetworkHelper {
   }
 
   //Add Subscription
-  Future<dynamic> addSubscription(
-      String subId, String childId, String token, BuildContext context) async {
-    var body = {"plan": subId, "childId": childId};
+  Future<dynamic> toggleSubscription(
+      String subId, String type, String token, BuildContext context) async {
+    var params = {"type": type};
+
+    return await patchParamRequest(
+        url: 'subscriptions/$subId',
+        params: params,
+        token: token,
+        context: context);
+  }
+
+  //Add Subscription
+  Future<dynamic> addSubscription(String subId, String childId, String type,
+      String token, BuildContext context) async {
+    var body = {"plan": subId, "childId": childId, "type": type};
 
     return await postRequest(
         body: body, url: 'subscriptions', token: token, context: context);
+  }
+
+  //Add Card
+  Future<dynamic> addCard(String token, BuildContext context) async {
+    return await postRequest(url: 'cards', token: token, context: context);
+  }
+
+  //delete Card
+  Future<dynamic> deleteCard(
+      String id, String token, BuildContext context) async {
+    return await http.delete(
+      uriConverter('cards/$id'),
+      headers: kHeaders(token ?? null),
+    );
   }
 
   //Verify Subscription
@@ -394,10 +436,16 @@ class NetworkHelper {
     }
   }
 
-  Future<dynamic> getRequest(
-      {String url, String token, BuildContext context}) async {
-    var response =
-        await http.get(uriConverter(url), headers: kHeaders(token ?? null));
+  Future<dynamic> patchParamRequest(
+      {String url,
+      Map body,
+      Map<String, dynamic> params,
+      String token,
+      BuildContext context}) async {
+    print('url: ${uriConverterWithQuery(url, params)}');
+    var response = await http.patch(uriConverterWithQuery(url, params),
+        headers: kHeaders(token ?? null),
+        body: body == null ? null : json.encode(body));
     var decoded = jsonDecode(response.body);
     print(response.headers);
     if (response.statusCode.toString().startsWith('2')) {
@@ -405,6 +453,41 @@ class NetworkHelper {
     } else {
       throw ApiFailureException(
           decoded['msg'] ?? response.reasonPhrase ?? 'Unknown error');
+    }
+  }
+
+  Future<dynamic> getRequest(
+      {String url, String token, BuildContext context}) async {
+    var response =
+        await http.get(uriConverter(url), headers: kHeaders(token ?? null));
+    print(response.body);
+
+    var decoded = jsonDecode(response.body);
+
+    if (response.statusCode.toString().startsWith('2')) {
+      return decoded;
+    } else {
+      throw ApiFailureException(
+          decoded['msg'] ?? response.reasonPhrase ?? 'Unknown error');
+    }
+  }
+
+  Future<dynamic> patchRequest(
+      {Map body, String url, String token, BuildContext context}) async {
+    print('body is $body');
+    print('Encoded body ${json.encode(body)}');
+    var response = await http.patch(uriConverter(url),
+        headers: kHeaders(token ?? null),
+        body: body == null ? null : json.encode(body));
+    print(response.body);
+    var decoded = jsonDecode(response.body);
+    if (response.statusCode.toString().startsWith('2')) {
+      print('decode:$decoded');
+      return decoded;
+    } else {
+      print(
+          'reason is ${response.reasonPhrase} message is ${decoded['error']}');
+      throw ApiFailureException(decoded['error'] ?? response.reasonPhrase);
     }
   }
 
@@ -431,7 +514,8 @@ class NetworkHelper {
     print('body is $body');
     print('Encoded body ${json.encode(body)}');
     var response = await http.post(uriConverter(url),
-        headers: kHeaders(token ?? null), body: json.encode(body));
+        headers: kHeaders(token ?? null),
+        body: body == null ? null : json.encode(body));
     print(response.body);
     var decoded = jsonDecode(response.body);
     if (response.statusCode.toString().startsWith('2')) {

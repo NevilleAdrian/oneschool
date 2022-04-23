@@ -359,6 +359,9 @@ var quizzData = [
     "id": "616f255a668b55206a6f4038"
   }
 ];
+
+var paymentType = ['one-off', 'recurring'];
+
 //Child year data
 var childYears = [
   {"name": '5 years', "years": Years.fifth},

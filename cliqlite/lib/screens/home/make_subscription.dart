@@ -1,19 +1,19 @@
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
-import 'package:cliqlite/models/make_payment/make_payment.dart';
 import 'package:cliqlite/models/subscription_model/all_subscriptions/all_subscriptions.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/home/payment_summary.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 
-enum Attribute { yearly, monthly, quaterly }
+enum Attribute { yearly, monthly, quaterly, daily }
 
 class MakeSubscription extends StatefulWidget {
   static String id = 'make_subscription';
@@ -25,6 +25,7 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
   Attribute val = Attribute.yearly;
   String subId;
   String childId;
+  String type;
   int amount;
   int number = 0;
 
@@ -101,17 +102,27 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                     return SubscriptionBox(
                         title: sub.type == "monthly"
                             ? 'Monthly'
-                            : (sub.type == "yearly" ? 'Yearly' : 'Quarterly'),
+                            : (sub.type == "yearly"
+                                ? 'Yearly'
+                                : (sub.type == "quarterly"
+                                    ? 'Quarterly'
+                                    : "Daily")),
                         type: sub.type == "monthly"
                             ? 'Monthly'
-                            : (sub.type == "yearly" ? 'Yearly' : 'Quarterly'),
+                            : (sub.type == "yearly"
+                                ? 'Yearly'
+                                : (sub.type == "quarterly"
+                                    ? 'Quarterly'
+                                    : "Daily")),
                         subTitle: addSeparator(toDecimalPlace(
                             int.parse(sub.price.toString()) ?? 0)),
                         attribute: sub.type == "monthly"
                             ? Attribute.monthly
                             : (sub.type == "yearly"
                                 ? Attribute.yearly
-                                : Attribute.quaterly),
+                                : (sub.type == "quarterly"
+                                    ? Attribute.quaterly
+                                    : Attribute.daily)),
                         groupVal: val,
                         decoration: decoration.copyWith(
                             borderRadius: BorderRadius.circular(20),
@@ -125,26 +136,30 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                             ? Attribute.monthly
                             : (sub.type == "yearly"
                                 ? Attribute.yearly
-                                : Attribute.quaterly),
+                                : (sub.type == "quarterly"
+                                    ? Attribute.quaterly
+                                    : Attribute.daily)),
                         onChanged: (Attribute value) {
                           setState(() {
                             val = value;
                             number = index;
-
                             print('number:$number');
                             print('number:$index');
-                            // subId = val == Attribute.monthly
-                            //     ? subscription.allSubscription[1].id
-                            //     : subscription.allSubscription[0].id;
                             subId = sub.id;
                             amount = sub.price;
+                            type = sub.type;
                           });
                         });
                   }),
             ),
             kSmallHeight,
             GreenButton(
-              submit: () => nextPage(context),
+              submit: () => nextPage(
+                  context,
+                  type ?? subscription.allSubscription[0].type,
+                  amount ?? subscription.allSubscription[0].price,
+                  subId,
+                  childId),
               color: primaryColor,
               name: 'Continue',
               buttonColor: secondaryColor,
@@ -156,22 +171,17 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
     );
   }
 
-  nextPage(BuildContext context) async {
-    SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
-    AuthProvider.auth(context).setIsLoading(true);
-    try {
-      setState(() {});
-
-      MakePayment(
-        ctx: context,
-        amount: amount ?? subscription.allSubscription[0].price,
-        email: AuthProvider.auth(context).user.email,
-      ).chargeCardAndMakePayment(subId, childId, context);
-    } catch (ex) {
-      setState(() {
-        AuthProvider.auth(context).setIsLoading(false);
-      });
-    }
+  nextPage(BuildContext context, String type, int amount, String subId,
+      String childId) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PaymentSummary(
+                  type: type,
+                  amount: amount,
+                  subId: subId,
+                  childId: childId,
+                )));
   }
 
   @override

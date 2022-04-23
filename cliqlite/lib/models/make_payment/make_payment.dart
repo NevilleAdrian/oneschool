@@ -11,11 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
 
 class MakePayment {
-  MakePayment({this.ctx, this.amount, this.email});
+  MakePayment({
+    this.ctx,
+    this.amount,
+    this.email,
+    this.type,
+  });
 
   BuildContext ctx;
   int amount;
   String email;
+  String type;
 
   PaystackPlugin payStack = PaystackPlugin();
 
@@ -43,7 +49,7 @@ class MakePayment {
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(ctx);
     try {
       var data = await SubscriptionProvider.subscribe(ctx).addSubscription(
-          subId ?? subscription.allSubscription[0].id, childId);
+          subId ?? subscription.allSubscription[0].id, type, childId);
       print('data:$data');
       if (data != null) {
         AuthProvider.auth(context).setIsLoading(false);

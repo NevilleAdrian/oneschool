@@ -1,7 +1,9 @@
+import 'package:cliqlite/models/mock_data/mock_data.dart';
 import 'package:cliqlite/models/subscription_model/subscription_model.dart';
 import 'package:cliqlite/models/transactions/transactions.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
+import 'package:cliqlite/screens/home/payment_summary.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
@@ -14,6 +16,7 @@ class BillingDetails extends StatefulWidget {
 }
 
 class _BillingDetailsState extends State<BillingDetails> {
+  Attribute val;
   Future<List<Subscription>> futureTransactions;
 
   Future<List<Subscription>> futureTask() async {
@@ -29,9 +32,18 @@ class _BillingDetailsState extends State<BillingDetails> {
 
       print('result:$result');
 
+      val = subscription.subscription[0].type == 'recurring'
+          ? Attribute.recurring
+          : Attribute.onetime;
+
       //Return future value
       return Future.value(result);
     } catch (ex) {}
+  }
+
+  void toggleSub(String subId, String type) async {
+    await SubscriptionProvider.subscribe(context)
+        .toggleSubscription(subId, type);
   }
 
   Widget subscriptionScreen() {
@@ -106,6 +118,45 @@ class _BillingDetailsState extends State<BillingDetails> {
                         subText:
                             '${DateFormat("d MMM h:mma").format(subscription[0].createdAt)}',
                       ),
+                      Container(
+                        height: 150,
+                        decoration: decoration.copyWith(
+                            borderRadius: BorderRadius.circular(20),
+                            color: lightPrimaryColor,
+                            border: Border.all(color: lightPrimaryColor)),
+                        child: ListView.separated(
+                          separatorBuilder: (context, _) => kVerySmallHeight,
+                          itemCount: paymentType.length,
+                          itemBuilder: (context, index) {
+                            final sub = paymentType[index];
+
+                            print('payment:$paymentType');
+
+                            return PaymentBox(
+                                title: sub == "one-off"
+                                    ? 'One-time payment'
+                                    : 'Recurring Payment',
+                                attribute: sub == "one-off"
+                                    ? Attribute.onetime
+                                    : Attribute.recurring,
+                                groupVal: val,
+                                val: sub == "one-off"
+                                    ? Attribute.onetime
+                                    : Attribute.recurring,
+                                onChanged: (Attribute value) {
+                                  setState(() {
+                                    val = value;
+                                    print('val:$val');
+                                  });
+                                  toggleSub(
+                                      subscription[0].id,
+                                      val == Attribute.onetime
+                                          ? 'one-off'
+                                          : 'recurring');
+                                });
+                          },
+                        ),
+                      )
                     ],
                   ),
             kSmallHeight,
@@ -131,30 +182,32 @@ class _BillingDetailsState extends State<BillingDetails> {
               thickness: 0.6,
               color: greyColor,
             ),
-            transactions.isEmpty
-                ? Container(
-                    child: Text(
-                      'No Transaction Found ',
-                      style: smallPrimaryColor,
-                    ),
-                  )
-                : Expanded(
-                    child: ListView.builder(
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          var transaction = transactions[index];
-                          return BillingDescription(
-                            date: DateFormat("dd MMM y")
-                                .format(DateTime.now())
-                                .toString(),
-                            timeStamp: DateFormat("h: mma")
-                                .format(DateTime.now())
-                                .toString(),
-                            // number: transaction['card_number'],
-                            amount: '500',
-                          );
-                        }),
-                  )
+
+            if (transactions != null)
+              transactions.isEmpty
+                  ? Container(
+                      child: Text(
+                        'No Transaction Found ',
+                        style: smallPrimaryColor,
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            var transaction = transactions[index];
+                            return BillingDescription(
+                              date: DateFormat("dd MMM y")
+                                  .format(DateTime.now())
+                                  .toString(),
+                              timeStamp: DateFormat("h: mma")
+                                  .format(DateTime.now())
+                                  .toString(),
+                              // number: transaction['card_number'],
+                              amount: '500',
+                            );
+                          }),
+                    )
           ],
         ),
       ),

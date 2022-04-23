@@ -3,11 +3,11 @@ import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
-import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/home.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
 import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
+import 'package:cliqlite/screens/videos/video_lessons.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/outline_button.dart';
@@ -33,7 +33,12 @@ class QuizResult extends StatefulWidget {
 
 class _QuizResultState extends State<QuizResult> {
   newQuiz() {
-    Navigator.pushNamed(context, AppLayout.id);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => VideoLessons(
+                // subId: ,
+                )));
   }
 
   retakeQuiz() {
@@ -227,26 +232,30 @@ class _QuizResultState extends State<QuizResult> {
                                       '0XFF${_topic[index].primaryColor}')),
                                   secondaryColor: Color(int.parse(
                                       '0XFF${_topic[index].secondaryColor}')),
-                                  widget: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                          child: SwipeChild(
-                                            height: 120,
-                                            subject: _topic[index].subject.name,
-                                            time:
-                                                '${DateFormat('mm').format(_topic[0].createdAt)} mins',
-                                            slug: _topic[index].icon,
-                                            topic: _topic[index].name,
-                                          ),
-                                          onTap: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      VideoFullScreen(
-                                                        topic: _topic[index],
-                                                      ))))
-                                    ],
+                                  widget: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        InkWell(
+                                            child: SwipeChild(
+                                              height: 120,
+                                              subject:
+                                                  _topic[index].subject.name,
+                                              time:
+                                                  '${DateFormat('mm').format(_topic[0].createdAt)} mins',
+                                              slug: _topic[index].icon,
+                                              topic: _topic[index].name,
+                                            ),
+                                            onTap: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        VideoFullScreen(
+                                                          topic: _topic[index],
+                                                        ))))
+                                      ],
+                                    ),
                                   ),
                                 );
                               }),

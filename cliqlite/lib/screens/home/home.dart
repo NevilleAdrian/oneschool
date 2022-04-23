@@ -72,7 +72,6 @@ class _HomeState extends State<Home> {
       // // Make call to get Children
       data = await AuthProvider.auth(context).getChildren();
 
-      // print('gradee:: ${subject?.grade?.grade}');
       print('gradee:: ${auth.users}');
       // // Make call to get Subjects
       sub = await subject.getSubjects(
@@ -480,7 +479,7 @@ class _HomeState extends State<Home> {
                         },
                       ),
                       Container(
-                        height: subject.length <= 3 ? 180 : 330,
+                        height: subject.length <= 3 ? 180 : 280,
                         child: GridView.builder(
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -488,7 +487,7 @@ class _HomeState extends State<Home> {
                                     crossAxisCount: 3,
                                     crossAxisSpacing: 12,
                                     mainAxisSpacing: 20),
-                            itemCount: subject.length,
+                            itemCount: 6,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
@@ -517,9 +516,20 @@ class _HomeState extends State<Home> {
                                         placeholder:
                                             AssetImage('assets/images/dna.png'),
                                       ),
-                                      Text(
-                                        subject[index].name,
-                                        style: heading18,
+                                      kVerySmallHeight,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              subject[index].name,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: heading18,
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),
@@ -563,27 +573,31 @@ class _HomeState extends State<Home> {
                                             '0XFF${childTopics[index].topic.primaryColor}')),
                                         secondaryColor: Color(int.parse(
                                             '0XFF${childTopics[index].topic.secondaryColor}')),
-                                        widget: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SwipeChild(
-                                              // height: 120,
-                                              subject:
-                                                  toBeginningOfSentenceCase(
-                                                      childTopics[index]
-                                                          .topic
-                                                          .name),
-                                              time:
-                                                  '${DateFormat('mm').format(childTopics[0].createdAt)} mins',
-                                              slug:
-                                                  childTopics[index].topic.icon,
-                                              topic: toBeginningOfSentenceCase(
-                                                  childTopics[index]
-                                                      .topic
-                                                      .description),
-                                            )
-                                          ],
+                                        widget: SingleChildScrollView(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SwipeChild(
+                                                // height: 120,
+                                                subject:
+                                                    toBeginningOfSentenceCase(
+                                                        childTopics[index]
+                                                            .topic
+                                                            .name),
+                                                time:
+                                                    '${childTopics[0].topic.video.duration} mins',
+                                                slug: childTopics[index]
+                                                    .topic
+                                                    .icon,
+                                                topic:
+                                                    toBeginningOfSentenceCase(
+                                                        childTopics[index]
+                                                            .topic
+                                                            .description),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );
@@ -592,43 +606,58 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                   kLargeHeight,
-                  TextBox(
-                    text: 'People love our product',
-                  ),
-                  kSmallHeight,
-                  Container(
-                    height: 200,
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) => kSmallWidth,
-                      itemCount: feed.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) => Container(
-                        width: 351,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 35, horizontal: 20),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: accentColor, width: 0.6)),
-                        child: Column(
+                  feed.isEmpty
+                      ? Container()
+                      : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(feed[index].owner?.name ?? 'Anonymous',
-                                style: smallPrimaryColor.copyWith(
-                                    color: accentColor, fontSize: 16)),
+                            TextBox(
+                              text: 'People love our product',
+                            ),
                             kSmallHeight,
-                            Text(feed[index].message,
-                                style:
-                                    smallPrimaryColor.copyWith(fontSize: 16)),
-                            kSmallHeight,
-                            Text(
-                                '${DateFormat('MMM d, y').format(feed[0].createdAt)}',
-                                style: smallPrimaryColor.copyWith(
-                                    color: accentColor, fontSize: 12)),
+                            Container(
+                              height: 200,
+                              child: ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    kSmallWidth,
+                                itemCount: feed.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) => Container(
+                                  width: 331,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 35, horizontal: 20),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                          color: accentColor, width: 0.6)),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                          feed[index].owner?.name ??
+                                              'Anonymous',
+                                          style: smallPrimaryColor.copyWith(
+                                              color: accentColor,
+                                              fontSize: 16)),
+                                      kSmallHeight,
+                                      Text(feed[index].message,
+                                          style: smallPrimaryColor.copyWith(
+                                              fontSize: 16)),
+                                      kSmallHeight,
+                                      Text(
+                                          '${DateFormat('MMM d, y').format(feed[0].createdAt)}',
+                                          style: smallPrimaryColor.copyWith(
+                                              color: accentColor,
+                                              fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ),
-                  ),
+
                   kLargeHeight,
                   InkWell(
                     onTap: () => shareToSocials(context),
@@ -800,6 +829,7 @@ class YellowButton extends StatelessWidget {
           backgroundColor: MaterialStateProperty.all(Color(0xffF8B800))),
       child: Text(
         text ?? 'Start Now',
+        textAlign: TextAlign.center,
         style: textExtraLightBlack.copyWith(fontSize: text != null ? 11 : 15),
       ),
     );

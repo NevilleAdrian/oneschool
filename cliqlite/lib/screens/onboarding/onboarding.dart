@@ -91,56 +91,108 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-            child: GestureDetector(
-              onTap: () {
-                if (_currentPage >= 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => GetStarted()),
-                  );
-                  first = AuthProvider.auth(context)
-                      .myFirst(FirstTime.fromJson({"bool": true}));
-                  _hiveRepository.add<FirstTime>(
-                      name: kFirst, key: 'first', item: first);
-                  return;
-                }
-                pageViewController.nextPage(
-                  curve: Curves.easeIn,
-                  duration: Duration(milliseconds: 250),
-                );
-              },
-              child: Container(
-                // splashColor: Colors.transparent,
-                decoration: BoxDecoration(
-                  color: _currentPage >= 2 ? primaryColor : secondaryColor,
-                  borderRadius: BorderRadius.circular(15),
-                  gradient: _currentPage >= 2
-                      ? const LinearGradient(
-                          colors: [
-                            Color(0XFF07AB2C),
-                            Color(0XFF69E905),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                  child: Text(
-                    _currentPage < 2 ? "Skip" : "Get Started",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color:
-                            _currentPage >= 2 ? secondaryColor : accentColor),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+                child: GestureDetector(
+                  onTap: () {
+                    if (_currentPage >= 2) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => GetStarted()),
+                      );
+                      first = AuthProvider.auth(context)
+                          .myFirst(FirstTime.fromJson({"bool": true}));
+                      _hiveRepository.add<FirstTime>(
+                          name: kFirst, key: 'first', item: first);
+                      return;
+                    }
+                    pageViewController.nextPage(
+                      curve: Curves.easeIn,
+                      duration: Duration(milliseconds: 250),
+                    );
+                  },
+                  child: Container(
+                    // splashColor: Colors.transparent,
+                    decoration: BoxDecoration(
+                      color: _currentPage >= 2 ? primaryColor : secondaryColor,
+                      borderRadius: BorderRadius.circular(15),
+                      gradient: _currentPage >= 2
+                          ? const LinearGradient(
+                              colors: [
+                                Color(0XFF07AB2C),
+                                Color(0XFF69E905),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : null,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 30),
+                      child: Text(
+                        _currentPage < 2 ? "Next" : "Get Started",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: _currentPage >= 2
+                                ? secondaryColor
+                                : accentColor),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              // _currentPage >= 2
+              //     ? Container()
+              //     : Padding(
+              //         padding: const EdgeInsets.symmetric(horizontal: 20),
+              //         child: GestureDetector(
+              //           onTap: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                   builder: (context) => GetStarted()),
+              //             );
+              //             first = AuthProvider.auth(context)
+              //                 .myFirst(FirstTime.fromJson({"bool": true}));
+              //             _hiveRepository.add<FirstTime>(
+              //                 name: kFirst, key: 'first', item: first);
+              //           },
+              //           child: Container(
+              //             // splashColor: Colors.transparent,
+              //             decoration: BoxDecoration(
+              //               color: primaryColor,
+              //               borderRadius: BorderRadius.circular(15),
+              //               // gradient: _currentPage >= 2
+              //               //     ? const LinearGradient(
+              //               //         colors: [
+              //               //           Color(0XFF07AB2C),
+              //               //           Color(0XFF69E905),
+              //               //         ],
+              //               //         begin: Alignment.topLeft,
+              //               //         end: Alignment.bottomRight,
+              //               //       )
+              //               //     : null,
+              //             ),
+              //             child: Padding(
+              //               padding: const EdgeInsets.symmetric(
+              //                   vertical: 15, horizontal: 30),
+              //               child: Text(
+              //                 "Skip",
+              //                 textAlign: TextAlign.center,
+              //                 style: TextStyle(
+              //                     fontSize: 16, color: secondaryColor),
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+            ],
           )
         ],
       ),

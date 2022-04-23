@@ -2,7 +2,6 @@ import 'package:cliqlite/screens/auth/child_registration.dart';
 import 'package:cliqlite/screens/auth/registration.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
-import 'package:cliqlite/utils/large_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -63,7 +62,6 @@ class _GetStartedState extends State<GetStarted> {
                     setState(() {
                       val = Attribute.parent;
                     });
-                    print('val: $val');
                   },
                 ),
                 kSmallHeight,
@@ -81,7 +79,6 @@ class _GetStartedState extends State<GetStarted> {
                       setState(() {
                         val = Attribute.child;
                       });
-                      print('val: $val');
                     }),
                 kSmallHeight,
                 InkWell(

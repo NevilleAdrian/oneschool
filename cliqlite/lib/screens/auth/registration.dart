@@ -131,11 +131,11 @@ class _RegistrationState extends State<Registration> {
                                 alignment: Alignment.centerRight,
                                 child: _visible
                                     ? Text(
-                                        'Hide',
+                                        'Show',
                                         style: smallAccentColor,
                                       )
                                     : Text(
-                                        'Show',
+                                        'Hide',
                                         style: smallAccentColor,
                                       ),
                               )),

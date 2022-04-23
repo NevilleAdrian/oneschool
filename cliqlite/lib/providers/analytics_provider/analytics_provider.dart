@@ -1,6 +1,7 @@
 import 'package:cliqlite/helper/network_helper.dart';
 import 'package:cliqlite/models/analytics/analytics_subject/analytics_subject.dart';
 import 'package:cliqlite/models/analytics/analytics_topic/analytics_topic.dart';
+import 'package:cliqlite/models/analytics/test_results/test_results.dart';
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/mock_data/mock_data.dart';
@@ -19,12 +20,15 @@ class AnalyticsProvider extends ChangeNotifier {
 
   List<AnalyticSubject> _subject = [];
   AnalyticTopic _topic;
+  List<TestResults> _testResults;
 
   List<AnalyticSubject> get subject => _subject;
   AnalyticTopic get topic => _topic;
+  List<TestResults> get testResults => _testResults;
 
   setSubject(List<AnalyticSubject> subject) => _subject = subject;
   setTopic(AnalyticTopic topic) => _topic = topic;
+  setTestResult(List<TestResults> topic) => _testResults = testResults;
 
   Future<List<AnalyticSubject>> getSubject() async {
     //ChildIndex and Users
@@ -79,6 +83,33 @@ class AnalyticsProvider extends ChangeNotifier {
       setTopic(data);
       _hiveRepository.add<AnalyticTopic>(
           name: kAnalyticsTopic, key: 'analyticsTopic', item: data);
+
+      return data;
+    } catch (ex) {
+      print('ex:$ex');
+    }
+  }
+
+  Future<List<TestResults>> getTestResults() async {
+    try {
+      //ChildIndex and Users
+      ChildIndex childIndex = SubjectProvider.subject(_context).index;
+      List<Users> users = AuthProvider.auth(_context).users;
+      MainChildUser mainChildUser = AuthProvider.auth(_context).mainChildUser;
+
+      //Get Topics
+      var data = await _helper.getTestResults(
+          _context,
+          users != null ? users[childIndex?.index ?? 0].id : mainChildUser.id,
+          AuthProvider.auth(_context).token);
+
+      print('TestQuiz:$data');
+
+      data = (data as List).map((e) => TestResults.fromJson(e)).toList();
+
+      setTestResult(data);
+
+      print('TestQuiz:$data');
 
       return data;
     } catch (ex) {

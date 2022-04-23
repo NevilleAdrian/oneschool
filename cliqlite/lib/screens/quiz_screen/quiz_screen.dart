@@ -152,7 +152,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (selected == answer && index == number ||
         selected != answer && index == number) {
       return YellowButton(
-        text: 'Explanation',
+        text: 'Check Answer',
         onTap: () {
           setState(() {
             show = !show;
@@ -185,12 +185,14 @@ class _QuizScreenState extends State<QuizScreen> {
               children: [
                 Image.asset(image),
                 kVerySmallWidth,
-                Text(
-                  text,
-                  style: smallPrimaryColor.copyWith(
-                      fontSize: 15,
-                      color: textColor,
-                      fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: smallPrimaryColor.copyWith(
+                        fontSize: 15,
+                        color: textColor,
+                        fontWeight: FontWeight.w600),
+                  ),
                 )
               ],
             ),
@@ -219,7 +221,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (selected == answer && selected != null) {
       return answerBox(
           quiz: quiz,
-          text: 'Correct!  You got 5 points',
+          text: 'Correct!  You got 5 points!',
           image: 'assets/images/smile.png',
           textColor: primaryColor,
           bgColor: secondaryColor,
@@ -309,251 +311,287 @@ class _QuizScreenState extends State<QuizScreen> {
 
     switch (type) {
       case 'trivia':
-        return Column(
-          children: [
-            // Image.asset(quizResult[quiz.number]['resource']['image'][0]),
-            // SizedBox(
-            //   height: 40,
-            // ),
-            Container(
-              padding: defaultPadding,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      quizResult[quiz.number]['description'],
-                      style: smallPrimaryColor.copyWith(fontSize: 18),
-                      textAlign: TextAlign.center,
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // Image.asset(quizResult[quiz.number]['resource']['image'][0]),
+              // SizedBox(
+              //   height: 40,
+              // ),
+              Container(
+                padding: defaultPadding,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(
+                        quizResult[quiz.number]['description'],
+                        style: smallPrimaryColor.copyWith(fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 60,
+              ),
+              Column(
+                children: [
+                  !show
+                      ? Container(
+                          padding: defaultPadding,
+                          height: 350,
+                          child: GridView.builder(
+                              itemCount: 4,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 1,
+                                childAspectRatio: 5,
+                                crossAxisSpacing: 20,
+                                mainAxisSpacing: 10,
+                              ),
+                              itemBuilder: (context, index) {
+                                return InkWell(
+                                  onTap: click
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            // expectedList(context);
+                                            indexNo = index;
+                                            // selected = quizResult[quiz.number]
+                                            //     ['option${index + 1}'];
+                                            selected = returnLetter(index + 1);
+                                            click = !click;
+                                            showBottomBar = !showBottomBar;
+                                            print('selected: $selected');
+                                            print(
+                                                'correctAnswer: ${quizResult[quiz.number]['correctAnswer']}');
+                                          });
+
+                                          // if (selected ==
+                                          //     quizResult[quiz.number]['resource']
+                                          //         ['correctAnswer'][0]) {
+                                          //   Future.delayed(Duration(milliseconds: 700), () {
+                                          //     dialogBox(
+                                          //         context,
+                                          //         Container(
+                                          //           height: 400,
+                                          //           width: MediaQuery.of(context).size.width,
+                                          //           child: Column(
+                                          //             children: [
+                                          //               Image.asset(
+                                          //                 'assets/images/success.png',
+                                          //               ),
+                                          //               kSmallHeight,
+                                          //               Text(
+                                          //                 'Success',
+                                          //                 style: smallPrimaryColor.copyWith(
+                                          //                     fontSize: 21,
+                                          //                     fontWeight: FontWeight.w600),
+                                          //               )
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //         onTap: () => successfulQuiz(quiz));
+                                          //   });
+                                          // } else {
+                                          //   Future.delayed(Duration(milliseconds: 700), () {
+                                          //     dialogBox(
+                                          //         context,
+                                          //         Container(
+                                          //           height: 400,
+                                          //           width: MediaQuery.of(context).size.width,
+                                          //           child: Column(
+                                          //             mainAxisAlignment:
+                                          //                 MainAxisAlignment.center,
+                                          //             children: [
+                                          //               Image.asset(
+                                          //                 'assets/images/failure.png',
+                                          //                 height: 150,
+                                          //               ),
+                                          //               kSmallHeight,
+                                          //               Text(
+                                          //                 'Failure',
+                                          //                 style: redTextStyle.copyWith(
+                                          //                     fontSize: 21),
+                                          //               )
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //         onTap: () => failedQuiz(quiz));
+                                          //   });
+                                          // }
+                                          // #FDE5E6
+                                        },
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    decoration: BoxDecoration(
+                                        border: indexNo == index
+                                            ? Border.all(
+                                                color: (selected ==
+                                                        quizResult[quiz.number]
+                                                            ['correctAnswer']
+                                                    ? accentColor
+                                                    : redColor))
+                                            : Border.all(
+                                                width: 0.2, color: greyColor),
+                                        color: indexNo == index
+                                            ? (selected ==
+                                                    quizResult[quiz.number]
+                                                        ['correctAnswer']
+                                                ? secondaryColor
+                                                : Color(0XFFFDE5E6))
+                                            : Color(0XFFF9F9F9),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  child: Text(
+                                                    '${returnLetter(index + 1)}'
+                                                        .toString(),
+                                                    style: headingSmallGreyColor
+                                                        .copyWith(
+                                                            fontSize: 14,
+                                                            color:
+                                                                greyishColor),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      color: greyColor2,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
+                                                ),
+                                                SizedBox(
+                                                  width: 30,
+                                                ),
+                                                Expanded(
+                                                  child: SingleChildScrollView(
+                                                    child: Text(
+                                                      quizResult[quiz.number][
+                                                          'option${index + 1}'],
+                                                      style: textLightBlack
+                                                          .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              color: Color(
+                                                                  0XFF747474)),
+                                                      textAlign: TextAlign.left,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          quizResult[quiz.number]
+                                                      ['explanation'] !=
+                                                  null
+                                              ? AnimatedCrossFade(
+                                                  duration: Duration(
+                                                      milliseconds: 1000),
+                                                  firstCurve: Curves.easeOut,
+                                                  secondCurve: Curves.easeIn,
+                                                  sizeCurve: Curves.bounceOut,
+                                                  crossFadeState: !show
+                                                      ? CrossFadeState
+                                                          .showSecond
+                                                      : CrossFadeState
+                                                          .showFirst,
+                                                  firstChild: Container(),
+                                                  secondChild: explanation(
+                                                      selected: selected,
+                                                      answer: quizResult[
+                                                              quiz.number]
+                                                          ['correctAnswer'],
+                                                      index: index,
+                                                      number: indexNo),
+                                                )
+                                              : Container()
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Padding(
+                          padding: defaultPadding,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Explanation',
+                                style: headingSmallGreyColor.copyWith(
+                                    color: greyishColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              kSmallHeight,
+                              Text(
+                                quizResult[quiz.number]['explanation'],
+                                style: headingSmallGreyColor.copyWith(
+                                    fontSize: 16),
+                              ),
+                              kLargeHeight,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        show = !show;
+                                      });
+                                    },
+                                    child: Text(
+                                      'Back to options',
+                                      style: smallPrimaryColor.copyWith(
+                                          decoration: TextDecoration.underline),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                  kSmallHeight,
+                  AnimatedCrossFade(
+                    duration: Duration(milliseconds: 1000),
+                    firstCurve: Curves.easeOut,
+                    secondCurve: Curves.easeIn,
+                    sizeCurve: Curves.bounceOut,
+                    crossFadeState: showBottomBar
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: Container(),
+                    secondChild: answerWidget(
+                      selected: selected,
+                      answer: quizResult[quiz.number]['correctAnswer'],
+                      quiz: quiz,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 40,
                   ),
                 ],
               ),
-            ),
-            SizedBox(
-              height: 60,
-            ),
-            Column(
-              children: [
-                !show
-                    ? Container(
-                        padding: defaultPadding,
-                        height: MediaQuery.of(context).size.height / 2.6,
-                        child: GridView.builder(
-                            itemCount: 4,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 1,
-                              childAspectRatio: 5,
-                              crossAxisSpacing: 20,
-                              mainAxisSpacing: 10,
-                            ),
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: click
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          // expectedList(context);
-                                          indexNo = index;
-                                          selected = quizResult[quiz.number]
-                                              ['option${index + 1}'];
-                                          click = !click;
-                                          showBottomBar = !showBottomBar;
-                                        });
-
-                                        // if (selected ==
-                                        //     quizResult[quiz.number]['resource']
-                                        //         ['correctAnswer'][0]) {
-                                        //   Future.delayed(Duration(milliseconds: 700), () {
-                                        //     dialogBox(
-                                        //         context,
-                                        //         Container(
-                                        //           height: 400,
-                                        //           width: MediaQuery.of(context).size.width,
-                                        //           child: Column(
-                                        //             children: [
-                                        //               Image.asset(
-                                        //                 'assets/images/success.png',
-                                        //               ),
-                                        //               kSmallHeight,
-                                        //               Text(
-                                        //                 'Success',
-                                        //                 style: smallPrimaryColor.copyWith(
-                                        //                     fontSize: 21,
-                                        //                     fontWeight: FontWeight.w600),
-                                        //               )
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //         onTap: () => successfulQuiz(quiz));
-                                        //   });
-                                        // } else {
-                                        //   Future.delayed(Duration(milliseconds: 700), () {
-                                        //     dialogBox(
-                                        //         context,
-                                        //         Container(
-                                        //           height: 400,
-                                        //           width: MediaQuery.of(context).size.width,
-                                        //           child: Column(
-                                        //             mainAxisAlignment:
-                                        //                 MainAxisAlignment.center,
-                                        //             children: [
-                                        //               Image.asset(
-                                        //                 'assets/images/failure.png',
-                                        //                 height: 150,
-                                        //               ),
-                                        //               kSmallHeight,
-                                        //               Text(
-                                        //                 'Failure',
-                                        //                 style: redTextStyle.copyWith(
-                                        //                     fontSize: 21),
-                                        //               )
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //         onTap: () => failedQuiz(quiz));
-                                        //   });
-                                        // }
-                                        // #FDE5E6
-                                      },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  decoration: BoxDecoration(
-                                      border: indexNo == index
-                                          ? Border.all(
-                                              color: (selected ==
-                                                      quizResult[quiz.number]
-                                                          ['correctAnswer']
-                                                  ? accentColor
-                                                  : redColor))
-                                          : Border.all(
-                                              width: 0.2, color: greyColor),
-                                      color: indexNo == index
-                                          ? (selected ==
-                                                  quizResult[quiz.number]
-                                                      ['correctAnswer']
-                                              ? secondaryColor
-                                              : Color(0XFFFDE5E6))
-                                          : Color(0XFFF9F9F9),
-                                      borderRadius: BorderRadius.circular(15)),
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              child: Text(
-                                                '${index + 1}'.toString(),
-                                                style: headingSmallGreyColor
-                                                    .copyWith(
-                                                        fontSize: 14,
-                                                        color: greyishColor),
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  color: greyColor2,
-                                                  borderRadius:
-                                                      BorderRadius.circular(5)),
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 12, vertical: 6),
-                                            ),
-                                            SizedBox(
-                                              width: 30,
-                                            ),
-                                            Text(
-                                              quizResult[quiz.number]
-                                                  ['option${index + 1}'],
-                                              style: textLightBlack.copyWith(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0XFF747474)),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                        AnimatedCrossFade(
-                                          duration:
-                                              Duration(milliseconds: 1000),
-                                          firstCurve: Curves.easeOut,
-                                          secondCurve: Curves.easeIn,
-                                          sizeCurve: Curves.bounceOut,
-                                          crossFadeState: !show
-                                              ? CrossFadeState.showSecond
-                                              : CrossFadeState.showFirst,
-                                          firstChild: Container(),
-                                          secondChild: explanation(
-                                              selected: selected,
-                                              answer: quizResult[quiz.number]
-                                                  ['correctAnswer'],
-                                              index: index,
-                                              number: indexNo),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                      )
-                    : Padding(
-                        padding: defaultPadding,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Explanation',
-                              style: headingSmallGreyColor.copyWith(
-                                  color: greyishColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            kSmallHeight,
-                            Text(
-                              quizResult[quiz.number]['explanation'],
-                              style:
-                                  headingSmallGreyColor.copyWith(fontSize: 16),
-                            ),
-                            kLargeHeight,
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      show = !show;
-                                    });
-                                  },
-                                  child: Text(
-                                    'Back to options',
-                                    style: smallPrimaryColor.copyWith(
-                                        decoration: TextDecoration.underline),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                kSmallHeight,
-                AnimatedCrossFade(
-                  duration: Duration(milliseconds: 1000),
-                  firstCurve: Curves.easeOut,
-                  secondCurve: Curves.easeIn,
-                  sizeCurve: Curves.bounceOut,
-                  crossFadeState: showBottomBar
-                      ? CrossFadeState.showSecond
-                      : CrossFadeState.showFirst,
-                  firstChild: Container(),
-                  secondChild: answerWidget(
-                    selected: selected,
-                    answer: quizResult[quiz.number]['correctAnswer'],
-                    quiz: quiz,
-                  ),
-                )
-              ],
-            ),
-          ],
+            ],
+          ),
         );
       case 'gaps':
         return Column(
@@ -829,6 +867,20 @@ class _QuizScreenState extends State<QuizScreen> {
         );
       default:
         return Container();
+    }
+  }
+
+  String returnLetter(int number) {
+    if (number == 1) {
+      return 'A';
+    } else if (number == 2) {
+      return 'B';
+    } else if (number == 3) {
+      return 'C';
+    } else if (number == 4) {
+      return 'D';
+    } else {
+      return '';
     }
   }
 

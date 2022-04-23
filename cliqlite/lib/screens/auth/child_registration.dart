@@ -63,6 +63,7 @@ class _ChildRegistrationState extends State<ChildRegistration> {
   TextEditingController _controllerName = new TextEditingController();
   TextEditingController _controllerEmail = new TextEditingController();
   TextEditingController _controllerPassword = new TextEditingController();
+  TextEditingController _controllerAge = new TextEditingController();
 
   //validation boolean
   bool autoValidate = false;
@@ -132,7 +133,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
         print('imggg:$imageUrl');
         var result = await AuthProvider.auth(context).addUser(
             _controllerName.text,
-            int.parse(age?.replaceAll(' years', '') ?? '5'),
+            int.parse(_controllerAge.text),
+            // int.parse(age?.replaceAll(' years', '') ?? '5'),
             imageUrl ??
                 'https://images.pexels.com/photos/8264629/pexels-photo-8264629.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
             childClassName ?? AuthProvider.auth(context).grades[0].id);
@@ -512,13 +514,23 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                               kSmallHeight,
                             ],
                           ),
-                        DropDown(
-                          onTap: () => bottomSheet(context, 'age'),
-                          text: widget.user != 'parent'
-                              ? (age ?? "5 Years")
-                              : (age ?? "5 Years"),
+                        // DropDown(
+                        //   onTap: () => bottomSheet(context, 'age'),
+                        //   text: widget.user != 'parent'
+                        //       ? (age ?? "5 Years")
+                        //       : (age ?? "5 Years"),
+                        // ),
+                        Column(
+                          children: [
+                            MyTextForm(
+                                controllerName: _controllerAge,
+                                validations: validations.validateAmount,
+                                type: TextInputType.number,
+                                hintText: 'Age'),
+                            kSmallHeight,
+                          ],
                         ),
-                        kSmallHeight,
+                        // kSmallHeight,
                         DropDown(
                           onTap: () => bottomSheet(context, 'class'),
                           text: widget.user != 'parent'
@@ -576,10 +588,7 @@ class DropDown extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              color: accentColor,
-              width: 1.0,
-            ),
+            borderSide: BorderSide(color: accentColor, width: 1.0),
           ),
           focusColor: primaryColor,
           suffixIcon: Icon(Icons.keyboard_arrow_down),

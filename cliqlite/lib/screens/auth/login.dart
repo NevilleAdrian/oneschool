@@ -29,7 +29,7 @@ enum Type { parent, child }
 
 class _LoginState extends State<Login> {
   Type type = Type.parent;
-  bool _visible = false;
+  bool _visible = true;
   bool autoValidate = false;
   TextEditingController _controllerEmail = new TextEditingController();
   TextEditingController _controllerPassword = new TextEditingController();
@@ -226,11 +226,11 @@ class _LoginState extends State<Login> {
                                 alignment: Alignment.centerRight,
                                 child: _visible
                                     ? Text(
-                                        'Hide',
+                                        'Show',
                                         style: smallAccentColor,
                                       )
                                     : Text(
-                                        'Show',
+                                        'Hide',
                                         style: smallAccentColor,
                                       ),
                               )),

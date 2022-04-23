@@ -81,6 +81,7 @@ class AuthProvider extends ChangeNotifier {
       //Login user
 
       var data = await _helper.loginUser(emailAddress, password, url, _context);
+      print('token: ${data['data']}');
 
       //Decode token and save user
       setUser(AuthUser.fromJson(parseJwtPayLoad(data['data'])));
@@ -202,17 +203,21 @@ class AuthProvider extends ChangeNotifier {
 
   Future<MainChildUser> getMainChild() async {
     //Get children
-    var data = await _helper.getChildUser(_context, token);
-    print('childUser: $data');
+    try {
+      var data = await _helper.getChildUser(_context, token);
+      print('childUser: $data');
 
-    data = MainChildUser.fromJson(data);
+      data = MainChildUser.fromJson(data);
 
-    //Save Children users in local storage
-    setMainChildUser(data);
-    notifyListeners();
-    _hiveRepository.add<MainChildUser>(
-        name: kMainUser, key: 'mainUser', item: data);
-    return data;
+      //Save Children users in local storage
+      setMainChildUser(data);
+      notifyListeners();
+      _hiveRepository.add<MainChildUser>(
+          name: kMainUser, key: 'mainUser', item: data);
+      return data;
+    } catch (ex) {
+      print('ex:${ex.toString()}');
+    }
   }
 
   Future<List<Grades>> getGrades() async {

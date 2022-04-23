@@ -91,9 +91,11 @@ class _SelectSubjectState extends State<SelectSubject> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Image.asset('assets/images/dna.png'),
-                                      Text(
-                                        'Biology',
-                                        style: heading18,
+                                      Expanded(
+                                        child: Text(
+                                          'Biology',
+                                          style: heading18,
+                                        ),
                                       )
                                     ],
                                   ),

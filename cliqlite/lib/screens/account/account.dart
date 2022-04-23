@@ -4,9 +4,11 @@ import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/screens/account/billing_details/billing_details.dart';
 import 'package:cliqlite/screens/account/change_password/change_password.dart';
 import 'package:cliqlite/screens/account/edit_chid.dart';
 import 'package:cliqlite/screens/account/feedback/feedback.dart';
+import 'package:cliqlite/screens/account/manage_payment/manage_payment.dart';
 import 'package:cliqlite/screens/account/support/support.dart';
 import 'package:cliqlite/screens/auth/login.dart';
 import 'package:cliqlite/screens/background/background.dart';
@@ -198,66 +200,67 @@ class _AccountState extends State<Account> {
                             height: 50,
                             thickness: 1,
                           ),
-                          // InkWell(
-                          //   onTap: () => Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) => BillingDetails())),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Row(
-                          //         children: [
-                          //           SvgPicture.asset(
-                          //               'assets/images/svg/settings-3.svg'),
-                          //           kVerySmallWidth,
-                          //           Text(
-                          //             "Manage payment info",
-                          //             style: smallPrimaryColor,
-                          //           ),
-                          //         ],
-                          //       ),
-                          //       Icon(
-                          //         Icons.chevron_right,
-                          //         color: theme.status ? whiteColor : blackColor,
-                          //       )
-                          //     ],
-                          //   ),
-                          // ),
-                          // Divider(
-                          //   height: 50,
-                          //   thickness: 1,
-                          // ),
-                          // InkWell(
-                          //   onTap: () => Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) => BillingDetails())),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Row(
-                          //         children: [
-                          //           SvgPicture.asset(
-                          //               'assets/images/svg/settings-4.svg'),
-                          //           kVerySmallWidth,
-                          //           Text(
-                          //             "Billing Details",
-                          //             style: smallPrimaryColor,
-                          //           ),
-                          //         ],
-                          //       ),
-                          //       Icon(
-                          //         Icons.chevron_right,
-                          //         color: theme.status ? whiteColor : blackColor,
-                          //       )
-                          //     ],
-                          //   ),
-                          // ),
-                          // Divider(
-                          //   height: 50,
-                          //   thickness: 1,
-                          // ),
+                          InkWell(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BillingDetails())),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                        'assets/images/svg/settings-3.svg'),
+                                    kVerySmallWidth,
+                                    Text(
+                                      "Billing Details",
+                                      style: smallPrimaryColor,
+                                    ),
+                                  ],
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: theme.status ? whiteColor : blackColor,
+                                )
+                              ],
+                            ),
+                          ),
+                          Divider(
+                            height: 50,
+                            thickness: 1,
+                          ),
+
+                          InkWell(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ManagePayoutInfo())),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                        'assets/images/svg/settings-4.svg'),
+                                    kVerySmallWidth,
+                                    Text(
+                                      "Manage payout info",
+                                      style: smallPrimaryColor,
+                                    ),
+                                  ],
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: theme.status ? whiteColor : blackColor,
+                                )
+                              ],
+                            ),
+                          ),
+                          Divider(
+                            height: 50,
+                            thickness: 1,
+                          ),
                           InkWell(
                             onTap: () => Navigator.push(
                                 context,

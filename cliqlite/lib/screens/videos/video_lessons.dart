@@ -3,6 +3,7 @@ import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
+import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/home.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
@@ -63,123 +64,147 @@ class _VideoLessonsState extends State<VideoLessons> {
             children: [
               BackArrow(
                 text: 'Video lessons',
+                onTap: () => Navigator.pushNamed(context, AppLayout.id),
               ),
               kLargeHeight,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SwipeItems(
-                    width: 115,
-                    primaryColor:
-                        Color(int.parse('0XFF${_topic[0].primaryColor}')),
-                    secondaryColor:
-                        Color(int.parse('0XFF${_topic[0].secondaryColor}')),
-                    widget: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              _topic.isEmpty
+                  ? Center(
+                      child: Container(
+                        child: Text('No Topic Available'),
+                      ),
+                    )
+                  : Column(
                       children: [
-                        FadeInImage(
-                          image: NetworkImage(_topic[0].icon),
-                          height: 45,
-                          placeholder: AssetImage('assets/images/dna.png'),
-                        ),
-                        kSmallHeight,
-                        Text(
-                          _topic[0].subject.name,
-                          style: heading18,
-                        )
-                      ],
-                    ),
-                  ),
-                  kSmallWidth,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _topic[0].subject.name,
-                        style: textStyleSmall.copyWith(
-                            fontSize: 21.0,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('${_topic.length} Topics',
-                          style: headingSmallGreyColor.copyWith(fontSize: 14)),
-                      kVerySmallHeight,
-                      Text(
-                          'Total time: ${DateFormat('h').format(_topic[0].createdAt)} hr(s)',
-                          style: headingSmallGreyColor.copyWith(fontSize: 14)),
-                    ],
-                  )
-                ],
-              ),
-              // kSmallHeight,
-              // GreenButton(
-              //   submit: () {
-              //     nextPage(context);
-              //   },
-              //   color: primaryColor,
-              //   name: 'Take Quiz',
-              //   buttonColor: secondaryColor,
-              //   loader: false,
-              // ),
-              kSmallHeight,
-              Divider(
-                thickness: 0.7,
-              ),
-              kSmallHeight,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'Topics',
-                    style: textStyleSmall.copyWith(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                        color: primaryColor),
-                  )
-                ],
-              ),
-              kSmallHeight,
-              Container(
-                child: ListView.separated(
-                    separatorBuilder: (context, _) => kSmallHeight,
-                    itemCount: _topic.length,
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return SwipeItems(
-                        borderHeight: 80,
-                        borderWidth: 90,
-                        primaryColor: Color(
-                            int.parse('0XFF${_topic[index].primaryColor}')),
-                        secondaryColor: Color(
-                            int.parse('0XFF${_topic[index].secondaryColor}')),
-                        widget: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            InkWell(
-                                child: SwipeChild(
-                                  height: 120,
-                                  subject: _topic[index].subject.name,
-                                  time:
-                                      '${DateFormat('mm').format(_topic[0].createdAt)} mins',
-                                  slug: _topic[index].icon,
-                                  topic: _topic[index].name,
+                            SwipeItems(
+                              width: 115,
+                              primaryColor: Color(
+                                  int.parse('0XFF${_topic[0].primaryColor}')),
+                              secondaryColor: Color(
+                                  int.parse('0XFF${_topic[0].secondaryColor}')),
+                              widget: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  FadeInImage(
+                                    image: NetworkImage(_topic[0].icon),
+                                    height: 45,
+                                    placeholder:
+                                        AssetImage('assets/images/dna.png'),
+                                  ),
+                                  kSmallHeight,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _topic[0].subject.name,
+                                        style: heading18,
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            kSmallWidth,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _topic[0].subject.name,
+                                  style: textStyleSmall.copyWith(
+                                      fontSize: 21.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: primaryColor),
                                 ),
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => VideoFullScreen(
-                                              topic: _topic[index],
-                                            ))))
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text('${_topic.length} Topics',
+                                    style: headingSmallGreyColor.copyWith(
+                                        fontSize: 14)),
+                                kVerySmallHeight,
+                                Text(
+                                    'Total time: ${_topic[0].video.duration} min(s)',
+                                    style: headingSmallGreyColor.copyWith(
+                                        fontSize: 14)),
+                              ],
+                            )
                           ],
                         ),
-                      );
-                    }),
-              )
+                        // kSmallHeight,
+                        // GreenButton(
+                        //   submit: () {
+                        //     nextPage(context);
+                        //   },
+                        //   color: primaryColor,
+                        //   name: 'Take Quiz',
+                        //   buttonColor: secondaryColor,
+                        //   loader: false,
+                        // ),
+                        kSmallHeight,
+                        Divider(
+                          thickness: 0.7,
+                        ),
+                        kSmallHeight,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Topics',
+                              style: textStyleSmall.copyWith(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor),
+                            )
+                          ],
+                        ),
+                        kSmallHeight,
+                        Container(
+                          child: ListView.separated(
+                              separatorBuilder: (context, _) => kSmallHeight,
+                              itemCount: _topic.length,
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return SwipeItems(
+                                  borderHeight: 80,
+                                  borderWidth: 90,
+                                  primaryColor: Color(int.parse(
+                                      '0XFF${_topic[index].primaryColor}')),
+                                  secondaryColor: Color(int.parse(
+                                      '0XFF${_topic[index].secondaryColor}')),
+                                  widget: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                          child: SwipeChild(
+                                            height: 120,
+                                            subject: _topic[index].subject.name,
+                                            time:
+                                                '${_topic[0].video.duration} mins',
+                                            slug: _topic[index].icon,
+                                            topic: toBeginningOfSentenceCase(
+                                                _topic[index]
+                                                    .name
+                                                    .toLowerCase()),
+                                          ),
+                                          onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VideoFullScreen(
+                                                        topic: _topic[index],
+                                                      ))))
+                                    ],
+                                  ),
+                                );
+                              }),
+                        )
+                      ],
+                    )
             ],
           ),
         ),

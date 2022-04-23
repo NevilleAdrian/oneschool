@@ -19,20 +19,21 @@ class RecentTopicAdapter extends TypeAdapter<RecentTopic> {
     return RecentTopic(
       id: fields[0] as String,
       child: fields[1] as String,
-      grade: fields[2] as Grade,
-      subject: fields[3] as Grade,
+      grade: fields[2] as SubjectClass,
+      subject: fields[3] as SubjectClass,
       topic: fields[4] as Topic,
       lastViewed: fields[5] as DateTime,
-      createdAt: fields[6] as DateTime,
-      updatedAt: fields[7] as DateTime,
-      v: fields[8] as int,
+      expireAt: fields[6] as DateTime,
+      v: fields[7] as int,
+      createdAt: fields[8] as DateTime,
+      updatedAt: fields[9] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, RecentTopic obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -46,11 +47,13 @@ class RecentTopicAdapter extends TypeAdapter<RecentTopic> {
       ..writeByte(5)
       ..write(obj.lastViewed)
       ..writeByte(6)
-      ..write(obj.createdAt)
+      ..write(obj.expireAt)
       ..writeByte(7)
-      ..write(obj.updatedAt)
+      ..write(obj.v)
       ..writeByte(8)
-      ..write(obj.v);
+      ..write(obj.createdAt)
+      ..writeByte(9)
+      ..write(obj.updatedAt);
   }
 
   @override

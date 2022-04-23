@@ -55,9 +55,10 @@ class Topic {
   int v;
 
   factory Topic.fromJson(Map<String, dynamic> json) => Topic(
-        video: VideoClass.fromJson(json["video"]),
+        video: VideoClass.fromJson(
+            json["video"] ?? {"name": '', "description": ''}),
         id: json["_id"],
-        name: json["name"],
+        name: json["name"] ?? '',
         description: json["description"],
         grade: GradeClass.fromJson(json["grade"]),
         subject: GradeClass.fromJson(json["subject"]),
@@ -88,22 +89,22 @@ class Topic {
 }
 
 class VideoClass {
-  VideoClass({
-    this.name,
-    this.url,
-  });
+  VideoClass({this.name, this.url, this.duration});
 
   String name;
   String url;
+  String duration;
 
   factory VideoClass.fromJson(Map<String, dynamic> json) => VideoClass(
-        name: json["name"],
+        name: json["name"] ?? '',
         url: json["url"],
+        duration: json["duration"] ?? '0:00',
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "url": url,
+        "duration": duration,
       };
 }
 

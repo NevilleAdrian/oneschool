@@ -124,9 +124,19 @@ class _VideosState extends State<Videos> {
                                         placeholder:
                                             AssetImage('assets/images/dna.png'),
                                       ),
-                                      Text(
-                                        subject[index].name,
-                                        style: heading18,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              subject[index].name,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: heading18,
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),

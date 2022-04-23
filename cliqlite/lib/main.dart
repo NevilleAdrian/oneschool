@@ -104,7 +104,7 @@ class _MyAppState extends State<MyApp> {
         title: 'Cliq Lite',
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
-        darkTheme: darkTheme,
+        darkTheme: lightTheme,
         initialRoute: SplashScreen.id,
         routes: {
           SplashScreen.id: (context) => SplashScreen(),
