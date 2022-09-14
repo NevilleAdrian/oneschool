@@ -20,21 +20,24 @@ class UsersAdapter extends TypeAdapter<Users> {
       id: fields[0] as String,
       name: fields[1] as String,
       email: fields[2] as String,
-      age: fields[3] as int,
+      dob: fields[3] as String,
       parent: fields[4] as String,
       isSubscribed: fields[5] as bool,
       grade: fields[6] as String,
       role: fields[7] as String,
       photo: fields[8] as String,
       createdAt: fields[9] as DateTime,
+      test: fields[11] as bool,
+      age: fields[12] as int,
       isActive: fields[10] as bool,
+      planType: fields[13] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Users obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -42,7 +45,7 @@ class UsersAdapter extends TypeAdapter<Users> {
       ..writeByte(2)
       ..write(obj.email)
       ..writeByte(3)
-      ..write(obj.age)
+      ..write(obj.dob)
       ..writeByte(4)
       ..write(obj.parent)
       ..writeByte(5)
@@ -56,7 +59,13 @@ class UsersAdapter extends TypeAdapter<Users> {
       ..writeByte(9)
       ..write(obj.createdAt)
       ..writeByte(10)
-      ..write(obj.isActive);
+      ..write(obj.isActive)
+      ..writeByte(11)
+      ..write(obj.test)
+      ..writeByte(12)
+      ..write(obj.age)
+      ..writeByte(13)
+      ..write(obj.planType);
   }
 
   @override

@@ -64,7 +64,7 @@ class _VideosState extends State<Videos> {
                   //           builder: (context) => SearchScreen(
                   //                 route: 'videos',
                   //               ))),
-                  //   child: SearchBox(
+                  //   cshild: SearchBox(
                   //     type: 'route',
                   //     width: MediaQuery.of(context).size.width / 1.4,
                   //     placeholder: 'Search for Videos',

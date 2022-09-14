@@ -14,11 +14,13 @@ enum Attribute { onetime, recurring }
 class PaymentSummary extends StatefulWidget {
   static String id = 'summary';
 
-  PaymentSummary({this.type, this.amount, this.subId, this.childId});
+  PaymentSummary(
+      {this.type, this.amount, this.subId, this.childId, this.cardId});
   final String type;
   final int amount;
   final String subId;
   final String childId;
+  final String cardId;
 
   @override
   _PaymentSummaryState createState() => _PaymentSummaryState();
@@ -32,18 +34,26 @@ class _PaymentSummaryState extends State<PaymentSummary> {
     AuthProvider.auth(context).setIsLoading(true);
     try {
       setState(() {});
-
       MakePayment(
               ctx: context,
               amount: widget.amount ?? subscription.allSubscription[0].price,
               email: AuthProvider.auth(context).user.email,
               type: val == Attribute.onetime ? 'one-off' : 'recurring')
-          .chargeCardAndMakePayment(widget.subId, widget.childId, context);
+          .chargeCardAndMakePayment(
+              widget.subId, widget.childId, context, widget.cardId);
     } catch (ex) {
       setState(() {
         AuthProvider.auth(context).setIsLoading(false);
       });
     }
+  }
+
+  @override
+  void initState() {
+    // print('amount: ${widget.amount}');
+    // print('type: ${widget.type}');
+    // print('cardId: ${widget.cardId}');
+    super.initState();
   }
 
   @override

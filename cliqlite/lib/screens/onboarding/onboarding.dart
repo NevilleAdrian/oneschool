@@ -50,19 +50,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   title:
                       "Access a Video Library of Your Favorite School Subjects",
                   description:
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                      "We have  a comprehensive library of fun and  interactive videos that cut across Science, English, Technology, Mathematics, Mandarin, French. Coding, Graphic design and much more ",
                 ),
                 OnboardItem(
                   image: "assets/images/svg/Online_Courses_1_.svg",
                   title: "Learn From The Best Lesson Tutors ",
                   description:
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                      "Our tutors are well trained experts that make learning  easy, interesting and practical for you to enjoy. We ensure that our learners become the very best in core subject areas and skill of their choice.",
                 ),
                 OnboardItem(
                   image: "assets/images/svg/Student_Desk_1_.svg",
                   title: "Test Yourself With The In-App Quiz",
                   description:
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tortor.",
+                      "Get access to over 1000 interactive projects and quizzes with solutions to help you excel in  key academic subjects and topics that might be difficult for you.",
                 ),
               ],
             ),
@@ -91,108 +91,56 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-                child: GestureDetector(
-                  onTap: () {
-                    if (_currentPage >= 2) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => GetStarted()),
-                      );
-                      first = AuthProvider.auth(context)
-                          .myFirst(FirstTime.fromJson({"bool": true}));
-                      _hiveRepository.add<FirstTime>(
-                          name: kFirst, key: 'first', item: first);
-                      return;
-                    }
-                    pageViewController.nextPage(
-                      curve: Curves.easeIn,
-                      duration: Duration(milliseconds: 250),
-                    );
-                  },
-                  child: Container(
-                    // splashColor: Colors.transparent,
-                    decoration: BoxDecoration(
-                      color: _currentPage >= 2 ? primaryColor : secondaryColor,
-                      borderRadius: BorderRadius.circular(15),
-                      gradient: _currentPage >= 2
-                          ? const LinearGradient(
-                              colors: [
-                                Color(0XFF07AB2C),
-                                Color(0XFF69E905),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            )
-                          : null,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 30),
-                      child: Text(
-                        _currentPage < 2 ? "Next" : "Get Started",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: _currentPage >= 2
-                                ? secondaryColor
-                                : accentColor),
-                      ),
-                    ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+            child: GestureDetector(
+              onTap: () {
+                if (_currentPage >= 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GetStarted()),
+                  );
+                  first = AuthProvider.auth(context)
+                      .myFirst(FirstTime.fromJson({"bool": true}));
+                  _hiveRepository.add<FirstTime>(
+                      name: kFirst, key: 'first', item: first);
+                  return;
+                }
+                pageViewController.nextPage(
+                  curve: Curves.easeIn,
+                  duration: Duration(milliseconds: 250),
+                );
+              },
+              child: Container(
+                // splashColor: Colors.transparent,
+                decoration: BoxDecoration(
+                  color: _currentPage >= 2 ? primaryColor : secondaryColor,
+                  borderRadius: BorderRadius.circular(15),
+                  gradient: _currentPage >= 2
+                      ? const LinearGradient(
+                          colors: [
+                            Color(0XFF014CD9),
+                            Color(0XFF0179E9),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: _currentPage < 2 ? 15 : 25, horizontal: 30),
+                  child: Text(
+                    _currentPage < 2 ? "Next" : "Get Started",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color:
+                            _currentPage >= 2 ? secondaryColor : primaryColor),
                   ),
                 ),
               ),
-              // _currentPage >= 2
-              //     ? Container()
-              //     : Padding(
-              //         padding: const EdgeInsets.symmetric(horizontal: 20),
-              //         child: GestureDetector(
-              //           onTap: () {
-              //             Navigator.push(
-              //               context,
-              //               MaterialPageRoute(
-              //                   builder: (context) => GetStarted()),
-              //             );
-              //             first = AuthProvider.auth(context)
-              //                 .myFirst(FirstTime.fromJson({"bool": true}));
-              //             _hiveRepository.add<FirstTime>(
-              //                 name: kFirst, key: 'first', item: first);
-              //           },
-              //           child: Container(
-              //             // splashColor: Colors.transparent,
-              //             decoration: BoxDecoration(
-              //               color: primaryColor,
-              //               borderRadius: BorderRadius.circular(15),
-              //               // gradient: _currentPage >= 2
-              //               //     ? const LinearGradient(
-              //               //         colors: [
-              //               //           Color(0XFF07AB2C),
-              //               //           Color(0XFF69E905),
-              //               //         ],
-              //               //         begin: Alignment.topLeft,
-              //               //         end: Alignment.bottomRight,
-              //               //       )
-              //               //     : null,
-              //             ),
-              //             child: Padding(
-              //               padding: const EdgeInsets.symmetric(
-              //                   vertical: 15, horizontal: 30),
-              //               child: Text(
-              //                 "Skip",
-              //                 textAlign: TextAlign.center,
-              //                 style: TextStyle(
-              //                     fontSize: 16, color: secondaryColor),
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-            ],
+            ),
           )
         ],
       ),

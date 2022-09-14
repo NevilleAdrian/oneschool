@@ -4,45 +4,41 @@
 
 import 'dart:convert';
 
-List<Transactions> transactionsFromJson(String str) => List<Transactions>.from(
-    json.decode(str).map((x) => Transactions.fromJson(x)));
+Transactions transactionsFromJson(String str) =>
+    Transactions.fromJson(json.decode(str));
 
-String transactionsToJson(List<Transactions> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String transactionsToJson(Transactions data) => json.encode(data.toJson());
 
 class Transactions {
   Transactions({
     this.id,
-    this.amount,
-    this.reference,
-    this.subscription,
-    this.payer,
-    this.role,
     this.child,
+    this.plan,
+    this.subscription,
+    this.expireAt,
+    this.expired,
     this.createdAt,
     this.updatedAt,
     this.v,
   });
 
   String id;
-  int amount;
-  String reference;
-  Subscribe subscription;
-  Payer payer;
-  String role;
-  String child;
+  Child child;
+  TransactionsPlan plan;
+  Subscriptions subscription;
+  DateTime expireAt;
+  bool expired;
   DateTime createdAt;
   DateTime updatedAt;
   int v;
 
   factory Transactions.fromJson(Map<String, dynamic> json) => Transactions(
         id: json["_id"],
-        amount: json["amount"],
-        reference: json["reference"],
-        subscription: Subscribe.fromJson(json["subscription"]),
-        payer: Payer.fromJson(json["payer"]),
-        role: json["role"],
-        child: json["child"],
+        child: Child.fromJson(json["child"]),
+        plan: TransactionsPlan.fromJson(json["plan"]),
+        subscription: Subscriptions.fromJson(json["subscription"]),
+        expireAt: DateTime.parse(json["expireAt"]),
+        expired: json["expired"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
@@ -50,20 +46,19 @@ class Transactions {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
-        "amount": amount,
-        "reference": reference,
+        "child": child.toJson(),
+        "plan": plan.toJson(),
         "subscription": subscription.toJson(),
-        "payer": payer.toJson(),
-        "role": role,
-        "child": child,
+        "expireAt": expireAt.toIso8601String(),
+        "expired": expired,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };
 }
 
-class Payer {
-  Payer({
+class Child {
+  Child({
     this.id,
     this.name,
   });
@@ -71,7 +66,7 @@ class Payer {
   String id;
   String name;
 
-  factory Payer.fromJson(Map<String, dynamic> json) => Payer(
+  factory Child.fromJson(Map<String, dynamic> json) => Child(
         id: json["_id"],
         name: json["name"],
       );
@@ -82,70 +77,104 @@ class Payer {
       };
 }
 
-class Subscribe {
-  Subscribe({
+class TransactionsPlan {
+  TransactionsPlan({
     this.id,
-    this.plan,
-    this.status,
-    this.amount,
+    this.name,
+    this.duration,
+    this.price,
   });
 
   String id;
-  Plan plan;
-  String status;
-  int amount;
+  String name;
+  int duration;
+  int price;
 
-  factory Subscribe.fromJson(Map<String, dynamic> json) => Subscribe(
+  factory TransactionsPlan.fromJson(Map<String, dynamic> json) =>
+      TransactionsPlan(
         id: json["_id"],
-        plan: Plan.fromJson(json["plan"]),
-        status: json["status"],
-        amount: json["amount"],
+        name: json["name"],
+        duration: json["duration"],
+        price: json["price"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
-        "plan": plan.toJson(),
-        "status": status,
-        "amount": amount,
+        "name": name,
+        "duration": duration,
+        "price": price,
       };
 }
 
-class Plan {
-  Plan({
+class Subscriptions {
+  Subscriptions({
+    this.id,
+    this.owner,
+    this.role,
+    this.plan,
+    this.type,
+  });
+
+  String id;
+  String owner;
+  String role;
+  SubscriptionPlan plan;
+  String type;
+
+  factory Subscriptions.fromJson(Map<String, dynamic> json) => Subscriptions(
+        id: json["_id"],
+        owner: json["owner"],
+        role: json["role"],
+        plan: SubscriptionPlan.fromJson(json["plan"]),
+        type: json["type"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "owner": owner,
+        "role": role,
+        "plan": plan.toJson(),
+        "type": type,
+      };
+}
+
+class SubscriptionPlan {
+  SubscriptionPlan({
     this.id,
     this.name,
-    this.price,
     this.duration,
+    this.price,
+    this.v,
     this.createdAt,
     this.updatedAt,
-    this.v,
   });
 
   String id;
   String name;
-  int price;
   int duration;
+  int price;
+  int v;
   DateTime createdAt;
   DateTime updatedAt;
-  int v;
 
-  factory Plan.fromJson(Map<String, dynamic> json) => Plan(
+  factory SubscriptionPlan.fromJson(Map<String, dynamic> json) =>
+      SubscriptionPlan(
         id: json["_id"],
         name: json["name"],
-        price: json["price"],
         duration: json["duration"],
+        price: json["price"],
+        v: json["__v"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
-        "price": price,
         "duration": duration,
+        "price": price,
+        "__v": v,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "__v": v,
       };
 }

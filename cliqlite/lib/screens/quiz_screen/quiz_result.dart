@@ -3,8 +3,10 @@ import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
+import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/home.dart';
+import 'package:cliqlite/screens/home/select_subject.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
 import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
 import 'package:cliqlite/screens/videos/video_lessons.dart';
@@ -21,12 +23,14 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 class QuizResult extends StatefulWidget {
   static String id = 'result';
 
-  QuizResult({this.score, this.aggregate, this.topicId, this.quizId});
+  QuizResult(
+      {this.score, this.aggregate, this.topicId, this.quizId, this.type});
 
   final int score;
   final int aggregate;
   final String topicId;
   final String quizId;
+  final String type;
   @override
   _QuizResultState createState() => _QuizResultState();
 }
@@ -52,7 +56,7 @@ class _QuizResultState extends State<QuizResult> {
 
   @override
   void initState() {
-    print('topicID:${widget.topicId}');
+    print('type:${widget.type}');
     super.initState();
   }
 
@@ -65,31 +69,36 @@ class _QuizResultState extends State<QuizResult> {
     //   retakeQuiz();
     // }
     // Set Loader
-    setState(() {
-      AuthProvider.auth(context).setIsLoading(true);
-    });
-    try {
-      //Submit Quiz
-      var result = await QuizProvider.quizProvider(context)
-          .submitQuiz(score: widget.score, quizId: widget.quizId);
+    if (widget.type == 'quick') {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          AppLayout.id, (Route<dynamic> route) => false);
+    } else {
+      setState(() {
+        AuthProvider.auth(context).setIsLoading(true);
+      });
+      try {
+        //Submit Quiz
+        var result = await QuizProvider.quizProvider(context)
+            .submitQuiz(score: widget.score, quizId: widget.quizId);
 
-      if (result != null) {
+        if (result != null) {
+          setState(() {
+            AuthProvider.auth(context).setIsLoading(false);
+          });
+          if (type) {
+            //Route to home page
+            newQuiz();
+          } else {
+            //Take Quiz again
+            retakeQuiz();
+          }
+        }
+      } catch (ex) {
         setState(() {
           AuthProvider.auth(context).setIsLoading(false);
         });
-        if (type) {
-          //Route to home page
-          newQuiz();
-        } else {
-          //Take Quiz again
-          retakeQuiz();
-        }
+        showFlush(context, ex.toString(), primaryColor);
       }
-    } catch (ex) {
-      setState(() {
-        AuthProvider.auth(context).setIsLoading(false);
-      });
-      showFlush(context, ex.toString(), primaryColor);
     }
   }
 
@@ -186,25 +195,43 @@ class _QuizResultState extends State<QuizResult> {
                     ),
                   ),
                   kLargeHeight,
-                  GreenButton(
-                    submit: () => submitQuiz(type: false),
-                    color: primaryColor,
-                    name: 'Take new quiz',
-                    height: 45,
-                    buttonColor: secondaryColor,
-                    loader: false,
-                  ),
-                  kSmallHeight,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      BorderButton(
-                        onTap: () => submitQuiz(type: true),
-                        height: 15,
-                        text: 'Return to lesson',
-                      ),
-                    ],
-                  ),
+                  widget.type == 'quick'
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            GreenButton(
+                              submit: () => submitQuiz(type: false),
+                              color: primaryColor,
+                              name: 'Take new quiz',
+                              height: 45,
+                              buttonColor: secondaryColor,
+                              loader: false,
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            GreenButton(
+                              submit: () => submitQuiz(type: false),
+                              color: primaryColor,
+                              name: 'Take new quiz',
+                              height: 45,
+                              buttonColor: secondaryColor,
+                              loader: false,
+                            ),
+                            kSmallHeight,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                BorderButton(
+                                  onTap: () => submitQuiz(type: true),
+                                  height: 15,
+                                  text: 'Return to lesson',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                   kLargeHeight,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,

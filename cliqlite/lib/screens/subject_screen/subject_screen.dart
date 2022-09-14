@@ -70,7 +70,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
             children: [
               BackArrow(
                 onTap: () => widget.route == 'home'
-                    ? Navigator.pushNamed(context, AppLayout.id)
+                    ? Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppLayout.id, (Route<dynamic> route) => false)
                     : Navigator.pushNamed(context, SearchScreen.id),
                 text: '',
               ),

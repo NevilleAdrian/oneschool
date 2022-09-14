@@ -15,16 +15,18 @@ class Register {
       this.password,
       this.phone,
       this.childName,
-      this.childAge,
-      this.childClass});
+      this.dob,
+      this.childClass,
+      this.category});
 
   String email;
   String fullName;
   String phone;
   String password;
   String childName;
-  String childAge;
+  String dob;
   String childClass;
+  String category;
 
   factory Register.fromJson(Map<String, dynamic> json) => Register(
         email: json["email"],
@@ -32,8 +34,9 @@ class Register {
         password: json["password"],
         phone: json["phone"],
         childName: json["childName"],
-        childAge: json["age"],
+        dob: json["dob"],
         childClass: json["grade"],
+        category: json["category"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -42,7 +45,8 @@ class Register {
         "phone": phone,
         "password": password,
         "childName": childName,
-        "age": childAge,
-        "grade": childClass
+        "dob": dob,
+        "grade": childClass,
+        "category": category
       };
 }

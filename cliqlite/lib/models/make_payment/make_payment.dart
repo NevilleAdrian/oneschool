@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
+import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/payment/payment_page.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/constants.dart';
@@ -45,21 +46,35 @@ class MakePayment {
   }
 
   dynamic chargeCardAndMakePayment(
-      String subId, String childId, BuildContext context) async {
+      String subId, String childId, BuildContext context,
+      [String cardId]) async {
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(ctx);
     try {
       var data = await SubscriptionProvider.subscribe(ctx).addSubscription(
-          subId ?? subscription.allSubscription[0].id, type, childId);
-      print('data:$data');
+          subId ?? subscription.allSubscription[0].id, type, childId, cardId);
+      print('dataaa:$data');
       if (data != null) {
         AuthProvider.auth(context).setIsLoading(false);
         print('loading:${AuthProvider.auth(context).isLoading}');
-        Navigator.push(
-            ctx,
-            MaterialPageRoute(
-                builder: (context) => PaymentPage(
-                      url: data['data']['data']['authorization_url'],
-                    )));
+        if (data['data'].isEmpty) {
+          AuthProvider.auth(context).setIsLoading(false);
+          Navigator.push(
+              ctx,
+              MaterialPageRoute(
+                  builder: (context) => AppLayout(
+                        index: 3,
+                      )));
+          showFlush(ctx, data['message'], primaryColor);
+
+          print('dataaa: $data');
+        } else {
+          Navigator.push(
+              ctx,
+              MaterialPageRoute(
+                  builder: (context) => PaymentPage(
+                        url: data['data']['data']['authorization_url'],
+                      )));
+        }
       }
     } catch (ex) {
       print('ex...$ex');

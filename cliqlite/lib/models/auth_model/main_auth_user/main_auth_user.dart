@@ -23,7 +23,10 @@ class MainChildUser {
       this.createdAt,
       this.v,
       this.mainChildUserId,
-      this.isActive});
+      this.isActive,
+      this.dob,
+      this.test,
+      this.planType});
 
   @HiveField(0)
   String id;
@@ -49,20 +52,29 @@ class MainChildUser {
   String mainChildUserId;
   @HiveField(11)
   bool isActive;
+  @HiveField(12)
+  bool test;
+  @HiveField(13)
+  String dob;
+  @HiveField(14)
+  String planType;
 
   factory MainChildUser.fromJson(Map<String, dynamic> json) => MainChildUser(
         id: json["_id"],
         name: json["name"],
         email: json["email"],
         age: json["age"],
-        isSubscribed: json["isSubscribed"],
+        isSubscribed: json["subscribed"],
         isActive: json["isActive"],
+        test: json["test"],
         grade: json["grade"],
         role: json["role"],
         photo: json["photo"],
+        dob: json["dob"],
         createdAt: DateTime.parse(json["createdAt"]),
         v: json["__v"],
         mainChildUserId: json["id"],
+        planType: json["planType"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -72,11 +84,14 @@ class MainChildUser {
         "age": age,
         "isSubscribed": isSubscribed,
         "isActive": isActive,
+        "test": test,
         "grade": grade,
         "role": role,
         "photo": photo,
         "createdAt": createdAt.toIso8601String(),
         "__v": v,
         "id": mainChildUserId,
+        "dob": dob,
+        "planType": planType,
       };
 }

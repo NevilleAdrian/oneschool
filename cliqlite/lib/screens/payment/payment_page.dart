@@ -1,5 +1,6 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
+import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -31,12 +32,14 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _showWebView(String url) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: Text('PAYMENT'),
         leading: Padding(
           padding: const EdgeInsets.only(left: 15),
           child: InkWell(
               onTap: () {
-                Navigator.pushNamed(context, AppLayout.id);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppLayout.id, (Route<dynamic> route) => false);
                 AuthProvider.auth(context).setIsLoading(false);
                 setState(() {});
               },
@@ -49,10 +52,11 @@ class _PaymentPageState extends State<PaymentPage> {
         onPageFinished: (url) {
           print('url is ${url.substring(0, url.indexOf('&trxref'))}');
           print('url is $url');
-
+          // 'https://oneschool-web.netlify.app/dashboard/account/subscription/payment-summary?status=success'
           if (url.substring(0, url.indexOf('&trxref')) ==
-              'https://cliq-lite.herokuapp.com/api/v1?status=success') {
-            Navigator.pushNamed(context, AppLayout.id);
+              'https://staging.oneschool.africa/user-dashboard/account/subscription/payment-summary?status=success') {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                AppLayout.id, (Route<dynamic> route) => false);
           }
           setState(() {
             _loading = false;
@@ -65,31 +69,6 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
     );
   }
-
-  // Widget _showWeb(String url) {
-  //   return WebviewScaffold(
-  //       url: url,
-  //       appBar: AppBar(
-  //         title: Text('PAYMENT'),
-  //         leading: Padding(
-  //           padding: const EdgeInsets.only(left: 15),
-  //           child: BackArrow(
-  //             text: '',
-  //             onTap: () => Navigator.pop(context),
-  //           ),
-  //         ),
-  //       ),
-  //       withZoom: true,
-  //       withLocalStorage: true,
-  //       hidden: true,
-  //       initialChild: Container(
-  //         height: double.infinity,
-  //         width: double.infinity,
-  //         child: Center(
-  //           child: CircularProgressIndicator(backgroundColor: primaryColor),
-  //         ),
-  //       ));
-  // }
 
   @override
   Widget build(BuildContext context) {

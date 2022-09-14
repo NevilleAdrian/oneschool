@@ -1,16 +1,21 @@
+import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
 import 'package:cliqlite/models/topic/topic.dart';
+import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/home.dart';
+import 'package:cliqlite/screens/home/make_subscription.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
 import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/back_arrow.dart';
+import 'package:cliqlite/utils/large_button.dart';
+import 'package:cliqlite/utils/outline_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -53,8 +58,46 @@ class _VideoLessonsState extends State<VideoLessons> {
     //Return future value
   }
 
+  videoRoute(Topic topic) {
+    return Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => VideoFullScreen(
+                  topic: topic,
+                )));
+  }
+
+  bool summerSchool({String plan, String type}) {
+    ChildIndex childIndex = SubjectProvider.subject(context).index;
+    print('plan: $plan');
+    print('type: $type');
+    // print(
+    //     'plan-type: ${AuthProvider.auth(context).users[childIndex?.index ?? 0]?.planType}');
+    String planType = AuthProvider.auth(context).user.role != 'child'
+        ? AuthProvider.auth(context).users[childIndex?.index ?? 0]?.planType
+        : AuthProvider.auth(context).mainChildUser?.planType;
+    // print('child-users: ${AuthProvider.auth(context).users}');
+    if (plan == 'free' || planType == type) {
+      print('true');
+      return true;
+    } else {
+      print('false');
+      return false;
+    }
+  }
+
   Widget videoLessons() {
     List<Topic> _topic = TopicProvider.topic(context).topics;
+    ChildIndex childIndex = SubjectProvider.subject(context).index;
+    List<Users> users = AuthProvider.auth(context).users;
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+
+    bool subscribed = users != null
+        ? users[childIndex?.index ?? 0].isSubscribed
+        : mainChildUser.isSubscribed;
+
+    bool test =
+        users != null ? users[childIndex?.index ?? 0].test : mainChildUser.test;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -64,7 +107,11 @@ class _VideoLessonsState extends State<VideoLessons> {
             children: [
               BackArrow(
                 text: 'Video lessons',
-                onTap: () => Navigator.pushNamed(context, AppLayout.id),
+                onTap: () {
+                  Navigator.pop(context);
+                  // Navigator.of(context).pushNamedAndRemoveUntil(
+                  //     AppLayout.id, (Route<dynamic> route) => false),
+                }
               ),
               kLargeHeight,
               _topic.isEmpty
@@ -99,9 +146,11 @@ class _VideoLessonsState extends State<VideoLessons> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        _topic[0].subject.name,
-                                        style: heading18,
+                                      Expanded(
+                                        child: Text(
+                                          _topic[0].subject.name,
+                                          style: heading18,
+                                        ),
                                       ),
                                     ],
                                   )
@@ -172,16 +221,27 @@ class _VideoLessonsState extends State<VideoLessons> {
                                 return SwipeItems(
                                   borderHeight: 80,
                                   borderWidth: 90,
-                                  primaryColor: Color(int.parse(
-                                      '0XFF${_topic[index].primaryColor}')),
-                                  secondaryColor: Color(int.parse(
-                                      '0XFF${_topic[index].secondaryColor}')),
+                                  primaryColor: summerSchool(
+                                          plan: _topic[index].plan,
+                                          type: _topic[index].type)
+                                      // || AuthProvider.auth(context).users
+                                      ? Color(int.parse(
+                                          '0XFF${_topic[index].primaryColor}'))
+                                      : primaryColor.withOpacity(0.3),
+                                  secondaryColor: summerSchool(
+                                          plan: _topic[index].plan,
+                                          type: _topic[index].type)
+                                      ? Color(int.parse(
+                                          '0XFF${_topic[index].secondaryColor}'))
+                                      : primaryColor.withOpacity(0.3),
                                   widget: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       InkWell(
                                           child: SwipeChild(
                                             height: 120,
+                                            thumbnail:
+                                                _topic[index].video.thumbnail,
                                             subject: _topic[index].subject.name,
                                             time:
                                                 '${_topic[0].video.duration} mins',
@@ -191,13 +251,85 @@ class _VideoLessonsState extends State<VideoLessons> {
                                                     .name
                                                     .toLowerCase()),
                                           ),
-                                          onTap: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      VideoFullScreen(
-                                                        topic: _topic[index],
-                                                      ))))
+                                          onTap: () {
+                                            if (summerSchool(
+                                                plan: _topic[index].plan,
+                                                type: _topic[index].type)) {
+                                              print('free');
+                                              videoRoute(_topic[index]);
+                                            } else {
+                                              dialogBox(
+                                                  context,
+                                                  Container(
+                                                    padding: defaultPadding,
+                                                    height: 385,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      // crossAxisAlignment:
+                                                      //     CrossAxisAlignment.stretch,
+                                                      children: [
+                                                        Text(
+                                                          'Are you subscribed',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style:
+                                                              smallAccentColor
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          18),
+                                                        ),
+                                                        kSmallHeight,
+                                                        GreenButton(
+                                                          name: 'Yes',
+                                                          color: primaryColor,
+                                                          buttonColor:
+                                                              secondaryColor,
+                                                          loader: false,
+                                                          submit: () {
+                                                            if (test) {
+                                                              print('route');
+                                                              videoRoute(_topic[
+                                                                  index]);
+                                                            } else {
+                                                              if (subscribed) {
+                                                                videoRoute(
+                                                                    _topic[
+                                                                        index]);
+                                                              } else {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                MakeSubscription()));
+                                                              }
+                                                            }
+                                                          },
+                                                        ),
+                                                        kSmallHeight,
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .stretch,
+                                                          children: [
+                                                            BorderButton(
+                                                              text: 'No',
+                                                              onTap: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                            )
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  onTap: () =>
+                                                      Navigator.pop(context));
+                                            }
+                                          })
                                     ],
                                   ),
                                 );

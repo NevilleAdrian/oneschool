@@ -74,7 +74,7 @@ String addSeparator(String item) {
       new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
 }
 
-Widget profilePicture(BuildContext context, {double size}) {
+Widget profilePicture(BuildContext context, String type, {double size}) {
   //Initialize provider
   List<dynamic> mockChildren = ChildProvider.childProvider(context).children;
   SubjectProvider subject = SubjectProvider.subject(context);
@@ -105,16 +105,28 @@ Widget profilePicture(BuildContext context, {double size}) {
                     ),
                   )),
             )
-          : Container(
-              width: size ?? 65,
-              height: size ?? 65,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(
-                        profilePic ?? mockChildren[0]['image_url']),
-                  )),
-            )
+          : (type == 'photo'
+              ? Container(
+                  width: size ?? 65,
+                  height: size ?? 65,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: AssetImage(
+                          'assets/images/woman.png',
+                        ),
+                      )),
+                )
+              : Container(
+                  width: size ?? 65,
+                  height: size ?? 65,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(
+                            profilePic ?? mockChildren[0]['image_url']),
+                      )),
+                ))
       // Container(
       //         decoration: BoxDecoration(shape: BoxShape.circle
       //             //color: Theme.of(context).backgroundColor,

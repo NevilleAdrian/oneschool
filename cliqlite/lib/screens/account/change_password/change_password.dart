@@ -55,12 +55,13 @@ class _ChangePasswordState extends State<ChangePassword> {
                 _confirmPassword.text, 'auth/user/updatepassword');
           }
           if (result != null) {
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
                     builder: (context) => AppLayout(
                           index: 3,
-                        )));
+                        )),
+                (Route<dynamic> route) => false);
             showFlush(context, 'Successfully Changed Password', primaryColor);
 
             setState(() {

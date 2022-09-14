@@ -46,11 +46,12 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<dynamic>> getQuickQuiz({BuildContext buildContext}) async {
+  Future<List<dynamic>> getQuickQuiz(String subjectId,
+      {BuildContext buildContext}) async {
     //Get quiz
     try {
       var data = await _helper.getQuickQuiz(
-          _context, AuthProvider.auth(_context).token);
+          _context, subjectId, AuthProvider.auth(_context).token);
       print('quickquiz:$data');
       return data;
     } catch (ex) {

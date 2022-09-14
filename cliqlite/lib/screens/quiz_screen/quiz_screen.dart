@@ -54,7 +54,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     try {
       if (widget.type == 'quick') {
-        result = await quiz.getQuickQuiz();
+        result = await quiz.getQuickQuiz(widget.subjectId);
       } else {
         result = await quiz.getQuiz(
             topicId: widget.topicId,
@@ -102,6 +102,7 @@ class _QuizScreenState extends State<QuizScreen> {
             MaterialPageRoute(
                 builder: (context) => QuizResult(
                       score: score,
+                      type: widget.type == 'quick' ? 'quick' : '',
                       aggregate: quizResult.length,
                       topicId: widget.type == 'quick'
                           ? quizResult[quiz.number]['topic']['_id']
@@ -134,6 +135,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 builder: (context) => QuizResult(
                       score: score,
                       aggregate: quizResult.length,
+                      type: widget.type == 'quick' ? 'quick' : '',
                       topicId: widget.type == 'quick'
                           ? quizResult[quiz.number]['topic']['_id']
                           : widget.topicId,
@@ -149,8 +151,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Widget explanation({String selected, String answer, int index, int number}) {
-    if (selected == answer && index == number ||
-        selected != answer && index == number) {
+    if (selected != answer && index == number) {
       return YellowButton(
         text: 'Check Answer',
         onTap: () {
@@ -962,11 +963,11 @@ class _QuizScreenState extends State<QuizScreen> {
                                           BorderButton(
                                             text: 'End',
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AppLayout()));
+                                              Navigator.of(context)
+                                                  .pushNamedAndRemoveUntil(
+                                                      AppLayout.id,
+                                                      (Route<dynamic> route) =>
+                                                          false);
                                               quiz.setNumber(0);
                                             },
                                           )
@@ -1009,6 +1010,8 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     // TODO: implement initState
+
+    print('subid: ${widget.subjectId}');
 
     futureQuiz = futureTask();
     super.initState();

@@ -1,6 +1,7 @@
 import 'package:cliqlite/models/analytics/analytics_subject/analytics_subject.dart';
 import 'package:cliqlite/models/analytics/analytics_topic/analytics_topic.dart';
 import 'package:cliqlite/models/app_model/app_model.dart';
+import 'package:cliqlite/models/recommended_video_model/recommended_model.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
@@ -77,6 +78,7 @@ _openHive() async {
   Hive.registerAdapter(MainChildUserAdapter());
   Hive.registerAdapter(QuizActiveAdapter());
   Hive.registerAdapter(RecentTopicAdapter());
+  Hive.registerAdapter(RecommendedVideoAdapter());
 }
 
 class MyApp extends StatefulWidget {
@@ -101,7 +103,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: appProviders,
       child: MaterialApp(
-        title: 'Cliq Lite',
+        title: 'Oneschool Africa',
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: lightTheme,

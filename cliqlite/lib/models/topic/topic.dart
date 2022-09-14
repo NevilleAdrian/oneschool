@@ -12,21 +12,22 @@ String topicToJson(List<Topic> data) =>
 
 @HiveType(typeId: 8)
 class Topic {
-  Topic({
-    this.video,
-    this.id,
-    this.name,
-    this.description,
-    this.grade,
-    this.subject,
-    this.icon,
-    this.primaryColor,
-    this.secondaryColor,
-    this.isVerified,
-    this.createdAt,
-    this.updatedAt,
-    this.v,
-  });
+  Topic(
+      {this.video,
+      this.id,
+      this.name,
+      this.description,
+      this.grade,
+      this.subject,
+      this.icon,
+      this.primaryColor,
+      this.secondaryColor,
+      this.isVerified,
+      this.createdAt,
+      this.updatedAt,
+      this.v,
+      this.plan,
+      this.type});
   @HiveField(0)
   VideoClass video;
   @HiveField(1)
@@ -53,23 +54,32 @@ class Topic {
   DateTime updatedAt;
   @HiveField(12)
   int v;
+  @HiveField(13)
+  String plan;
+  @HiveField(14)
+  String type;
 
-  factory Topic.fromJson(Map<String, dynamic> json) => Topic(
-        video: VideoClass.fromJson(
-            json["video"] ?? {"name": '', "description": ''}),
-        id: json["_id"],
-        name: json["name"] ?? '',
-        description: json["description"],
-        grade: GradeClass.fromJson(json["grade"]),
-        subject: GradeClass.fromJson(json["subject"]),
-        isVerified: json["isVerified"],
-        icon: json["icon"],
-        primaryColor: json["primaryColor"],
-        secondaryColor: json["secondaryColor"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
-      );
+  factory Topic.fromJson(Map<String, dynamic> json) {
+    print('json: ${json}');
+    return Topic(
+      video:
+          VideoClass.fromJson(json["video"] ?? {"name": '', "description": ''}),
+      id: json["_id"],
+      name: json["name"] ?? '',
+      plan: json["plan"] ?? '',
+      description: json["description"],
+      grade: GradeClass.fromJson(json["grade"]),
+      subject: GradeClass.fromJson(json["subject"]),
+      isVerified: json["isVerified"],
+      icon: json["icon"],
+      type: json["type"],
+      primaryColor: json["primaryColor"],
+      secondaryColor: json["secondaryColor"],
+      createdAt: DateTime.parse(json["createdAt"]),
+      updatedAt: DateTime.parse(json["updatedAt"]),
+      v: json["__v"],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "video": video.toJson(),
@@ -80,8 +90,10 @@ class Topic {
         "subject": subject.toJson(),
         "isVerified": isVerified,
         "icon": icon,
+        "type": type,
         "primaryColor": primaryColor,
         "secondaryColor": secondaryColor,
+        "plan": plan,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
@@ -89,14 +101,16 @@ class Topic {
 }
 
 class VideoClass {
-  VideoClass({this.name, this.url, this.duration});
+  VideoClass({this.name, this.url, this.duration, this.thumbnail});
 
   String name;
   String url;
   String duration;
+  String thumbnail;
 
   factory VideoClass.fromJson(Map<String, dynamic> json) => VideoClass(
         name: json["name"] ?? '',
+        thumbnail: json["thumbnail"] ?? '',
         url: json["url"],
         duration: json["duration"] ?? '0:00',
       );
@@ -105,6 +119,7 @@ class VideoClass {
         "name": name,
         "url": url,
         "duration": duration,
+        "thumbnail": thumbnail,
       };
 }
 

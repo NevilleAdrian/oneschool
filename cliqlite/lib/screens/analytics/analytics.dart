@@ -128,7 +128,7 @@ class _AnalyticsState extends State<Analytics> {
               topicList.graph.isEmpty
                   ? Container()
                   : TextBox(
-                      text: 'Quiz results',
+                      text: 'Learning Performance',
                     ),
               kSmallHeight,
               topicList.graph.isEmpty

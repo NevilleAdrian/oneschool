@@ -1,5 +1,5 @@
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
-import 'package:cliqlite/screens/auth/login.dart';
+import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/recover_password.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/themes/style.dart';
@@ -77,7 +77,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
             AuthProvider.auth(context).setIsLoading(false);
           });
           showFlush(context, 'Account Successfully Verified', primaryColor);
-          Navigator.pushNamed(context, Login.id);
+          Navigator.pushNamed(context, AppLayout.id);
         }
       } catch (ex) {
         print('ex:$ex');
@@ -135,7 +135,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
                 ? LinearPercentIndicator(
                     lineHeight: 5.0,
                     percent: 1,
-                    progressColor: Color(0xFF09AC2C),
+                    progressColor: primaryColor,
                   )
                 : Container(),
             widget.type != 'forgot' ? kLargeHeight : kSmallHeight,

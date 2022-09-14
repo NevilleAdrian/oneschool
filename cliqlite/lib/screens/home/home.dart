@@ -5,19 +5,22 @@ import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/models/quiz_active/quiz_active.dart';
 import 'package:cliqlite/models/recent_topics/recent_topics.dart';
 import 'package:cliqlite/models/subject/subject.dart';
+import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/notification_provider/notifction_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
+import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
 import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
+import 'package:cliqlite/providers/video_provider/video_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/login.dart';
 import 'package:cliqlite/screens/background/background.dart';
-import 'package:cliqlite/screens/home/notifications.dart';
+import 'package:cliqlite/screens/home/first_time_popup.dart';
 import 'package:cliqlite/screens/home/profile_body.dart';
-import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
+import 'package:cliqlite/screens/home/select_subject.dart';
 import 'package:cliqlite/screens/search_screen/search_screen.dart';
 import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
 import 'package:cliqlite/screens/videos/video_lessons.dart';
@@ -46,17 +49,25 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Future<List<Subject>> futureSubjects;
   Future<List<Users>> futureUsers;
+  List<Topic> recommendedVideo;
   var childUser;
   HiveRepository _hiveRepository = HiveRepository();
+  String childClassName;
 
   Future<List<Subject>> futureTask() async {
     //Initialize provider
     SubjectProvider subject = SubjectProvider.subject(context);
+    SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
+    VideoProvider video = VideoProvider.video(context);
     AuthProvider auth = AuthProvider.auth(context);
     NotificationProvider notify = NotificationProvider.notify(context);
     QuizActive quizActive = QuizProvider.quizProvider(context).quizActive;
     TopicProvider topic = TopicProvider.topic(context);
     ChildIndex childIndex = subject.index;
+    List<Users> users = AuthProvider.auth(context).users;
+    MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+    //Subscription
+    await subscription.getSubscription();
 
     //Make call to get grades
     await auth.getGrades();
@@ -64,20 +75,38 @@ class _HomeState extends State<Home> {
     //Make call to get feedbacks
     await notify.getFeedBack();
 
-    List<Users> data;
+    //Call recommended videos
+
     List<Subject> sub;
 
     //Make call to get child
     if (auth.user.role != 'child') {
       // // Make call to get Children
-      data = await AuthProvider.auth(context).getChildren();
+      await AuthProvider.auth(context).getChildren();
 
-      print('gradee:: ${auth.users}');
+      final newData = AuthProvider.auth(context)
+          .grades
+          .where((element) =>
+              element.id == auth.users[childIndex?.index ?? 0].grade)
+          .toList();
+
+      childClassName = newData[0].name;
+
       // // Make call to get Subjects
       sub = await subject.getSubjects(
         id: subject?.grade?.grade ?? auth.users[0].grade,
         name: subject?.grade?.name ?? auth.users[0].name,
       );
+      // dynamic grade = AuthProvider.auth(context, listen: true)
+      //     .grades
+      //     .where((element) => element.id == users[childIndex?.index ?? 0].grade)
+      //     .toList();
+      // childClassName = grade[0].name;
+
+      // print('className: $childClassName');
+
+      recommendedVideo = await topic.getRecommendedVideos(
+          AuthProvider.auth(context).users[childIndex?.index ?? 0]?.grade);
 
       // Make call to get Recent topics
       await topic.getRecentTopics(
@@ -98,14 +127,24 @@ class _HomeState extends State<Home> {
       if (childUser != null) {
         //Make call to get Recent topics
         await topic.getRecentTopics(
-          childId: AuthProvider.auth(context).mainChildUser?.id,
+          childId: AuthProvider.auth(context).mainChildUser?.grade,
         );
+
+        final newData = AuthProvider.auth(context)
+            .grades
+            .where((element) => element.id == auth.mainChildUser.grade)
+            .toList();
+
+        childClassName = newData[0].name;
 
         //check if subscription is active
         // if (AuthProvider.auth(context).mainChildUser.isActive &&
         //     quizActive.active) {
         //   onPressed();
         // }
+
+        recommendedVideo = await topic
+            .getRecommendedVideos(AuthProvider.auth(context).mainChildUser?.id);
 
         //Make call to get subjects
         sub = await subject.getSubjects(
@@ -178,6 +217,15 @@ class _HomeState extends State<Home> {
     );
   }
 
+  videoRoute(Topic topic) {
+    return Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => VideoFullScreen(
+                  topic: topic,
+                )));
+  }
+
   Widget home({List<Users> children}) {
     List<Subject> subject = SubjectProvider.subject(context).subjects;
     List<Feedbacks> feed = NotificationProvider.notify(context).feedback;
@@ -186,6 +234,14 @@ class _HomeState extends State<Home> {
     List<Users> users = AuthProvider.auth(context).users;
     MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
     grades = AuthProvider.auth(context).grades;
+    List<Topic> topics = TopicProvider.topic(context).topics;
+
+    bool subscribed = users != null
+        ? users[childIndex?.index ?? 0].isSubscribed
+        : mainChildUser.isSubscribed;
+
+    bool test =
+        users != null ? users[childIndex?.index ?? 0].test : mainChildUser.test;
 
     return ModalProgressHUD(
       inAsyncCall: SubjectProvider.subject(context).spinner,
@@ -198,7 +254,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
-              overflow: Overflow.visible,
+              clipBehavior: Clip.none,
               alignment: Alignment.bottomCenter,
               children: <Widget>[
                 Container(
@@ -265,62 +321,36 @@ class _HomeState extends State<Home> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // InkWell(
-                              //   onTap: () {
-                              //     dialogBox(
-                              //       context,
-                              //       dialogContent(context),
-                              //       top: AppBar(
-                              //         backgroundColor: Colors.white,
-                              //         elevation: 0,
-                              //         title: Text(
-                              //           'Choose a class',
-                              //           style: smallPrimaryColor.copyWith(
-                              //               fontSize: 16,
-                              //               fontWeight: FontWeight.w600),
-                              //         ),
-                              //         actions: [
-                              //           XButton(
-                              //             onTap: () => Navigator.pop(context),
-                              //             color: primaryColor,
-                              //           )
-                              //         ],
-                              //       ),
-                              //     );
-                              //   },
-                              //   child: Container(
-                              //     padding: EdgeInsets.symmetric(
-                              //         vertical: 7, horizontal: 10),
-                              //     decoration: BoxDecoration(
-                              //         borderRadius: BorderRadius.circular(15),
-                              //         color: Color(0XFF72C683)),
-                              //     child: Row(
-                              //       children: [
-                              //         Text(
-                              //           toBeginningOfSentenceCase(val),
-                              //           style: smallPrimaryColor.copyWith(
-                              //               color: whiteColor),
-                              //         ),
-                              //         Icon(
-                              //           Icons.arrow_drop_down,
-                              //           color: whiteColor,
-                              //         )
-                              //       ],
-                              //     ),
-                              //   ),
-                              // ),
-                              // kVerySmallWidth,
-                              InkWell(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            NotificationScreen())),
-                                child: SvgPicture.asset(
-                                  'assets/images/svg/bell.svg',
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(color: whiteColor),
+                                    color: primaryColor),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      toBeginningOfSentenceCase(
+                                          childClassName ?? ''),
+                                      style: smallPrimaryColor.copyWith(
+                                          color: whiteColor),
+                                    ),
+                                  ],
                                 ),
                               ),
                               kVerySmallWidth,
+                              // InkWell(
+                              //   onTap: () => Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //           builder: (context) =>
+                              //               NotificationScreen())),
+                              //   child: SvgPicture.asset(
+                              //     'assets/images/svg/bell.svg',
+                              //   ),
+                              // ),
+                              // kVerySmallWidth,
                               InkWell(
                                 onTap: () {
                                   dialogBox(
@@ -360,14 +390,18 @@ class _HomeState extends State<Home> {
                             SizedBox(
                               width: 6,
                             ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 25),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Color(0XFF006B17)),
-                              child: SvgPicture.asset(
-                                'assets/images/svg/s-icon.svg',
+                            InkWell(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, SearchScreen.id),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 25),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: whiteColor),
+                                child: SvgPicture.asset(
+                                  'assets/images/svg/s-icon.svg',
+                                ),
                               ),
                             )
                           ],
@@ -384,58 +418,91 @@ class _HomeState extends State<Home> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Column(
-                  //   children: [
-                  //     Headers(
-                  //       text: 'Join live tutor sessions',
-                  //       onTap: () {
-                  //         Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //                 builder: (context) => AppLayout(
-                  //                       index: 3,
-                  //                     )));
-                  //       },
-                  //     ),
-                  //     kSmallHeight,
-                  //     Container(
-                  //       height: 140,
-                  //       child: ListView.separated(
-                  //           separatorBuilder: (context, _) => kSmallWidth,
-                  //           itemCount: 4,
-                  //           shrinkWrap: true,
-                  //           scrollDirection: Axis.horizontal,
-                  //           itemBuilder: (context, index) {
-                  //             return InkWell(
-                  //               onTap: () {
-                  //                 Navigator.push(
-                  //                     context,
-                  //                     MaterialPageRoute(
-                  //                         builder: (context) => AppLayout(
-                  //                               index: 3,
-                  //                             )));
-                  //               },
-                  //               child: SwipeItems(
-                  //                 widget: Column(
-                  //                   mainAxisAlignment: MainAxisAlignment.center,
-                  //                   children: [
-                  //                     SwipeChild(),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           }),
-                  //     ),
-                  //   ],
-                  // ),
-                  // kLargeHeight,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextBox(
+                        text: 'Recommended Videos',
+                      ),
+                      kSmallHeight,
+                      topics.isEmpty
+                          ? Container(
+                              child: Text(
+                                'No Videos',
+                              ),
+                            )
+                          : Container(
+                              height: 170,
+                              child: ListView.separated(
+                                  separatorBuilder: (context, _) => kSmallWidth,
+                                  itemCount: topics?.length,
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: (context, index) {
+                                    return SwipeItems(
+                                      borderHeight: 80,
+                                      borderWidth: 90,
+                                      primaryColor: Color(int.parse(
+                                          '0XFF${topics[index].primaryColor}')),
+                                      secondaryColor: Color(int.parse(
+                                          '0XFF${topics[index].secondaryColor}')),
+                                      widget: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          InkWell(
+                                              child: SwipeChild(
+                                                height: 120,
+                                                subject:
+                                                    topics[index].subject.name,
+                                                thumbnail: topics[index]
+                                                    .video
+                                                    .thumbnail,
+                                                time:
+                                                    '${topics[0].video.duration} mins',
+                                                slug: topics[index].icon,
+                                                topic:
+                                                    toBeginningOfSentenceCase(
+                                                        topics[index]
+                                                            .name
+                                                            .toLowerCase()),
+                                              ),
+                                              onTap: () {
+                                                videoRoute(topics[index]);
+
+                                                // if (test) {
+                                                //   print('route');
+                                                //   videoRoute(topics[index]);
+                                                // } else {
+                                                //   if (subscribed) {
+                                                //     videoRoute(topics[index]);
+                                                //   } else {
+                                                //     Navigator.push(
+                                                //         context,
+                                                //         MaterialPageRoute(
+                                                //             builder: (context) =>
+                                                //                 MakeSubscription()));
+                                                //   }
+                                                // }
+                                              })
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                            ),
+                    ],
+                  ),
+                  kLargeHeight,
                   InkWell(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => QuizScreen(
-                                  type: 'quick',
-                                ))),
+                    onTap: () => AuthProvider.auth(context).user.role == 'child'
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SelectSubject()))
+                        : showFlush(
+                            context,
+                            "Login to your child's account to take quiz",
+                            primaryColor),
                     child: Container(
                       padding:
                           EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -456,7 +523,11 @@ class _HomeState extends State<Home> {
                               'assets/images/svg/quizz.svg',
                             ),
                           ),
-                          Expanded(child: YellowButton())
+                          Expanded(
+                              child: YellowButton(
+                            color: darkPrimaryColor,
+                            fontColor: Colors.white,
+                          ))
                           // SvgPicture.asset(
                           //   'assets/images/svg/start_now.svg',
                           // )
@@ -470,12 +541,10 @@ class _HomeState extends State<Home> {
                       Headers(
                         text: 'Video lessons by subjects',
                         onTap: () {
-                          Navigator.push(
-                              context,
+                          Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => AppLayout(
-                                        index: 2,
-                                      )));
+                                  builder: (context) => AppLayout(index: 2)),
+                              (Route<dynamic> route) => false);
                         },
                       ),
                       Container(
@@ -580,10 +649,15 @@ class _HomeState extends State<Home> {
                                             children: [
                                               SwipeChild(
                                                 // height: 120,
+                                                thumbnail: topics[index]
+                                                    .video
+                                                    .thumbnail,
+
                                                 subject:
                                                     toBeginningOfSentenceCase(
                                                         childTopics[index]
                                                             .topic
+                                                            .subject
                                                             .name),
                                                 time:
                                                     '${childTopics[0].topic.video.duration} mins',
@@ -606,57 +680,78 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                   kLargeHeight,
-                  feed.isEmpty
-                      ? Container()
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextBox(
-                              text: 'People love our product',
-                            ),
-                            kSmallHeight,
-                            Container(
-                              height: 200,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextBox(
+                        text: 'People love our product',
+                      ),
+                      kSmallHeight,
+                      feed.isEmpty
+                          ? Container(
+                              child: Text('No Feedback'),
+                            )
+                          : Container(
+                              height: 235,
                               child: ListView.separated(
                                 separatorBuilder: (context, index) =>
                                     kSmallWidth,
                                 itemCount: feed.length,
                                 scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, index) => Container(
-                                  width: 331,
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 35, horizontal: 20),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                          color: accentColor, width: 0.6)),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          feed[index].owner?.name ??
-                                              'Anonymous',
-                                          style: smallPrimaryColor.copyWith(
-                                              color: accentColor,
-                                              fontSize: 16)),
-                                      kSmallHeight,
-                                      Text(feed[index].message,
-                                          style: smallPrimaryColor.copyWith(
-                                              fontSize: 16)),
-                                      kSmallHeight,
-                                      Text(
-                                          '${DateFormat('MMM d, y').format(feed[0].createdAt)}',
-                                          style: smallPrimaryColor.copyWith(
-                                              color: accentColor,
-                                              fontSize: 12)),
-                                    ],
+                                itemBuilder: (context, index) => InkWell(
+                                  onTap: () {
+                                    dialogBox(
+                                        context,
+                                        Testimonial(
+                                          context: context,
+                                          feed: feed[index],
+                                        ));
+                                  },
+                                  child: Container(
+                                    width: 331,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 35, horizontal: 20),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                            color: accentColor, width: 0.6)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            feed[index].owner?.name ??
+                                                'Anonymous',
+                                            style: smallPrimaryColor.copyWith(
+                                                color: accentColor,
+                                                fontSize: 16)),
+                                        kSmallHeight,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(feed[index].message,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 4,
+                                                  style: smallPrimaryColor
+                                                      .copyWith(fontSize: 16)),
+                                            ),
+                                          ],
+                                        ),
+                                        kSmallHeight,
+                                        Text(
+                                            '${DateFormat('MMM d, y').format(feed[0].createdAt)}',
+                                            style: smallPrimaryColor.copyWith(
+                                                color: accentColor,
+                                                fontSize: 12)),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                    ],
+                  ),
 
                   kLargeHeight,
                   InkWell(
@@ -767,6 +862,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     futureSubjects = futureTask();
+    if (AuthProvider.auth(context).user.role != 'child') {
+      Future.delayed(Duration(seconds: 5), () {
+        if (AuthProvider.auth(context).firstTime) {
+          dialogBox(context, FirstTimePopup());
+        }
+      });
+    }
 
     super.initState();
   }
@@ -808,10 +910,14 @@ class YellowButton extends StatelessWidget {
     Key key,
     this.text,
     this.onTap,
+    this.color,
+    this.fontColor,
   }) : super(key: key);
 
   final String text;
   final Function onTap;
+  final Color color;
+  final Color fontColor;
 
   @override
   Widget build(BuildContext context) {
@@ -826,11 +932,13 @@ class YellowButton extends StatelessWidget {
               RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           )),
-          backgroundColor: MaterialStateProperty.all(Color(0xffF8B800))),
+          backgroundColor:
+              MaterialStateProperty.all(color ?? Color(0xffF8B800))),
       child: Text(
         text ?? 'Start Now',
         textAlign: TextAlign.center,
-        style: textExtraLightBlack.copyWith(fontSize: text != null ? 11 : 15),
+        style: textExtraLightBlack.copyWith(
+            fontSize: text != null ? 11 : 15, color: fontColor ?? blackColor),
       ),
     );
   }
@@ -904,6 +1012,7 @@ class SwipeChild extends StatelessWidget {
     this.time,
     this.slug,
     this.topic,
+    this.thumbnail,
   }) : super(key: key);
 
   final double height;
@@ -912,6 +1021,7 @@ class SwipeChild extends StatelessWidget {
   final String topic;
   final String time;
   final String slug;
+  final String thumbnail;
 
   @override
   Widget build(BuildContext context) {
@@ -985,7 +1095,9 @@ class SwipeChild extends StatelessWidget {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 image: DecorationImage(
-                    image: AssetImage('assets/images/image-1.png'))),
+                    image: thumbnail == null
+                        ? AssetImage('assets/images/image-1.png')
+                        : NetworkImage(thumbnail))),
             child: Image.asset('assets/images/play_button.png'),
           ),
         )
@@ -1060,7 +1172,7 @@ class ProfilePopup extends StatelessWidget {
         children: [
           Row(
             children: [
-              profilePicture(context),
+              profilePicture(context, ''),
               kSmallWidth,
               Text(
                 ' ${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].name.split(' ')[0] : mainChildUser.name.split(' ')[0])}',
@@ -1124,6 +1236,49 @@ class ProfilePopup extends StatelessWidget {
             buttonColor: secondaryColor,
             loader: false,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class Testimonial extends StatelessWidget {
+  const Testimonial({
+    Key key,
+    @required this.context,
+    @required this.feed,
+  }) : super(key: key);
+
+  final BuildContext context;
+  final Feedbacks feed;
+
+  @override
+  Widget build(BuildContext context) {
+    AuthProvider auth = AuthProvider.auth(context);
+
+    return Container(
+      height: 350,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(feed.owner?.name ?? 'Anonymous',
+              style:
+                  smallPrimaryColor.copyWith(color: accentColor, fontSize: 16)),
+          kSmallHeight,
+          Row(
+            children: [
+              Expanded(
+                child: Text(feed.message,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 12,
+                    style: smallPrimaryColor.copyWith(fontSize: 16)),
+              ),
+            ],
+          ),
+          kSmallHeight,
+          Text('${DateFormat('MMM d, y').format(feed.createdAt)}',
+              style:
+                  smallPrimaryColor.copyWith(color: accentColor, fontSize: 12)),
         ],
       ),
     );

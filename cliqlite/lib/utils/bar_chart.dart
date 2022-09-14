@@ -101,15 +101,25 @@ class PointsLineChart extends StatelessWidget {
     print('val:$value');
     if (value == 0) {
       return "0%";
-    } else if (value >= 0) {
+    } else if (value == 10) {
+      return "10%";
+    } else if (value == 20) {
       return "20%";
-    } else if (value >= 20) {
+    } else if (value == 30) {
+      return "30%";
+    } else if (value == 40) {
       return "40%";
-    } else if (value >= 40) {
+    } else if (value == 50) {
+      return "50%";
+    } else if (value == 60) {
       return "60%";
-    } else if (value >= 60) {
+    } else if (value == 70) {
+      return "70%";
+    } else if (value == 80) {
       return "80%";
-    } else if (value >= 80) {
+    } else if (value == 90) {
+      return "20%";
+    } else if (value == 100) {
       return "100%";
     } else {
       return null;
@@ -119,29 +129,29 @@ class PointsLineChart extends StatelessWidget {
   final xAxis = charts.BasicNumericTickFormatterSpec((num value) {
     print('value:$value');
     if (value == 1) {
-      return "January";
+      return "Jan";
     } else if (value == 2) {
-      return "February";
+      return "Feb";
     } else if (value == 3) {
-      return "March";
+      return "Mar";
     } else if (value == 4) {
-      return "April";
+      return "Apr";
     } else if (value == 5) {
       return "May";
     } else if (value == 6) {
-      return "June";
+      return "Jun";
     } else if (value == 7) {
-      return "July";
+      return "Jul";
     } else if (value == 8) {
-      return "August";
+      return "Aug";
     } else if (value == 9) {
-      return "September";
+      return "Sept";
     } else if (value == 10) {
-      return "October";
+      return "Oct";
     } else if (value == 11) {
-      return "November";
+      return "Nov";
     } else if (value == 12) {
-      return "December";
+      return "Dec";
     } else {
       return '';
     }
@@ -161,7 +171,7 @@ class PointsLineChart extends StatelessWidget {
                 thickness: 1,
               )),
               tickProviderSpec:
-                  charts.BasicNumericTickProviderSpec(desiredTickCount: 6),
+                  charts.BasicNumericTickProviderSpec(desiredTickCount: 13),
               tickFormatterSpec: xAxis,
               showAxisLine: true),
           primaryMeasureAxis: new charts.NumericAxisSpec(
@@ -171,7 +181,7 @@ class PointsLineChart extends StatelessWidget {
                 thickness: 1,
               )),
               tickProviderSpec: new charts.BasicNumericTickProviderSpec(
-                desiredTickCount: 5,
+                desiredTickCount: 6,
               ),
               // tickFormatterSpec: yAxis,
               showAxisLine: true),
@@ -193,14 +203,13 @@ class PointsLineChart extends StatelessWidget {
     // ];
 
     final data = graph;
-    print('data:$graph');
+    print('score: ${data.map((e) => e.score)}');
 
     return [
       new charts.Series<Graph, int>(
         id: 'Sales',
-        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (Graph sales, _) {
-          print('year:${sales.score}');
           return sales.id.month;
         },
         measureFn: (Graph sales, _) => sales.score,

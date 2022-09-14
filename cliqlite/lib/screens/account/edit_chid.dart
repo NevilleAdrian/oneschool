@@ -19,6 +19,7 @@ import 'package:cliqlite/utils/validations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -58,6 +59,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
 
   //Age
   String age;
+  TextEditingController _controllerAge = new TextEditingController();
 
   //Class
   String childClassName;
@@ -70,7 +72,9 @@ class _EditChildDetailsState extends State<EditChildDetails> {
 
   String profilePix;
 
-  addUser({String imageUrl}) async {
+  String birthDate;
+
+  addUser({File imageFile}) async {
     ChildIndex childIndex = SubjectProvider.subject(context).index;
     List<Users> children = AuthProvider.auth(context).users;
     AuthProvider auth = AuthProvider.auth(context);
@@ -83,6 +87,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
       });
 
       print('imgUrl:$imageUrl');
+      print('role:${auth.user.role}');
 
       var result = await AuthProvider.auth(context).updateUser(
           _controllerName.text == ''
@@ -90,18 +95,18 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                   ? users[childIndex?.index ?? 0].name
                   : mainChildUser.name)
               : _controllerName.text,
-          int.parse(age?.replaceAll(' years', '') ?? '5'),
-          imageUrl ??
-              'https://images.pexels.com/photos/8264629/pexels-photo-8264629.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260',
+          birthDate ??
+              DateFormat('yyyy-MM-dd').format(DateTime.now()).toString(),
+          imageFile,
           childClassID ?? AuthProvider.auth(context).grades[0].id,
           children != null
               ? children[childIndex?.index ?? 0]?.id
               : mainChildUser?.id);
-      if (auth.user.role != 'user') {
-        await AuthProvider.auth(context).getChildren();
+      if (auth.user.role == 'child') {
+        AuthProvider.auth(context).getMainChild();
         profilePix = null;
       } else {
-        AuthProvider.auth(context).getMainChild();
+        await AuthProvider.auth(context).getChildren();
         profilePix = null;
       }
 
@@ -109,12 +114,14 @@ class _EditChildDetailsState extends State<EditChildDetails> {
         setState(() {
           AuthProvider.auth(context).setIsLoading(false);
         });
-        Navigator.push(
+
+        Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
                 builder: (context) => AppLayout(
                       index: 3,
-                    )));
+                    )),
+            (Route<dynamic> route) => false);
         showFlush(context, 'Successfully Updated User', primaryColor);
       }
     } catch (ex) {
@@ -131,34 +138,39 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     if (!form.validate()) {
       autoValidate = true; // Start validating on every change.
     } else {
-      if (_croppedImageFile != null) {
-        setState(() {
-          AuthProvider.auth(context).setIsLoading(true);
-        });
-        Reference reference =
-            _storage.ref().child("updateProfile" + DateTime.now().toString());
-        UploadTask uploadTask = reference.putFile(_croppedImageFile);
-        uploadTask.whenComplete(() async {
-          try {
-            imageUrl = await reference.getDownloadURL();
-            setState(() {});
-            print('url: $imageUrl');
-            if (imageUrl != null) {
-              addUser(imageUrl: imageUrl);
-            }
-          } catch (ex) {
-            print('ex: $ex');
-          }
-        });
-      } else {
-        List<Users> children = AuthProvider.auth(context).users;
-        ChildIndex childIndex = SubjectProvider.subject(context).index;
-        MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
-        addUser(
-            imageUrl: children != null
-                ? children[childIndex?.index ?? 0].photo
-                : mainChildUser.photo);
-      }
+      setState(() {
+        AuthProvider.auth(context).setIsLoading(true);
+      });
+      addUser(imageFile: _croppedImageFile);
+
+      // if (_croppedImageFile != null) {
+
+      // Reference reference = _storage.ref().child("updateProfile" + DateTime.now().toString());
+      // UploadTask uploadTask = reference.putFile(_croppedImageFile);
+      // uploadTask.whenComplete(() async {
+      //   try {
+      //     imageUrl = await reference.getDownloadURL();
+      //     setState(() {});
+      //     print('url: $imageUrl');
+      //     if (imageUrl != null) {
+      //       addUser(imageUrl: imageUrl);
+      //     }
+      //   } catch (ex) {
+      //     print('ex: $ex');
+      //   }
+      // });
+      //   addUser(imageFile: _croppedImageFile);
+      //
+      // }
+      // else {
+      //   List<Users> children = AuthProvider.auth(context).users;
+      //   ChildIndex childIndex = SubjectProvider.subject(context).index;
+      //   MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
+      //   addUser(
+      //       imageFile: children != null
+      //           ? children[childIndex?.index ?? 0].photo
+      //           : mainChildUser.photo);
+      // }
     }
   }
 
@@ -334,7 +346,7 @@ class _EditChildDetailsState extends State<EditChildDetails> {
             )),
       );
     } else {
-      return profilePicture(context, size: 80);
+      return profilePicture(context, 'photo', size: 80);
     }
   }
 
@@ -345,12 +357,12 @@ class _EditChildDetailsState extends State<EditChildDetails> {
     MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
     List<Grades> grades = AuthProvider.auth(context).grades;
 
-    age = toBeginningOfSentenceCase(users != null
-        ? users[childIndex?.index ?? 0].age.toString()
-        : mainChildUser.age.toString());
+    birthDate = toBeginningOfSentenceCase(users != null
+        ? users[childIndex?.index ?? 0].dob.toString()
+        : mainChildUser.dob.toString());
     val = toBeginningOfSentenceCase(users != null
-        ? users[childIndex?.index ?? 0].age.toString()
-        : mainChildUser.age.toString());
+        ? users[childIndex?.index ?? 0].dob.toString()
+        : mainChildUser.dob.toString());
 
     final grade = grades
         .where((element) =>
@@ -369,6 +381,20 @@ class _EditChildDetailsState extends State<EditChildDetails> {
           : mainChildUser.photo;
     });
     super.initState();
+  }
+
+  dateFilter(BuildContext context) {
+    DatePicker.showDatePicker(context,
+        showTitleActions: true, maxTime: DateTime.now(), onChanged: (date) {
+      setState(() {
+        birthDate = DateFormat('yyyy-MM-dd').format(date).toString();
+      });
+    }, onConfirm: (date) {
+      print('confirm $date');
+      setState(() {
+        birthDate = DateFormat('yyyy-MM-dd').format(date).toString();
+      });
+    }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
 
   @override
@@ -459,16 +485,31 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                                     : mainChildUser.name) ??
                                 "Child's Name"),
                         kSmallHeight,
-                        DropDown(
-                            onTap: () => bottomSheet(context, 'age'),
-                            text: '$age years' ??
-                                ('${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].age.toString() : mainChildUser.age.toString())} Years' ??
-                                    "Child's Age")),
+                        MyTextForm(
+                          controllerName: _controllerAge,
+                          // validations:  validations.validateDate,
+                          type: TextInputType.number,
+                          hintText: birthDate ?? 'Date of Birth',
+                          readonly: true,
+                          onTap: () => dateFilter(context),
+                        ),
+                        // MyTextForm(
+                        //     controllerName: _controllerAge,
+                        //     validations: validations.validateAge,
+                        //     type: TextInputType.number,
+                        //     hintText: '$age years' ??
+                        //         ('${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].age.toString() : mainChildUser.age.toString())} Years' ??
+                        //             "Child's Age")),
+                        // DropDown(
+                        //     onTap: () => bottomSheet(context, 'age'),
+                        //     text: '$age years' ??
+                        //         ('${toBeginningOfSentenceCase(users != null ? users[childIndex?.index ?? 0].age.toString() : mainChildUser.age.toString())} Years' ??
+                        //             "Child's Age")),
                         kSmallHeight,
                         DropDown(
                             onTap: () => bottomSheet(context, 'class'),
                             text: toBeginningOfSentenceCase(childClassName) ??
-                                "Grade 1"),
+                                "Primary 1"),
                         kLargeHeight,
                         GreenButton(
                           submit: () => nextPage(),

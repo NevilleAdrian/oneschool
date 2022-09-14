@@ -67,7 +67,8 @@ class _LoginState extends State<Login> {
               'user');
         }
         if (result != null) {
-          Navigator.pushNamed(context, AppLayout.id);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              AppLayout.id, (Route<dynamic> route) => false);
           setState(() {
             AuthProvider.auth(context).setIsLoading(false);
 

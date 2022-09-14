@@ -1,5 +1,6 @@
 import 'package:cliqlite/helper/network_helper.dart';
 import 'package:cliqlite/models/recent_topics/recent_topics.dart';
+import 'package:cliqlite/models/recommended_video_model/recommended_model.dart';
 import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
@@ -14,6 +15,7 @@ class TopicProvider extends ChangeNotifier {
 
   List<Topic> _topics;
   List<RecentTopic> _recentTopics;
+  List<RecommendedVideo> _recommended;
 
   List<Topic> get topics => _topics;
 
@@ -42,6 +44,21 @@ class TopicProvider extends ChangeNotifier {
     } catch (ex) {
       print('ex: $ex');
     }
+  }
+
+  Future<List<Topic>> getRecommendedVideos(String childId) async {
+    //Get recent topics
+    var data = await _helper.getRecommendedVideo(
+        childId, _context, AuthProvider.auth(_context).token);
+    print('getRecommendedVideos:${data}');
+
+    data = (data as List).map((e) => Topic.fromJson(e)).toList();
+
+    //Save Topics in local storage
+    setTopic(data);
+    _hiveRepository.add<List<Topic>>(name: kTopic, key: 'topic', item: data);
+
+    return data;
   }
 
   Future<dynamic> submitFeedback(

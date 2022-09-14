@@ -1,5 +1,7 @@
 ///alpha
-const String kUrl = 'cliqlit.herokuapp.com';
+// const String kUrl = 'oneskul.herokuapp.com';
+// const String kUrl = 'api.oneschool.africa';
+const String kUrl = 'staging.api.oneschool.africa';
 const String kAppUrl = '/api/v1';
 Map<String, String> _headers(String token) {
   return {'Content-type': 'application/json', 'Authorization': 'Bearer $token'};
@@ -19,6 +21,7 @@ const String kIndex = 'index';
 const String kSingleGrade = 'singleGrade';
 const String kTopic = 'topic';
 const String kRecent = 'recentTopics';
+const String kRecommended = 'recommendedVideo';
 const String kVideo = 'video';
 const String kQuiz = 'quiz';
 const String kAnalyticsSubject = 'analyticsSubject';

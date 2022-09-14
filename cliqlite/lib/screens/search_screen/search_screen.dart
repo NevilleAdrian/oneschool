@@ -1,10 +1,10 @@
 import 'package:cliqlite/models/mock_data/mock_data.dart';
-import 'package:cliqlite/models/subject/subject.dart';
-import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
+import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
+import 'package:cliqlite/providers/topic_provider/topic_provider.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/background/background.dart';
-import 'package:cliqlite/screens/videos/video_lessons.dart';
+import 'package:cliqlite/screens/videos/video_fulls_screen.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/search_box.dart';
@@ -22,8 +22,8 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  Future<List<Subject>> futureSubject;
-  List<Subject> subject;
+  Future<List<Topic>> futureTopic;
+  List<Topic> topic;
 
   TextEditingController _nameController = TextEditingController();
   List<dynamic> filteredSearch = [];
@@ -38,12 +38,12 @@ class _SearchScreenState extends State<SearchScreen> {
   //   return Future.value(result);
   // }
 
-  Future<List<Subject>> futureSubjectTask() async {
-    List<Subject> result = await SubjectProvider.subject(context)
-        .getSubjectsBySearch(description: '');
+  Future<List<Topic>> futureTopicTask() async {
+    List<Topic> result =
+        await TopicProvider.topic(context).getTopicsBySearch(description: '');
     print('result: $result');
     setState(() {
-      subject = result;
+      topic = result;
     });
     return Future.value(result);
   }
@@ -60,16 +60,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
   onSearch() async {
     print('text is ${_nameController.text}');
-    List<Subject> result;
+    List<Topic> result;
     if (_nameController.text.length > 1) {
-      result = await SubjectProvider.subject(context)
-          .getSubjectsBySearch(description: _nameController.text.toLowerCase());
+      result = await TopicProvider.topic(context)
+          .getTopicsBySearch(description: _nameController.text.toLowerCase());
     } else {
-      result = await SubjectProvider.subject(context)
-          .getSubjectsBySearch(description: '');
+      result =
+          await TopicProvider.topic(context).getTopicsBySearch(description: '');
     }
     setState(() {
-      subject = result;
+      topic = result;
       print('subject');
     });
   }
@@ -78,7 +78,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     filteredSearch = data;
     _nameController.addListener(onSearch);
-    futureSubject = futureSubjectTask();
+    futureTopic = futureTopicTask();
     // futureTopic = futureTopicTask();
     // futureVideo = futureVideoTask();
     super.initState();
@@ -91,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return BackgroundImage(
         child: SafeArea(
       child: FutureHelper(
-        task: futureSubject,
+        task: futureTopic,
         loader: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [circularProgressIndicator()],
@@ -101,7 +101,8 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Column(
             children: [
               XButton(
-                onTap: () => Navigator.pushNamed(context, AppLayout.id),
+                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppLayout.id, (Route<dynamic> route) => false),
                 color: greyColor,
               ),
               SizedBox(height: 15),
@@ -120,18 +121,18 @@ class _SearchScreenState extends State<SearchScreen> {
                             height: 35,
                           ),
                       scrollDirection: Axis.vertical,
-                      itemCount: subject.length,
+                      itemCount: topic.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         return InkWell(
                           onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => VideoLessons(
-                                        subId: subject[index].id,
+                                  builder: (context) => VideoFullScreen(
+                                        topic: topic[index],
                                       ))),
                           child: Text(
-                            toBeginningOfSentenceCase(subject[index].name),
+                            toBeginningOfSentenceCase(topic[index].name),
                             style: textExtraLightBlack.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: theme.status ? whiteColor : blackColor),

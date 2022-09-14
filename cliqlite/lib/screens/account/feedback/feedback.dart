@@ -118,7 +118,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Rate Topic',
+                              'Rate the app',
                               style: headingSmallBlack.copyWith(
                                   fontWeight: FontWeight.w600),
                             ),

@@ -30,13 +30,15 @@ class TopicAdapter extends TypeAdapter<Topic> {
       createdAt: fields[10] as DateTime,
       updatedAt: fields[11] as DateTime,
       v: fields[12] as int,
+      plan: fields[13] as String,
+      type: fields[14] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Topic obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.video)
       ..writeByte(1)
@@ -62,7 +64,11 @@ class TopicAdapter extends TypeAdapter<Topic> {
       ..writeByte(11)
       ..write(obj.updatedAt)
       ..writeByte(12)
-      ..write(obj.v);
+      ..write(obj.v)
+      ..writeByte(13)
+      ..write(obj.plan)
+      ..writeByte(14)
+      ..write(obj.type);
   }
 
   @override

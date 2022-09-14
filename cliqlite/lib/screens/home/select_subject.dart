@@ -1,9 +1,9 @@
-import 'package:cliqlite/models/video_model/video_model.dart';
-import 'package:cliqlite/providers/video_provider/video_provider.dart';
+import 'package:cliqlite/models/subject/subject.dart';
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
+import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/home.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
-import 'package:cliqlite/screens/videos/videos.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/ui_widgets/future_helper.dart';
 import 'package:cliqlite/utils/back_arrow.dart';
@@ -17,14 +17,18 @@ class SelectSubject extends StatefulWidget {
 }
 
 class _SelectSubjectState extends State<SelectSubject> {
-  Future<List<Video>> futureVideos;
+  Future<List<Subject>> futureSubjects;
 
-  Future<List<Video>> futureTask() async {
+  Future<List<Subject>> futureTask() async {
     //Initialize provider
-    VideoProvider video = VideoProvider.video(context);
+    SubjectProvider subject = SubjectProvider.subject(context);
+    AuthProvider auth = AuthProvider.auth(context);
 
     //Make call to get videos
-    var result = await video.getVideos();
+    var result = await subject.getSubjects(
+      id: subject?.grade?.grade ?? auth.users[0].grade,
+      name: subject?.grade?.name ?? auth.users[0].name,
+    );
 
     setState(() {});
 
@@ -32,7 +36,7 @@ class _SelectSubjectState extends State<SelectSubject> {
     return Future.value(result);
   }
 
-  Widget videos(List<Video> video) {
+  Widget videos(List<Subject> subject) {
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -57,8 +61,8 @@ class _SelectSubjectState extends State<SelectSubject> {
                       ),
                     ],
                   ),
-                  kSmallHeight,
-                  SearchCard(),
+                  // kSmallHeight,
+                  // SearchCard(),
                   kSmallHeight,
                   Column(
                     children: [
@@ -75,27 +79,50 @@ class _SelectSubjectState extends State<SelectSubject> {
                                     crossAxisCount: 3,
                                     crossAxisSpacing: 12,
                                     mainAxisSpacing: 20),
-                            itemCount: 6,
+                            itemCount: subject.length,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
+                              print('subId: ${subject[index].subjectId}');
                               return InkWell(
-                                onTap: () =>
-                                    Navigator.pushNamed(context, QuizScreen.id),
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => QuizScreen(
+                                              type: 'quick',
+                                              subjectId: subject[index].id,
+                                            ))),
                                 child: SwipeItems(
-                                  image: 'assets/images/Frame-1.png',
+                                  primaryColor: Color(int.parse(
+                                      '0XFF${subject[index].primaryColor}')),
+                                  secondaryColor: Color(int.parse(
+                                      '0XFF${subject[index].secondaryColor}')),
                                   widget: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Image.asset('assets/images/dna.png'),
-                                      Expanded(
-                                        child: Text(
-                                          'Biology',
-                                          style: heading18,
-                                        ),
+                                      FadeInImage(
+                                        image:
+                                            NetworkImage(subject[index].icon),
+                                        height: 45,
+                                        placeholder:
+                                            AssetImage('assets/images/dna.png'),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              subject[index].name,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: heading18,
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),
@@ -116,25 +143,26 @@ class _SelectSubjectState extends State<SelectSubject> {
 
   @override
   void initState() {
-    futureVideos = futureTask();
+    futureSubjects = futureTask();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    VideoProvider video = VideoProvider.video(context);
+    List<Subject> subject = SubjectProvider.subject(context).subjects;
+    print('subjects: $subject');
 
     return BackgroundImage(
       child: FutureHelper(
-        task: futureVideos,
-        loader: video?.videos == null
+        task: futureSubjects,
+        loader: subject == null
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [circularProgressIndicator()],
               )
-            : videos(video.videos),
-        builder: (context, _) => videos(video.videos),
+            : videos(subject),
+        builder: (context, _) => videos(subject),
       ),
     );
   }

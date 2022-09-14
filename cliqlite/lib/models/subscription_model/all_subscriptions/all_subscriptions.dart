@@ -12,14 +12,14 @@ String allSubscriptionsToJson(List<AllSubscriptions> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class AllSubscriptions {
-  AllSubscriptions({
-    this.id,
-    this.type,
-    this.price,
-    this.createdAt,
-    this.updatedAt,
-    this.v,
-  });
+  AllSubscriptions(
+      {this.id,
+      this.type,
+      this.price,
+      this.createdAt,
+      this.updatedAt,
+      this.v,
+      this.discount});
 
   String id;
   String type;
@@ -27,6 +27,7 @@ class AllSubscriptions {
   DateTime createdAt;
   DateTime updatedAt;
   int v;
+  int discount;
 
   factory AllSubscriptions.fromJson(Map<String, dynamic> json) =>
       AllSubscriptions(
@@ -36,6 +37,7 @@ class AllSubscriptions {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
+        discount: json["discount"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,5 +47,6 @@ class AllSubscriptions {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
+        "discount": discount,
       };
 }

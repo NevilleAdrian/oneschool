@@ -24,12 +24,10 @@ import 'package:cliqlite/providers/video_provider/video_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/screens/app_layout/applayout.dart';
 import 'package:cliqlite/screens/auth/login.dart';
-import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/onboarding/onboarding.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:cliqlite/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SplashScreen extends StatefulWidget {
   static String id = 'splash_screen';
@@ -172,18 +170,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundImage(
+    return Container(
+      color: primaryColor,
       child: SafeArea(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/logo.png',
+            'assets/images/oneschool.png',
             height: controller.value * 200,
           ),
-          kSmallWidth,
-          SvgPicture.asset('assets/images/svg/text.svg'),
+          // kSmallWidth,
+          // SvgPicture.asset('assets/images/svg/text.svg'),
         ],
       )),
     );

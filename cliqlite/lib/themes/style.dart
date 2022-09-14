@@ -111,18 +111,18 @@ TextStyle textGreen = const TextStyle(
 );
 
 const MaterialColor kPrimaryColor = const MaterialColor(
-  0xFF016F56,
+  0xFF0179E9,
   const <int, Color>{
-    50: const Color(0xFF016F56),
-    100: const Color(0xFF016F56),
-    200: const Color(0xFF016F56),
-    300: const Color(0xFF016F56),
-    400: const Color(0xFF016F56),
-    500: const Color(0xFF016F56),
-    600: const Color(0xFF016F56),
-    700: const Color(0xFF016F56),
-    800: const Color(0xFF016F56),
-    900: const Color(0xFF016F56),
+    50: const Color(0xFF0179E9),
+    100: const Color(0xFF0179E9),
+    200: const Color(0xFF0179E9),
+    300: const Color(0xFF0179E9),
+    400: const Color(0xFF0179E9),
+    500: const Color(0xFF0179E9),
+    600: const Color(0xFF0179E9),
+    700: const Color(0xFF0179E9),
+    800: const Color(0xFF0179E9),
+    900: const Color(0xFF0179E9),
   },
 );
 
@@ -185,13 +185,14 @@ const Color activeColor = const Color(0xFFF44336);
 const Color redColor = const Color(0xFFEF0000);
 const Color lightRedColor = const Color(0xFFFDE5E6);
 const Color buttonStop = const Color(0xFFF44336);
-const Color primaryColor = const Color(0xFF016F56);
-const Color lightPrimaryColor = const Color(0xFFf2f8f3);
-const Color lighterPrimaryColor = const Color(0xFFE6F7EA);
+const Color primaryColor = const Color(0xFF0179E9);
+const Color darkPrimaryColor = const Color(0xFF004CBD);
+const Color lightPrimaryColor = const Color(0xFFF3F9FF);
+const Color lighterPrimaryColor = const Color(0xFFF3F9FF);
 const Color veryLightPrimaryColor = const Color(0xFFCCE2DD);
-const Color accentColor = const Color(0xFF09AC2C);
+const Color accentColor = const Color(0xFF0179E9);
 const Color splashBgColor = const Color(0xFF00008B);
-const Color secondaryColor = const Color(0xFFE6F7EA);
+const Color secondaryColor = const Color(0xFFDEEFFF);
 const Color lightSecondaryColor = const Color(0xFF618B05);
 const Color facebook = const Color(0xFF4267b2);
 const Color googlePlus = const Color(0xFFdb4437);

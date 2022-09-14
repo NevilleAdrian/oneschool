@@ -62,15 +62,15 @@ class SubjectProvider extends ChangeNotifier {
     return data;
   }
 
-  Future<List<Subject>> getSubjectsBySearch({String description}) async {
-    //search for subjects
-    var data = await _helper.getSubjectBySearch(
-        _context, description, AuthProvider.auth(_context).token);
-
-    data = (data as List).map((e) => Subject.fromJson(e)).toList();
-
-    return data;
-  }
+  // Future<List<Subject>> getSubjectsBySearch({String description}) async {
+  //   //search for subjects
+  //   var data = await _helper.getSubjectBySearch(
+  //       _context, description, AuthProvider.auth(_context).token);
+  //   print('data:$data');
+  //   data = (data as List).map((e) => SearchTopics.fromJson(e)).toList();
+  //
+  //   return data;
+  // }
 
   static SubjectProvider subject(BuildContext context, {bool listen = false}) {
     _context = context;

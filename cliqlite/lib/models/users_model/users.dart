@@ -19,7 +19,7 @@ class Users {
   @HiveField(2)
   String email;
   @HiveField(3)
-  int age;
+  String dob;
   @HiveField(4)
   String parent;
   @HiveField(5)
@@ -34,45 +34,59 @@ class Users {
   DateTime createdAt;
   @HiveField(10)
   bool isActive;
+  @HiveField(11)
+  bool test;
+  @HiveField(12)
+  int age;
+  @HiveField(13)
+  String planType;
 
   Users(
       {this.id,
       this.name,
       this.email,
-      this.age,
+      this.dob,
       this.parent,
       this.isSubscribed,
       this.grade,
       this.role,
       this.photo,
       this.createdAt,
-      this.isActive});
+      this.test,
+      this.age,
+      this.isActive,
+      this.planType});
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
         id: json["_id"],
         name: json["name"],
         email: json["email"],
-        age: json["age"],
+        dob: json["dob"],
         parent: json["parent"],
         isSubscribed: json["subscribed"],
         isActive: json["isActive"],
+        age: json["age"],
+        test: json["test"],
         grade: json["grade"],
         role: json["role"],
         photo: json["photo"],
         createdAt: DateTime.parse(json["createdAt"]),
+        planType: json["planType"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
         "email": email,
-        "age": age,
+        "dob": dob,
         "parent": parent,
         "isSubscribed": isSubscribed,
         "isActive": isActive,
+        "test": test,
         "grade": grade,
         "role": role,
         "photo": photo,
+        "planType": planType,
         "createdAt": createdAt.toIso8601String(),
       };
 }

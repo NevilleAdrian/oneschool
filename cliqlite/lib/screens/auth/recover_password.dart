@@ -8,6 +8,7 @@ import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_form.dart';
 import 'package:cliqlite/utils/validations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class RecoverPassword extends StatefulWidget {
   RecoverPassword({this.token});
@@ -22,6 +23,8 @@ class _RecoverPasswordState extends State<RecoverPassword> {
   TextEditingController _controllerPassword = new TextEditingController();
   final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   Validations validations = new Validations();
+  bool _oldVisible = true;
+  bool _newVisible = true;
 
   nextPage(BuildContext context) async {
     final FormState form = formKey.currentState;
@@ -75,16 +78,50 @@ class _RecoverPasswordState extends State<RecoverPassword> {
               child: Column(
                 children: [
                   MyTextForm(
-                      controllerName: _controllerPassword,
-                      validations: validations.validatePassword,
-                      type: TextInputType.text,
-                      hintText: 'Password'),
+                    controllerName: _controllerPassword,
+                    validations: validations.validatePassword,
+                    hintText: 'Password',
+                    obscureText: _oldVisible,
+                    area: 1,
+                    suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _oldVisible = !_oldVisible;
+                          });
+                        },
+                        child: Container(
+                          width: 20.0,
+                          padding: EdgeInsets.only(right: 15),
+                          alignment: Alignment.centerRight,
+                          child: _oldVisible
+                              ? SvgPicture.asset(
+                                  'assets/images/svg/eye-off.svg')
+                              : SvgPicture.asset('assets/images/svg/eye.svg'),
+                        )),
+                  ),
                   kSmallHeight,
                   MyTextForm(
-                      controllerName: _controllerConfirm,
-                      validations: validations.validatePassword,
-                      type: TextInputType.text,
-                      hintText: 'Confirm Password'),
+                    controllerName: _controllerConfirm,
+                    validations: validations.validatePassword,
+                    hintText: 'Confirm Password',
+                    obscureText: _newVisible,
+                    area: 1,
+                    suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _newVisible = !_newVisible;
+                          });
+                        },
+                        child: Container(
+                          width: 20.0,
+                          padding: EdgeInsets.only(right: 15),
+                          alignment: Alignment.centerRight,
+                          child: _newVisible
+                              ? SvgPicture.asset(
+                                  'assets/images/svg/eye-off.svg')
+                              : SvgPicture.asset('assets/images/svg/eye.svg'),
+                        )),
+                  ),
                   kLargeHeight,
                   GreenButton(
                     submit: () {

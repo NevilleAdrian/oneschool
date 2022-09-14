@@ -89,8 +89,8 @@ class _GetStartedState extends State<GetStarted> {
                         borderRadius: BorderRadius.circular(8),
                         gradient: const LinearGradient(
                           colors: [
-                            Color(0XFF07AB2C),
-                            Color(0XFF69E905),
+                            Color(0XFF014CD9),
+                            Color(0XFF0179E9),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,

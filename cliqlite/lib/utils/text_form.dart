@@ -18,6 +18,7 @@ class MyTextForm extends StatelessWidget {
     this.enabled,
     this.borderWidth,
     this.readonly,
+    this.onTap,
   })  : _controllerName = controllerName,
         super(key: key);
 
@@ -35,17 +36,21 @@ class MyTextForm extends StatelessWidget {
   final Color enabled;
   final double borderWidth;
   final bool readonly;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
         controller: _controllerName,
         keyboardType: type,
+        autofocus: true,
         style: TextStyle(color: primaryColor, fontFamily: "Montserrat"),
         validator: validations,
         obscureText: obscureText,
         maxLines: area,
         readOnly: readonly ?? false,
+        cursorColor: primaryColor,
+        onTap: onTap,
         decoration: InputDecoration(
             floatingLabelBehavior: FloatingLabelBehavior.always,
             border: OutlineInputBorder(

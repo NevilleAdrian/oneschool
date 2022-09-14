@@ -1,6 +1,7 @@
 import 'package:better_player/better_player.dart';
 import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/models/video_model/video_model.dart';
+import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/quiz_provider/quiz_provider.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/quiz_screen/quiz_screen.dart';
@@ -134,7 +135,9 @@ class _VideoFullScreenState extends State<VideoFullScreen> {
                               style:
                                   headingSmallGreyColor.copyWith(fontSize: 14)),
                           kLargeHeight,
-                          quizResult.isEmpty
+                          quizResult.isEmpty ||
+                                  AuthProvider.auth(context).user.role !=
+                                      'child'
                               ? Container()
                               : GreenButton(
                                   submit: () {

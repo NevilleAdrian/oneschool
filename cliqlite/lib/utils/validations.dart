@@ -17,6 +17,11 @@ class Validations {
     return null;
   }
 
+  String validateAge(String value) {
+    if (value.isEmpty) return 'Enter Valid Age';
+    return null;
+  }
+
   String validateDate(String value) {
     if (value.isEmpty) return 'Select a date';
     return null;

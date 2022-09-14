@@ -73,8 +73,8 @@ class _GreenButtonState extends State<GreenButton> {
             borderRadius: BorderRadius.circular(8),
             gradient: LinearGradient(
               colors: [
-                widget.gradColor ?? Color(0XFF07AB2C),
-                widget.gradColor ?? Color(0XFF69E905),
+                widget.gradColor ?? Color(0XFF014CD9),
+                widget.gradColor ?? Color(0XFF0179E9),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

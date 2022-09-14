@@ -37,8 +37,12 @@ class _RegistrationState extends State<Registration> {
           AuthProvider.auth(context).setIsLoading(true);
         });
         var result;
+        var catResult;
         result = await AuthProvider.auth(context).getGrades();
-        if (result != null) {
+        catResult = await AuthProvider.auth(context).getCategories();
+
+        print('catResult: $catResult');
+        if (result != null && catResult != null) {
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -84,7 +88,7 @@ class _RegistrationState extends State<Registration> {
                     LinearPercentIndicator(
                       lineHeight: 5.0,
                       percent: 0.5,
-                      progressColor: Color(0xFF09AC2C),
+                      progressColor: primaryColor,
                     ),
                   ],
                 ),

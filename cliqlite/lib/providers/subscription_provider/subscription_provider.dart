@@ -24,20 +24,19 @@ class SubscriptionProvider extends ChangeNotifier {
 
   List<Subscription> _subscription;
   List<AllSubscriptions> _allSubscription;
-  List<Transactions> _transactions;
+  Transactions _transactions;
   List<GetCards> _cards;
 
   List<Subscription> get subscription => _subscription;
   List<AllSubscriptions> get allSubscription => _allSubscription;
-  List<Transactions> get transactions => _transactions;
+  Transactions get transactions => _transactions;
   List<GetCards> get cards => _cards;
 
   setSubscription(List<Subscription> subscription) =>
       _subscription = subscription;
   setAllSubscription(List<AllSubscriptions> allSubscription) =>
       _allSubscription = allSubscription;
-  setTransactions(List<Transactions> transactions) =>
-      _transactions = transactions;
+  setTransactions(Transactions transactions) => _transactions = transactions;
   setCards(List<GetCards> cards) => _cards = cards;
 
   Future<List<GetCards>> getCards() async {
@@ -118,7 +117,7 @@ class SubscriptionProvider extends ChangeNotifier {
               ? children[childIndex?.index ?? 0].id
               : mainChildUser.id,
           AuthProvider.auth(_context).token);
-      print('subscribedData: $data');
+      print('dsubscribedData: $data');
 
       // data = Subscription.fromJson(data);
       data = (data as List).map((e) => Subscription.fromJson(e)).toList();
@@ -140,7 +139,7 @@ class SubscriptionProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<Transactions>> getTransactions() async {
+  Future<Transactions> getTransactions() async {
     //initialize childIndex and users
     ChildIndex childIndex = SubjectProvider.subject(_context).index;
     List<Users> children = AuthProvider.auth(_context).users;
@@ -155,8 +154,9 @@ class SubscriptionProvider extends ChangeNotifier {
               : mainChildUser.id,
           AuthProvider.auth(_context).token);
 
-      print('transactionData: $data');
-      data = (data as List).map((e) => Transactions.fromJson(e)).toList();
+      data = Transactions.fromJson(data);
+
+      // data = (data as List).map((e) => Transactions.fromJson(e)).toList();
 
       //Save transactions in local storage
       setTransactions(data);
@@ -184,13 +184,14 @@ class SubscriptionProvider extends ChangeNotifier {
   }
 
   //add Subscription
-  Future<dynamic> addSubscription(
-      String subId, String type, String childId) async {
+  Future<dynamic> addSubscription(String subId, String type, String childId,
+      [String cardId]) async {
     // add a subscription
 
     try {
-      var data = await _helper.addSubscription(
-          subId, childId, type, AuthProvider.auth(_context).token, _context);
+      print('token:${AuthProvider.auth(_context).token}');
+      var data = await _helper.addSubscription(subId, childId, type,
+          AuthProvider.auth(_context).token, _context, cardId);
       return data;
     } catch (ex) {
       print('ex:$ex');

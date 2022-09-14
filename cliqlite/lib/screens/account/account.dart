@@ -1,8 +1,10 @@
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
 import 'package:cliqlite/models/child_Index_model/child_index_model.dart';
+import 'package:cliqlite/models/subscription_model/subscription_model.dart';
 import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
+import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
 import 'package:cliqlite/providers/theme_provider/theme_provider.dart';
 import 'package:cliqlite/screens/account/billing_details/billing_details.dart';
 import 'package:cliqlite/screens/account/change_password/change_password.dart';
@@ -32,6 +34,13 @@ class _AccountState extends State<Account> {
     List<Users> users = AuthProvider.auth(context).users;
     MainChildUser mainChildUser = AuthProvider.auth(context).mainChildUser;
     ChildIndex childIndex = SubjectProvider.subject(context).index;
+    List<Subscription> subscription =
+        SubscriptionProvider.subscribe(context).subscription;
+
+    bool test =
+        users != null ? users[childIndex?.index ?? 0].test : mainChildUser.test;
+
+    print('testtt: ${test}');
 
     return BackgroundImage(
       child: SafeArea(
@@ -61,7 +70,7 @@ class _AccountState extends State<Account> {
                     children: [
                       Row(
                         children: [
-                          profilePicture(context, size: 70),
+                          profilePicture(context, '', size: 70),
                           kSmallWidth,
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,7 +148,9 @@ class _AccountState extends State<Account> {
                                 Row(
                                   children: [
                                     SvgPicture.asset(
-                                        'assets/images/svg/settings-1.svg'),
+                                      'assets/images/svg/settings-1.svg',
+                                      color: primaryColor,
+                                    ),
                                     kVerySmallWidth,
                                     Text("Edit child's details",
                                         style: smallPrimaryColor),
@@ -167,7 +178,9 @@ class _AccountState extends State<Account> {
                                 Row(
                                   children: [
                                     SvgPicture.asset(
-                                        'assets/images/svg/settings-2.svg'),
+                                      'assets/images/svg/settings-2.svg',
+                                      color: primaryColor,
+                                    ),
                                     kVerySmallWidth,
                                     Text(
                                       "Change Password",
@@ -188,195 +201,227 @@ class _AccountState extends State<Account> {
                         height: 50,
                         thickness: 1,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            'Account Settings',
-                            style: smallPrimaryColor.copyWith(
-                                fontSize: 17, fontWeight: FontWeight.w600),
-                          ),
-                          Divider(
-                            height: 50,
-                            thickness: 1,
-                          ),
-                          InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => BillingDetails())),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/images/svg/settings-3.svg'),
-                                    kVerySmallWidth,
-                                    Text(
-                                      "Billing Details",
-                                      style: smallPrimaryColor,
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: theme.status ? whiteColor : blackColor,
-                                )
-                              ],
+                      if (!test)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Account Settings',
+                              style: smallPrimaryColor.copyWith(
+                                  fontSize: 17, fontWeight: FontWeight.w600),
                             ),
-                          ),
-                          Divider(
-                            height: 50,
-                            thickness: 1,
-                          ),
+                            Divider(
+                              height: 50,
+                              thickness: 1,
+                            ),
 
-                          InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ManagePayoutInfo())),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // (subscription?.isEmpty ?? false)
+                            //     ? Container()
+                            //     :
+                            Column(
                               children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/images/svg/settings-4.svg'),
-                                    kVerySmallWidth,
-                                    Text(
-                                      "Manage payout info",
-                                      style: smallPrimaryColor,
-                                    ),
-                                  ],
+                                InkWell(
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              BillingDetails())),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/svg/settings-3.svg',
+                                            color: primaryColor,
+                                          ),
+                                          kVerySmallWidth,
+                                          Text(
+                                            "Billing Details",
+                                            style: smallPrimaryColor,
+                                          ),
+                                        ],
+                                      ),
+                                      Icon(
+                                        Icons.chevron_right,
+                                        color: theme.status
+                                            ? whiteColor
+                                            : blackColor,
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: theme.status ? whiteColor : blackColor,
-                                )
+                                Divider(
+                                  height: 50,
+                                  thickness: 1,
+                                ),
                               ],
                             ),
-                          ),
-                          Divider(
-                            height: 50,
-                            thickness: 1,
-                          ),
-                          InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MakeSubscription())),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/images/svg/settings-5.svg'),
-                                    kVerySmallWidth,
-                                    Text(
-                                      "Subscription",
-                                      style: smallPrimaryColor,
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: theme.status ? whiteColor : blackColor,
-                                )
-                              ],
+                            InkWell(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ManagePayoutInfo())),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/images/svg/settings-4.svg',
+                                        color: primaryColor,
+                                      ),
+                                      kVerySmallWidth,
+                                      Text(
+                                        "Manage payout info",
+                                        style: smallPrimaryColor,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color:
+                                        theme.status ? whiteColor : blackColor,
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          Divider(
-                            height: 50,
-                            thickness: 1,
-                          ),
-                          // InkWell(
-                          //   onTap: () => Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) => UsageLimit())),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Row(
-                          //         children: [
-                          //           SvgPicture.asset(
-                          //               'assets/images/svg/settings-6.svg'),
-                          //           kVerySmallWidth,
-                          //           Text(
-                          //             "Set app usage timer",
-                          //             style: smallPrimaryColor,
-                          //           ),
-                          //         ],
-                          //       ),
-                          //       Icon(
-                          //         Icons.chevron_right,
-                          //         color: theme.status ? whiteColor : blackColor,
-                          //       )
-                          //     ],
-                          //   ),
-                          // ),
-                          // Divider(
-                          //   height: 50,
-                          //   thickness: 1,
-                          // ),
-                          InkWell(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FeedBackScreen())),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/images/svg/settings-7.svg'),
-                                    kVerySmallWidth,
-                                    Text(
-                                      "Feedback",
-                                      style: smallPrimaryColor,
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: theme.status ? whiteColor : blackColor,
-                                )
-                              ],
+                            Divider(
+                              height: 50,
+                              thickness: 1,
                             ),
-                          ),
-                          Divider(
-                            height: 50,
-                            thickness: 1,
-                          ),
-                          InkWell(
-                            onTap: () =>
-                                Navigator.pushNamed(context, Support.id),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/images/svg/settings-8.svg'),
-                                    kVerySmallWidth,
-                                    Text(
-                                      "Support",
-                                      style: smallPrimaryColor,
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: theme.status ? whiteColor : blackColor,
-                                )
-                              ],
+                            InkWell(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          MakeSubscription())),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/images/svg/settings-5.svg',
+                                        color: primaryColor,
+                                      ),
+                                      kVerySmallWidth,
+                                      Text(
+                                        "Subscription",
+                                        style: smallPrimaryColor,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color:
+                                        theme.status ? whiteColor : blackColor,
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            Divider(
+                              height: 50,
+                              thickness: 1,
+                            ),
+                            // InkWell(
+                            //   onTap: () => Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //           builder: (context) => UsageLimit())),
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       Row(
+                            //         children: [
+                            //           SvgPicture.asset(
+                            //               'assets/images/svg/settings-6.svg'),
+                            //           kVerySmallWidth,
+                            //           Text(
+                            //             "Set app usage timer",
+                            //             style: smallPrimaryColor,
+                            //           ),
+                            //         ],
+                            //       ),
+                            //       Icon(
+                            //         Icons.chevron_right,
+                            //         color: theme.status ? whiteColor : blackColor,
+                            //       )
+                            //     ],
+                            //   ),
+                            // ),
+                            // Divider(
+                            //   height: 50,
+                            //   thickness: 1,
+                            // ),
+                            InkWell(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FeedBackScreen())),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/images/svg/settings-7.svg',
+                                        color: primaryColor,
+                                      ),
+                                      kVerySmallWidth,
+                                      Text(
+                                        "Feedback",
+                                        style: smallPrimaryColor,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color:
+                                        theme.status ? whiteColor : blackColor,
+                                  )
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              height: 50,
+                              thickness: 1,
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, Support.id),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/images/svg/settings-8.svg',
+                                        color: primaryColor,
+                                      ),
+                                      kVerySmallWidth,
+                                      Text(
+                                        "Support",
+                                        style: smallPrimaryColor,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color:
+                                        theme.status ? whiteColor : blackColor,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       kLargeHeight,
                     ],
                   ),

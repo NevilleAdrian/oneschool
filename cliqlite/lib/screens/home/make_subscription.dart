@@ -5,6 +5,7 @@ import 'package:cliqlite/models/users_model/users.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/providers/subject_provider/subject_provider.dart';
 import 'package:cliqlite/providers/subscription_provider/subscription_provider.dart';
+import 'package:cliqlite/screens/account/manage_payment/manage_payment.dart';
 import 'package:cliqlite/screens/background/background.dart';
 import 'package:cliqlite/screens/home/payment_summary.dart';
 import 'package:cliqlite/themes/style.dart';
@@ -13,7 +14,7 @@ import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 
-enum Attribute { yearly, monthly, quaterly, daily }
+enum Attribute { yearly, summer }
 
 class MakeSubscription extends StatefulWidget {
   static String id = 'make_subscription';
@@ -27,7 +28,8 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
   String childId;
   String type;
   int amount;
-  int number = 0;
+  int number = 1;
+  dynamic cards;
 
   @override
   void initState() {
@@ -44,6 +46,9 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
     //Make call to get videos
     try {
       var result = await subscription.getAllSubscription();
+      cards = await subscription.getCards();
+      print('cardssss: $cards');
+
       setState(() {});
       ChildIndex childIndex = SubjectProvider.subject(context).index;
       List<Users> users = AuthProvider.auth(context).users;
@@ -99,46 +104,85 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                   itemCount: subscription.allSubscription.length,
                   itemBuilder: (context, index) {
                     final sub = subscription.allSubscription[index];
+                    // SubscriptionBox(
+                    //     title: sub.type.toLowerCase() == "monthly"
+                    //         ? 'Monthly'
+                    //         : (sub.type.toLowerCase() == "yearly"
+                    //         ? 'Yearly'
+                    //         : (sub.type.toLowerCase() == "quarterly"
+                    //         ? 'Quarterly'
+                    //         : 'Summer')),
+                    //     type: sub.type.toLowerCase() == "monthly"
+                    //         ? 'Monthly'
+                    //         : (sub.type.toLowerCase() == "yearly"
+                    //         ? 'Yearly'
+                    //         : (sub.type.toLowerCase() == "quarterly"
+                    //         ? 'Quarterly'
+                    //         : 'Summer')),
+                    //     subTitle: addSeparator(toDecimalPlace(
+                    //         int.parse(sub.price.toString()) ?? 0)),
+                    //     attribute: sub.type.toLowerCase() == "monthly"
+                    //         ? Attribute.monthly
+                    //         : (sub.type.toLowerCase() == "yearly"
+                    //         ? Attribute.yearly
+                    //         : (sub.type.toLowerCase() == "quarterly"
+                    //         ? Attribute.quaterly
+                    //         : Attribute.summer)),
+                    //     groupVal: val,
+                    //     decoration: decoration.copyWith(
+                    //       borderRadius: BorderRadius.circular(20),
+                    //       color: lightPrimaryColor,
+                    //       border: Border.all(
+                    //           color: subscription.allSubscription[number] ==
+                    //               subscription.allSubscription[index]
+                    //               ? accentColor
+                    //               : Colors.transparent),
+                    //     ),
+                    //     val: sub.type.toLowerCase() == "monthly"
+                    //         ? Attribute.monthly
+                    //         : (sub.type.toLowerCase() == "yearly"
+                    //         ? Attribute.yearly
+                    //         : (sub.type.toLowerCase() == "quarterly"
+                    //         ? Attribute.quaterly
+                    //         : Attribute.summer)),
+                    //     onChanged: (Attribute value) {
+                    //       setState(() {
+                    //         val = value;
+                    //         number = index;
+                    //         print('number:$number');
+                    //         print('number:$index');
+                    //         subId = sub.id;
+                    //         amount = sub.price;
+                    //         type = sub.type.toLowerCase();
+                    //       });
+                    //     })
                     return SubscriptionBox(
-                        title: sub.type == "monthly"
-                            ? 'Monthly'
-                            : (sub.type == "yearly"
-                                ? 'Yearly'
-                                : (sub.type == "quarterly"
-                                    ? 'Quarterly'
-                                    : "Daily")),
-                        type: sub.type == "monthly"
-                            ? 'Monthly'
-                            : (sub.type == "yearly"
-                                ? 'Yearly'
-                                : (sub.type == "quarterly"
-                                    ? 'Quarterly'
-                                    : "Daily")),
+                        title: sub.type.toLowerCase() == "yearly"
+                            ? 'Yearly'
+                            : 'Summer',
+                        type: sub.type.toLowerCase() == "yearly"
+                            ? 'Yearly'
+                            : 'Summer',
+                        strikeTitle: addSeparator(toDecimalPlace(
+                            int.parse(sub.discount.toString()) ?? 0)),
                         subTitle: addSeparator(toDecimalPlace(
                             int.parse(sub.price.toString()) ?? 0)),
-                        attribute: sub.type == "monthly"
-                            ? Attribute.monthly
-                            : (sub.type == "yearly"
-                                ? Attribute.yearly
-                                : (sub.type == "quarterly"
-                                    ? Attribute.quaterly
-                                    : Attribute.daily)),
+                        attribute: sub.type.toLowerCase() == "yearly"
+                            ? Attribute.yearly
+                            : Attribute.summer,
                         groupVal: val,
                         decoration: decoration.copyWith(
-                            borderRadius: BorderRadius.circular(20),
-                            color: lightPrimaryColor,
-                            border: Border.all(
-                                color: subscription.allSubscription[number] ==
-                                        subscription.allSubscription[index]
-                                    ? accentColor
-                                    : Colors.transparent)),
-                        val: sub.type == "monthly"
-                            ? Attribute.monthly
-                            : (sub.type == "yearly"
-                                ? Attribute.yearly
-                                : (sub.type == "quarterly"
-                                    ? Attribute.quaterly
-                                    : Attribute.daily)),
+                          borderRadius: BorderRadius.circular(20),
+                          color: lightPrimaryColor,
+                          border: Border.all(
+                              color: subscription.allSubscription[number] ==
+                                      subscription.allSubscription[index]
+                                  ? accentColor
+                                  : Colors.transparent),
+                        ),
+                        val: sub.type.toLowerCase() == "yearly"
+                            ? Attribute.yearly
+                            : Attribute.summer,
                         onChanged: (Attribute value) {
                           setState(() {
                             val = value;
@@ -147,7 +191,7 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
                             print('number:$index');
                             subId = sub.id;
                             amount = sub.price;
-                            type = sub.type;
+                            type = sub.type.toLowerCase();
                           });
                         });
                   }),
@@ -156,8 +200,8 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
             GreenButton(
               submit: () => nextPage(
                   context,
-                  type ?? subscription.allSubscription[0].type,
-                  amount ?? subscription.allSubscription[0].price,
+                  type ?? subscription.allSubscription[2].type,
+                  amount ?? subscription.allSubscription[2].price,
                   subId,
                   childId),
               color: primaryColor,
@@ -173,15 +217,28 @@ class _MakeSubscriptionState extends State<MakeSubscription> {
 
   nextPage(BuildContext context, String type, int amount, String subId,
       String childId) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PaymentSummary(
-                  type: type,
-                  amount: amount,
-                  subId: subId,
-                  childId: childId,
-                )));
+    if (cards.isNotEmpty) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ManagePayoutInfo(
+                    show: 'show',
+                    type: type,
+                    amount: amount,
+                    subId: subId,
+                    childId: childId,
+                  )));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaymentSummary(
+                    type: type,
+                    amount: amount,
+                    subId: subId,
+                    childId: childId,
+                  )));
+    }
   }
 
   @override
@@ -212,12 +269,14 @@ class SubscriptionBox extends StatelessWidget {
       this.title,
       this.type,
       this.subTitle,
+      this.strikeTitle,
       this.val,
       this.decoration,
       this.onChanged,
       this.groupVal});
   Attribute attribute;
   String title;
+  String strikeTitle;
   String type;
   Attribute val;
   Attribute groupVal;
@@ -226,6 +285,18 @@ class SubscriptionBox extends StatelessWidget {
   BoxDecoration decoration;
   @override
   Widget build(BuildContext context) {
+    String showDescription(String type) {
+      if (type.toLowerCase() == 'monthly') {
+        return 'for each month for your child';
+      } else if (type.toLowerCase() == 'quarterly') {
+        return 'for 3 months for your child';
+      } else if (type.toLowerCase() == 'yearly') {
+        return 'for 12 months per child';
+      } else {
+        return 'for summer per child';
+      }
+    }
+
     return Material(
       color: Colors.white,
       shadowColor: secondaryColor,
@@ -249,24 +320,31 @@ class SubscriptionBox extends StatelessWidget {
                     style: smallAccentColor.copyWith(fontSize: 16),
                   ),
                   kSmallHeight,
+                  strikeTitle == '0.00'
+                      ? Container()
+                      : Text(
+                          '₦$strikeTitle/$type',
+                          style: smallPrimaryColor.copyWith(
+                              decoration: TextDecoration.lineThrough,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                  kVerySmallHeight,
                   Text(
                     '₦$subTitle/$type',
                     style: smallPrimaryColor.copyWith(
                         fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   kSmallHeight,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '1 quiz trial then ₦$subTitle per ',
-                        style: smallPrimaryColor.copyWith(fontSize: 16),
-                      ),
-                      Text(
-                        '$type per child. Cancel anytime.',
-                        style: smallPrimaryColor.copyWith(fontSize: 16),
-                      ),
-                    ],
+                  SizedBox(
+                    width: 250,
+                    child: Text(
+                      showDescription(type) == 'for summer per child'
+                          ? 'Online and Interactive live classes, fun competitions and certificate for kids on Coding,Game development, Graphic design, French, Mandarin and more!'
+                          : 'Have all-round access to learning content, assessments and videos ${showDescription(type)}',
+                      overflow: TextOverflow.visible,
+                      style: smallPrimaryColor.copyWith(fontSize: 16),
+                    ),
                   )
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cliqlite/exceptions/api_failure_exception.dart';
 import 'package:cliqlite/helper/network_helper.dart';
@@ -6,6 +7,7 @@ import 'package:cliqlite/models/app_model/app_model.dart';
 import 'package:cliqlite/models/auth_model/auth_user/auth_user.dart';
 import 'package:cliqlite/models/auth_model/first_time/first_time.dart';
 import 'package:cliqlite/models/auth_model/main_auth_user/main_auth_user.dart';
+import 'package:cliqlite/models/categories/categories.dart';
 import 'package:cliqlite/models/grades/grades.dart';
 import 'package:cliqlite/models/subject/grade/grade.dart';
 import 'package:cliqlite/models/subject/subject.dart';
@@ -32,31 +34,37 @@ class AuthProvider extends ChangeNotifier {
   AuthUser _user;
   FirstTime _first;
   List<Grades> _grades;
+  List<Categories> _categories;
   List<Users> _users;
   MainChildUser _mainChildUser;
   PageController _pageController;
+  bool _firstTime = false;
 
   bool get isLoading => _isLoading;
   String get token => _token;
   AuthUser get user => _user;
   FirstTime get first => _first;
   List<Grades> get grades => _grades;
+  List<Categories> get categories => _categories;
   List<Users> get users => _users;
   MainChildUser get mainChildUser => _mainChildUser;
   PageController get pageController => _pageController;
+  bool get firstTime => _firstTime;
 
   setIsLoading(bool isLoading) => _isLoading = isLoading;
   setToken(String token) => _token = token;
   setUser(AuthUser user) => _user = user;
   setFirst(FirstTime first) => _first = first;
+  setCategories(List<Categories> categories) => _categories = categories;
   setGrades(List<Grades> grades) => _grades = grades;
   setUsers(List<Users> users) => _users = users;
   setMainChildUser(MainChildUser mainChildUser) =>
       _mainChildUser = mainChildUser;
   setPageController(PageController controller) => _pageController = controller;
+  setFirstTime(bool firstTime) => _firstTime = firstTime;
 
   Future<dynamic> register(emailAddress, phone, fullName, password, childName,
-      childAge, childClass, String url) async {
+      dob, childClass, String catId, String url) async {
     try {
       var data = await _helper.register(
         emailAddress,
@@ -64,8 +72,9 @@ class AuthProvider extends ChangeNotifier {
         fullName,
         password,
         childName,
-        childAge,
+        dob,
         childClass,
+        catId,
         url,
         _context,
       );
@@ -81,10 +90,14 @@ class AuthProvider extends ChangeNotifier {
       //Login user
 
       var data = await _helper.loginUser(emailAddress, password, url, _context);
-      print('token: ${data['data']}');
 
       //Decode token and save user
-      setUser(AuthUser.fromJson(parseJwtPayLoad(data['data'])));
+      setUser(AuthUser.fromJson(parseJwtPayLoad(data['data']['token'])));
+
+      //Set first Time
+      setFirstTime(data['data']['parentDetails'] == null
+          ? data['data']['childDetails']['firstTime']
+          : data['data']['parentDetails']['firstTime']);
 
       //Save decoded user in local storage
       _hiveRepository.add<AuthUser>(name: kUser, key: 'user', item: user);
@@ -93,7 +106,7 @@ class AuthProvider extends ChangeNotifier {
       await getGrades();
 
       //Save token in local storage
-      setToken(data['data']);
+      setToken(data['data']['token']);
 
       print('token:$token');
       print('user:${user.toJson()}');
@@ -116,10 +129,27 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<dynamic> verifyAccount(int token, {String url}) async {
+  Future<dynamic> verifyAccount(int toks, {String url}) async {
     try {
       //Call verify Account
-      var data = await _helper.verifyAccount(token, _context, url: url);
+      var data = await _helper.verifyAccount(toks, _context, url: url);
+
+      //Decode token and save user
+      setUser(AuthUser.fromJson(parseJwtPayLoad(data['data']['token'])));
+
+      //Save decoded user in local storage
+      _hiveRepository.add<AuthUser>(name: kUser, key: 'user', item: user);
+
+      //Make call to get grades
+      await getGrades();
+
+      //Save token in local storage
+      setToken(data['data']['token']);
+
+      print('token:$token');
+      print('user:${user.toJson()}');
+      _hiveRepository.add<AppModel>(
+          name: kAppDataName, key: 'appModel', item: AppModel(token: token));
       return data;
     } catch (ex) {
       print('dataz:$ex');
@@ -163,26 +193,28 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<dynamic> addUser(
-      String name, int age, String image, String grade) async {
+      String name, String dob, String image, String catId, String grade) async {
+    print('catID: $catId');
     try {
       //Add child user
-      var data =
-          await _helper.addUser(name, age, image, grade, token, _context);
+      var data = await _helper.addUser(
+          name, dob, image, grade, catId, token, _context);
       return data;
     } catch (ex) {
       throw ApiFailureException(ex);
     }
   }
 
-  Future<dynamic> updateUser(
-      String name, int age, String imgUrl, String grade, String childId) async {
+  Future<dynamic> updateUser(String name, String dob, File imgFile,
+      String grade, String childId) async {
     print('gradeId: $grade');
     try {
       //Add child user
       var data = await _helper.updateUser(
-          name, age, imgUrl, grade, childId, token, _context);
+          name, dob, imgFile, grade, childId, token, _context);
       return data;
     } catch (ex) {
+      print('ex:$ex');
       throw ApiFailureException(ex);
     }
   }
@@ -218,6 +250,20 @@ class AuthProvider extends ChangeNotifier {
     } catch (ex) {
       print('ex:${ex.toString()}');
     }
+  }
+
+  Future<List<Categories>> getCategories() async {
+    //Get categories
+    var data = await _helper.getCategories(_context);
+    print('categories:$data');
+
+    data = (data as List).map((e) => Categories.fromJson(e)).toList();
+
+    print('categoriess:$data');
+
+    //Save categories in local storage
+    setCategories(data);
+    return data;
   }
 
   Future<List<Grades>> getGrades() async {

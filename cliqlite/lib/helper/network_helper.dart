@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cliqlite/exceptions/api_failure_exception.dart';
 import 'package:cliqlite/models/auth_model/forgot_password.dart';
 import 'package:cliqlite/models/auth_model/login_model.dart';
 import 'package:cliqlite/models/auth_model/registration_model.dart';
 import 'package:cliqlite/models/users_model/add_user/add_user.dart';
-import 'package:cliqlite/models/users_model/updateUser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
@@ -90,13 +90,40 @@ class NetworkHelper {
   }
 
   //Edit User Details
-  Future<dynamic> updateUser(String name, int age, String imgUrl, String grade,
-      String childId, String token, BuildContext context) async {
-    var body =
-        UpdateUser(name: name, age: age, grade: grade, photo: imgUrl).toJson();
+  Future<dynamic> updateUser(String name, String dob, File imgFile,
+      String grade, String childId, String token, BuildContext context) async {
+    // var body =
+    //     UpdateUser(name: name, age: age, grade: grade, photo: imgUrl).toJson();
 
-    return await putRequest(
-        body: body, url: 'users/$childId', token: token, context: context);
+    print('imgfile: $imgFile');
+    var request =
+        new http.MultipartRequest("PUT", uriConverter('users/$childId'));
+    request.headers.addAll(kHeaders(token));
+    request.fields['name'] = name;
+    request.fields['dob'] = dob;
+    request.fields['grade'] = grade;
+    if (imgFile != null) {
+      request.files
+          .add(await http.MultipartFile.fromPath('photo', imgFile?.path));
+    }
+
+    var response = await request.send();
+
+    var responsed = await http.Response.fromStream(response);
+    print('decode:${responsed.body}');
+
+    final responseData = jsonDecode(responsed.body);
+
+    if (response.statusCode.toString().startsWith('2')) {
+      print('decode:$responseData');
+      return responseData;
+    } else {
+      print(
+          'reason is ${response.reasonPhrase} message is ${responseData['error']}');
+      throw ApiFailureException(responseData['error'] ?? response.reasonPhrase);
+    }
+    // return await putRequest(
+    //     body: map, url: 'users/$childId', token: token, context: context);
   }
 
   // Register User
@@ -106,8 +133,9 @@ class NetworkHelper {
       String fullName,
       String password,
       String childName,
-      String childAge,
+      String dob,
       String childClass,
+      String catId,
       String url,
       BuildContext context) async {
     var body = Register(
@@ -116,21 +144,29 @@ class NetworkHelper {
             phone: phone,
             password: password,
             childName: childName,
-            childAge: childAge,
-            childClass: childClass)
+            dob: dob,
+            childClass: childClass,
+            category: catId)
         .toJson();
     var childBody = {
       "email": email,
       "name": fullName,
       "password": password,
-      "age": int.parse(childAge),
-      "grade": childClass
+      "dob": dob,
+      "grade": childClass,
+      "category": catId
     };
     print(body);
     return await postRequest(
         body: url == 'auth/user/register' ? childBody : body,
         url: url,
         context: context);
+  }
+
+  //Get Categories
+  Future<dynamic> getCategories(BuildContext context) async {
+    final result = await getRequest(url: 'categories', context: context);
+    return result['data'];
   }
 
   //Get Grades
@@ -167,7 +203,7 @@ class NetworkHelper {
     var params = {"search": description};
 
     final result = await getParamRequest(
-        url: 'subjects', params: params, context: context, token: token);
+        url: 'topics', params: params, context: context, token: token);
     return result['data'];
   }
 
@@ -192,10 +228,10 @@ class NetworkHelper {
   //Get Subject by search
   Future<dynamic> getTopicBySearch(
       BuildContext context, String description, String token) async {
-    var params = {"searchKey": description, "limit": "4"};
+    var params = {"search": description};
 
     final result = await getParamRequest(
-        url: 'topics/search', params: params, context: context, token: token);
+        url: 'topics', params: params, context: context, token: token);
     print('topicsResult:$result');
     return result['data'];
   }
@@ -241,9 +277,10 @@ class NetworkHelper {
   }
 
   //Get Quiz
-  Future<dynamic> getQuickQuiz(BuildContext context, String token) async {
-    final result =
-        await getRequest(url: 'quizzes/quick', context: context, token: token);
+  Future<dynamic> getQuickQuiz(
+      BuildContext context, String subjectId, String token) async {
+    final result = await getRequest(
+        url: 'questions/subjects/$subjectId', context: context, token: token);
     return result['data'];
   }
 
@@ -291,7 +328,7 @@ class NetworkHelper {
   Future<dynamic> getTransactions(
       BuildContext context, String childId, String token) async {
     final result = await getRequest(
-        url: 'transactions/$childId', context: context, token: token);
+        url: 'subscriptions/plan/$childId', context: context, token: token);
     return result['data'];
   }
 
@@ -307,6 +344,17 @@ class NetworkHelper {
   Future<dynamic> getSupport(BuildContext context, String token) async {
     final result =
         await getRequest(url: 'supports', context: context, token: token);
+    return result['data'];
+  }
+
+  //Get Recommended
+  Future<dynamic> getRecommendedVideo(
+      String childId, BuildContext context, String token) async {
+    final result = await getRequest(
+        url: 'topics/videos/dashboard/random/$childId',
+        context: context,
+        token: token);
+    print('result:$result');
     return result['data'];
   }
 
@@ -378,11 +426,28 @@ class NetworkHelper {
 
   //Add Subscription
   Future<dynamic> addSubscription(String subId, String childId, String type,
-      String token, BuildContext context) async {
-    var body = {"plan": subId, "childId": childId, "type": type};
+      String token, BuildContext context,
+      [String cardId]) async {
+    var body = {
+      "plan": subId,
+      "childId": childId,
+      "type": type,
+      "device": "mobile"
+    };
+
+    var cardBody = {
+      "plan": subId,
+      "childId": childId,
+      "type": type,
+      "card": cardId,
+      "device": "mobile"
+    };
 
     return await postRequest(
-        body: body, url: 'subscriptions', token: token, context: context);
+        body: cardId == null ? body : cardBody,
+        url: 'subscriptions',
+        token: token,
+        context: context);
   }
 
   //Add Card
@@ -410,11 +475,13 @@ class NetworkHelper {
   }
 
   //Add User
-  Future<dynamic> addUser(String name, int age, String image, String grade,
-      String token, BuildContext context) async {
-    var body =
-        AddUser(name: name, age: age, grade: grade, image: image).toJson();
+  Future<dynamic> addUser(String name, String dob, String image, String grade,
+      String catId, String token, BuildContext context) async {
+    var body = AddUser(
+            name: name, dob: dob, grade: grade, image: image, category: catId)
+        .toJson();
 
+    print('body: $body');
     return await postRequest(
         body: body, url: 'parents/children', token: token, context: context);
   }
@@ -424,6 +491,9 @@ class NetworkHelper {
       Map<String, dynamic> params,
       String token,
       BuildContext context}) async {
+    print('url: ${uriConverterWithQuery(url, params)}');
+    print('token: $token');
+
     var response = await http.get(uriConverterWithQuery(url, params),
         headers: kHeaders(token ?? null));
     var decoded = jsonDecode(response.body);
@@ -460,7 +530,7 @@ class NetworkHelper {
       {String url, String token, BuildContext context}) async {
     var response =
         await http.get(uriConverter(url), headers: kHeaders(token ?? null));
-    print(response.body);
+    print('response:${response.body}');
 
     var decoded = jsonDecode(response.body);
 
@@ -513,6 +583,7 @@ class NetworkHelper {
       {Map body, String url, String token, BuildContext context}) async {
     print('body is $body');
     print('Encoded body ${json.encode(body)}');
+    print('Url ${uriConverter(url)}');
     var response = await http.post(uriConverter(url),
         headers: kHeaders(token ?? null),
         body: body == null ? null : json.encode(body));

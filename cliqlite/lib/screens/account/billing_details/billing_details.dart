@@ -17,27 +17,28 @@ class BillingDetails extends StatefulWidget {
 
 class _BillingDetailsState extends State<BillingDetails> {
   Attribute val;
-  Future<List<Subscription>> futureTransactions;
+  Future<Transactions> futureTransactions;
 
-  Future<List<Subscription>> futureTask() async {
+  Future<Transactions> futureTask() async {
     //Initialize provider
     SubscriptionProvider subscription = SubscriptionProvider.subscribe(context);
 
     //Make call to get videos
     try {
+      var trans = await subscription.getTransactions();
       var result = await subscription.getSubscription();
-      await subscription.getTransactions();
 
       setState(() {});
 
-      print('result:$result');
+      print('resultsss:$result');
+      print('trans:$trans');
 
-      val = subscription.subscription[0].type == 'recurring'
+      val = trans.subscription.type == 'recurring'
           ? Attribute.recurring
           : Attribute.onetime;
 
       //Return future value
-      return Future.value(result);
+      return Future.value(trans);
     } catch (ex) {}
   }
 
@@ -49,10 +50,8 @@ class _BillingDetailsState extends State<BillingDetails> {
   Widget subscriptionScreen() {
     List<Subscription> subscription =
         SubscriptionProvider.subscribe(context).subscription;
-    List<Transactions> transactions =
+    Transactions transactions =
         SubscriptionProvider.subscribe(context).transactions;
-
-    print('subscription:$subscription');
 
     return SafeArea(
       child: Padding(
@@ -84,81 +83,86 @@ class _BillingDetailsState extends State<BillingDetails> {
             // subscription == null
             //     ? Text('No Billing Information')
             //     :
-            subscription.isEmpty
-                ? Container(
-                    child: Text(
-                      'No Subscription Found ',
-                      style: smallPrimaryColor,
+            // subscription.isEmpty
+            //     ? Container(
+            //         child: Text(
+            //           'No Subscription Found ',
+            //           style: smallPrimaryColor,
+            //         ),
+            //       )
+            //     :
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // BillingPlan(
+                //   text: 'Your Plan',
+                //   subText:
+                //       'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].subscription.amount.toString())))}month',
+                //   addedText: '1 Child',
+                // ),
+                // kLargeHeight,
+                // BillingPlan(
+                //   text: 'Your next bill',
+                //   subText:
+                //       '${DateFormat("d MMM h:mma").format(subscription[0].user.subscriptionDueDate).toString() ?? ''}',
+                // ),
+                BillingPlan(
+                  text: 'Your Plan',
+                  subText:
+                      'Your current plan is ${transactions?.plan?.name} for ${transactions.child.name}',
+                  // subText:
+                  //     'Your current plan is ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].plan.price.toString())))}month',
+                  // addedText: ' ',
+                ),
+                kSmallHeight,
+                BillingPlan(
+                  text: 'Your next billing date',
+                  subText:
+                      '${DateFormat("d MMM yyy h:mma").format(transactions.expireAt)}',
+                ),
+                if (transactions.plan.name != 'free')
+                  Container(
+                    height: 150,
+                    decoration: decoration.copyWith(
+                        borderRadius: BorderRadius.circular(20),
+                        color: lightPrimaryColor,
+                        border: Border.all(color: lightPrimaryColor)),
+                    child: ListView.separated(
+                      separatorBuilder: (context, _) => kVerySmallHeight,
+                      itemCount: paymentType.length,
+                      itemBuilder: (context, index) {
+                        final sub = paymentType[index];
+
+                        print('payment:$paymentType');
+
+                        return PaymentBox(
+                            title: sub == "one-off"
+                                ? 'One-time payment'
+                                : 'Recurring Payment',
+                            attribute: sub == "one-off"
+                                ? Attribute.onetime
+                                : Attribute.recurring,
+                            groupVal: val,
+                            val: sub == "one-off"
+                                ? Attribute.onetime
+                                : Attribute.recurring,
+                            onChanged: (Attribute value) {
+                              setState(() {
+                                val = value;
+                                print('val:$val');
+                              });
+                              toggleSub(
+                                  subscription[0].id,
+                                  val == Attribute.onetime
+                                      ? 'one-off'
+                                      : 'recurring');
+                            });
+                      },
                     ),
                   )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // BillingPlan(
-                      //   text: 'Your Plan',
-                      //   subText:
-                      //       'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].subscription.amount.toString())))}month',
-                      //   addedText: '1 Child',
-                      // ),
-                      // kLargeHeight,
-                      // BillingPlan(
-                      //   text: 'Your next bill',
-                      //   subText:
-                      //       '${DateFormat("d MMM h:mma").format(subscription[0].user.subscriptionDueDate).toString() ?? ''}',
-                      // ),
-                      BillingPlan(
-                        text: 'Your Plan',
-                        subText:
-                            'Your current plan is - ₦${addSeparator(toDecimalPlace(double.parse(subscription[0].plan.price.toString())))}month',
-                        addedText: '${subscription.length.toString()} Child',
-                      ),
-                      kLargeHeight,
-                      BillingPlan(
-                        text: 'Your next billing date',
-                        subText:
-                            '${DateFormat("d MMM h:mma").format(subscription[0].createdAt)}',
-                      ),
-                      Container(
-                        height: 150,
-                        decoration: decoration.copyWith(
-                            borderRadius: BorderRadius.circular(20),
-                            color: lightPrimaryColor,
-                            border: Border.all(color: lightPrimaryColor)),
-                        child: ListView.separated(
-                          separatorBuilder: (context, _) => kVerySmallHeight,
-                          itemCount: paymentType.length,
-                          itemBuilder: (context, index) {
-                            final sub = paymentType[index];
-
-                            print('payment:$paymentType');
-
-                            return PaymentBox(
-                                title: sub == "one-off"
-                                    ? 'One-time payment'
-                                    : 'Recurring Payment',
-                                attribute: sub == "one-off"
-                                    ? Attribute.onetime
-                                    : Attribute.recurring,
-                                groupVal: val,
-                                val: sub == "one-off"
-                                    ? Attribute.onetime
-                                    : Attribute.recurring,
-                                onChanged: (Attribute value) {
-                                  setState(() {
-                                    val = value;
-                                    print('val:$val');
-                                  });
-                                  toggleSub(
-                                      subscription[0].id,
-                                      val == Attribute.onetime
-                                          ? 'one-off'
-                                          : 'recurring');
-                                });
-                          },
-                        ),
-                      )
-                    ],
-                  ),
+              ],
+            ),
             kSmallHeight,
             // Expanded(
             //   child: ListView.builder(
@@ -183,31 +187,31 @@ class _BillingDetailsState extends State<BillingDetails> {
               color: greyColor,
             ),
 
-            if (transactions != null)
-              transactions.isEmpty
-                  ? Container(
-                      child: Text(
-                        'No Transaction Found ',
-                        style: smallPrimaryColor,
-                      ),
-                    )
-                  : Expanded(
-                      child: ListView.builder(
-                          itemCount: 5,
-                          itemBuilder: (context, index) {
-                            var transaction = transactions[index];
-                            return BillingDescription(
-                              date: DateFormat("dd MMM y")
-                                  .format(DateTime.now())
-                                  .toString(),
-                              timeStamp: DateFormat("h: mma")
-                                  .format(DateTime.now())
-                                  .toString(),
-                              // number: transaction['card_number'],
-                              amount: '500',
-                            );
-                          }),
-                    )
+            // if (transactions != null)
+            //   transactions.isEmpty
+            //       ? Container(
+            //           child: Text(
+            //             'No Transaction Found ',
+            //             style: smallPrimaryColor,
+            //           ),
+            //         )
+            //       : Expanded(
+            //           child: ListView.builder(
+            //               itemCount: 5,
+            //               itemBuilder: (context, index) {
+            //                 var transaction = transactions[index];
+            //                 return BillingDescription(
+            //                   date: DateFormat("dd MMM y")
+            //                       .format(DateTime.now())
+            //                       .toString(),
+            //                   timeStamp: DateFormat("h: mma")
+            //                       .format(DateTime.now())
+            //                       .toString(),
+            //                   // number: transaction['card_number'],
+            //                   amount: '500',
+            //                 );
+            //               }),
+            //         )
           ],
         ),
       ),
@@ -225,11 +229,13 @@ class _BillingDetailsState extends State<BillingDetails> {
     return BackgroundImage(
       child: FutureHelper(
         task: futureTransactions,
-        loader: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [circularProgressIndicator()],
-        ),
+        loader: SubscriptionProvider.subscribe(context).subscription == null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [circularProgressIndicator()],
+              )
+            : subscriptionScreen(),
         noData: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
