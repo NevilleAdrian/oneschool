@@ -1,4 +1,3 @@
-import 'package:better_player/better_player.dart';
 import 'package:cliqlite/models/topic/topic.dart';
 import 'package:cliqlite/models/video_model/video_model.dart';
 import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
@@ -11,7 +10,9 @@ import 'package:cliqlite/utils/back_arrow.dart';
 import 'package:cliqlite/utils/large_button.dart';
 import 'package:cliqlite/utils/show_dialog.dart';
 import 'package:cliqlite/utils/text_box.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoFullScreen extends StatefulWidget {
   static String id = 'fullscreen';
@@ -25,9 +26,10 @@ class VideoFullScreen extends StatefulWidget {
 }
 
 class _VideoFullScreenState extends State<VideoFullScreen> {
-  BetterPlayerController _betterPlayerController;
+  // BetterPlayerController _betterPlayerController;
   Future<List<dynamic>> futureQuiz;
   List<dynamic> quizResult;
+  FlickManager flickManager;
 
   Future<List<dynamic>> futureTask() async {
     //Initialize provider
@@ -54,20 +56,27 @@ class _VideoFullScreenState extends State<VideoFullScreen> {
   void initState() {
     futureQuiz = futureTask();
 
-    BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource(
-        BetterPlayerDataSourceType.network,
-        widget.topic.video.url ??
-            'https://res.cloudinary.com/obioflagos/video/upload/v1644839936/uploads/nm4umngsx7buam3ek07c.mp4');
-    _betterPlayerController = BetterPlayerController(
-        BetterPlayerConfiguration(aspectRatio: 12 / 10),
-        betterPlayerDataSource: betterPlayerDataSource);
+    flickManager = FlickManager(
+      autoPlay: false,
+      videoPlayerController: VideoPlayerController.network(widget
+              .topic.video.url ??
+          'https://res.cloudinary.com/obioflagos/video/upload/v1644839936/uploads/nm4umngsx7buam3ek07c.mp4'),
+    );
+
+    // BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource(
+    //     BetterPlayerDataSourceType.network,
+    //     widget.topic.video.url ??
+    //         'https://res.cloudinary.com/obioflagos/video/upload/v1644839936/uploads/nm4umngsx7buam3ek07c.mp4');
+    // _betterPlayerController = BetterPlayerController(
+    //     BetterPlayerConfiguration(aspectRatio: 12 / 10),
+    //     betterPlayerDataSource: betterPlayerDataSource);
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _betterPlayerController.dispose();
+    flickManager.dispose();
   }
 
   @override
@@ -108,9 +117,7 @@ class _VideoFullScreenState extends State<VideoFullScreen> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           color: Colors.black),
-                      child: BetterPlayer(
-                        controller: _betterPlayerController,
-                      ),
+                      child: FlickVideoPlayer(flickManager: flickManager),
                     ),
                     kSmallHeight,
                     Container(

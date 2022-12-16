@@ -23,11 +23,12 @@ class LargeButton extends StatelessWidget {
     return ButtonTheme(
       height: height ?? 60.0,
       minWidth: MediaQuery.of(context).size.width,
-      child: RaisedButton.icon(
-        shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(50.0)),
-        elevation: 0.0,
-        color: color,
+      child: ElevatedButton.icon(
+        style: ButtonStyle(
+            shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0))),
+            elevation: MaterialStatePropertyAll(0.0),
+            backgroundColor: MaterialStatePropertyAll(color)),
         icon: new Text(''),
         label: loader ??
             Text(

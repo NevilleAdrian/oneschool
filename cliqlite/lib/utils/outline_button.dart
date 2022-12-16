@@ -22,13 +22,14 @@ class LineButton extends StatelessWidget {
       child: ButtonTheme(
         height: height ?? 50.0,
         minWidth: MediaQuery.of(context).size.width,
-        child: RaisedButton.icon(
-          shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(8.0),
-            // side: BorderSide(width: 1, color: primaryColor)
-          ),
-          elevation: 0.0,
-          color: lighterPrimaryColor,
+        child: ElevatedButton.icon(
+          style: ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(8.0),
+                // side: BorderSide(width: 1, color: primaryColor)
+              )),
+              elevation: MaterialStatePropertyAll(0.0),
+              backgroundColor: MaterialStatePropertyAll(lighterPrimaryColor)),
           icon: text != null
               ? Icon(
                   Icons.add,

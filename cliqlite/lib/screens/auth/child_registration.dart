@@ -507,7 +507,8 @@ class _ChildRegistrationState extends State<ChildRegistration> {
                                                   ImageSource.gallery);
                                             },
                                             child: Stack(
-                                              overflow: Overflow.visible,
+                                              clipBehavior: Clip.hardEdge,
+                                              // overflow: Overflow.visible,
                                               alignment: Alignment.bottomRight,
                                               children: [
                                                 imageDisplay(

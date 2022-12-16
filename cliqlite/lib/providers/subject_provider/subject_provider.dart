@@ -6,6 +6,7 @@ import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/repository/hive_repository.dart';
 import 'package:cliqlite/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 class SubjectProvider extends ChangeNotifier {
@@ -44,6 +45,7 @@ class SubjectProvider extends ChangeNotifier {
         _context, grade?.grade ?? id, AuthProvider.auth(_context).token);
 
     print('subject: $data');
+    Logger().d('subject: $data');
 
     data = (data as List).map((e) => Subject.fromJson(e)).toList();
 

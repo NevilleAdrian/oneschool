@@ -22,7 +22,7 @@ class Grades {
   });
 
   @HiveField(0)
-  String id;
+  dynamic id;
   @HiveField(1)
   String name;
   @HiveField(2)

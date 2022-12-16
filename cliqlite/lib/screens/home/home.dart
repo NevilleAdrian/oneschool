@@ -976,7 +976,8 @@ class SwipeItems extends StatelessWidget {
           ),
       child: Indexer(
         alignment: AlignmentDirectional.topEnd,
-        overflow: Overflow.clip,
+        clipBehavior: Clip.hardEdge,
+        // overflow: Overflow.clip,
         children: [
           Indexed(
             index: 1,

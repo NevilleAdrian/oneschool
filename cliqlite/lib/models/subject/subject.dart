@@ -29,7 +29,7 @@ class Subject {
   @HiveField(0)
   String photo;
   @HiveField(1)
-  String id;
+  dynamic id;
   @HiveField(2)
   String name;
   @HiveField(3)
@@ -41,7 +41,7 @@ class Subject {
   @HiveField(6)
   String slug;
   @HiveField(7)
-  int v;
+  dynamic v;
   @HiveField(8)
   String subjectId;
   @HiveField(9)
@@ -52,19 +52,22 @@ class Subject {
   String secondaryColor;
 
   factory Subject.fromJson(Map<String, dynamic> json) {
+    print(json["grade"]["_id"].runtimeType);
     return Subject(
-      photo: json["photo"],
-      id: json["_id"],
-      name: json["name"],
-      description: json["description"],
+      photo: json["photo"] ?? '',
+      id: json["_id"] ?? '',
+      name: json["name"] ?? '',
+      description: json["description"] ?? '',
       grade: Grades.fromJson(json["grade"]),
-      createdAt: DateTime.parse(json["createdAt"]),
-      slug: json["slug"],
-      v: json["__v"],
+      createdAt: json["createdAt"] == null
+          ? DateTime.now()
+          : DateTime.parse(json["createdAt"]),
+      slug: json["slug"] ?? '',
+      v: json["__v"] ?? '',
       subjectId: json["id"] ?? '',
-      icon: json["icon"],
-      primaryColor: json["primaryColor"],
-      secondaryColor: json["secondaryColor"],
+      icon: json["icon"] ?? '',
+      primaryColor: json["primaryColor"] ?? '',
+      secondaryColor: json["secondaryColor"] ?? '',
     );
   }
 

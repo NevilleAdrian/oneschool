@@ -889,6 +889,8 @@ class _QuizScreenState extends State<QuizScreen> {
     // Question Number
     QuizProvider quiz = QuizProvider.quizProvider(context);
     ThemeProvider theme = ThemeProvider.themeProvider(context);
+
+    print('quizLenght: ${quizResult.length}');
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -909,12 +911,15 @@ class _QuizScreenState extends State<QuizScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   kSmallHeight,
-                  StepProgressIndicator(
-                    totalSteps: quizResult.length,
-                    currentStep: quiz.number + 1,
-                    selectedColor: accentColor,
-                    unselectedColor: theme.status ? whiteColor : greyColor2,
-                    roundedEdges: Radius.circular(20),
+                  Container(
+                    child: StepProgressIndicator(
+                      totalSteps:
+                          quizResult.length >= 10 ? 10 : quizResult.length,
+                      currentStep: quiz.number + 1,
+                      selectedColor: accentColor,
+                      unselectedColor: theme.status ? whiteColor : greyColor2,
+                      roundedEdges: Radius.circular(20),
+                    ),
                   ),
                   kSmallHeight,
                   Row(

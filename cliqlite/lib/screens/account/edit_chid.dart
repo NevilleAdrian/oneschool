@@ -451,7 +451,9 @@ class _EditChildDetailsState extends State<EditChildDetails> {
                                   await getImage(ImageSource.gallery);
                                 },
                                 child: Stack(
-                                  overflow: Overflow.visible,
+                                  clipBehavior: Clip.hardEdge,
+
+                                  // overflow: Overflow.visible,
                                   alignment: Alignment.bottomRight,
                                   children: [
                                     imageDisplay(_croppedImageFile,

@@ -2,7 +2,6 @@ import 'package:cliqlite/providers/auth_provider/auth_provider.dart';
 import 'package:cliqlite/screens/account/account.dart';
 import 'package:cliqlite/screens/analytics/analytics.dart';
 import 'package:cliqlite/screens/home/home.dart';
-import 'package:cliqlite/screens/live_tutor/live_tutor.dart';
 import 'package:cliqlite/screens/videos/videos.dart';
 import 'package:cliqlite/themes/style.dart';
 import 'package:flutter/material.dart';
@@ -68,39 +67,43 @@ class _AppLayoutState extends State<AppLayout> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/home.svg",
                 color: _selectedIndex == 0 ? accentColor : greyColor),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Text('Home',
-                  style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 0 ? accentColor : greyColor)),
-            ),
+            label: 'Home',
+            // title: Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 3.0),
+            //   child: Text('Home',
+            //       style: TextStyle(
+            //           fontSize: 11.0,
+            //           fontWeight: FontWeight.w600,
+            //           color: _selectedIndex == 0 ? accentColor : greyColor)),
+            // ),
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/trending-up.svg",
                 color: _selectedIndex == 1 ? accentColor : greyColor),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Text('Analytics',
-                  style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 1 ? accentColor : greyColor)),
-            ),
+            label: 'Analytics',
+
+            // title: Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 3.0),
+            //   child: Text('Analytics',
+            //       style: TextStyle(
+            //           fontSize: 11.0,
+            //           fontWeight: FontWeight.w600,
+            //           color: _selectedIndex == 1 ? accentColor : greyColor)),
+            // ),
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset("assets/images/svg/video.svg",
                 height: 20.0,
                 color: _selectedIndex == 2 ? accentColor : greyColor),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Text('Videos',
-                  style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 2 ? accentColor : greyColor)),
-            ),
+            label: 'Videos',
+            // title: Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 3.0),
+            //   child: Text('Videos',
+            //       style: TextStyle(
+            //           fontSize: 11.0,
+            //           fontWeight: FontWeight.w600,
+            //           color: _selectedIndex == 2 ? accentColor : greyColor)),
+            // ),
           ),
           // BottomNavigationBarItem(
           //   icon: SvgPicture.asset("assets/images/svg/play.svg",
@@ -116,18 +119,19 @@ class _AppLayoutState extends State<AppLayout> {
           //   ),
           // ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset("assets/images/svg/user.svg",
-                height: 20.0,
-                color: _selectedIndex == 3 ? accentColor : greyColor),
-            title: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3.0),
-              child: Text('Account',
-                  style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                      color: _selectedIndex == 3 ? accentColor : greyColor)),
-            ),
-          ),
+              icon: SvgPicture.asset("assets/images/svg/user.svg",
+                  height: 20.0,
+                  color: _selectedIndex == 3 ? accentColor : greyColor),
+              label: 'Account'
+              // title: Padding(
+              //   padding: const EdgeInsets.symmetric(vertical: 3.0),
+              //   child: Text('Account',
+              //       style: TextStyle(
+              //           fontSize: 11.0,
+              //           fontWeight: FontWeight.w600,
+              //           color: _selectedIndex == 3 ? accentColor : greyColor)),
+              // ),
+              ),
         ],
       ),
     );

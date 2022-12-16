@@ -12,12 +12,15 @@ class GoogleButton extends StatelessWidget {
       child: ButtonTheme(
         height: 70.0,
         minWidth: MediaQuery.of(context).size.width,
-        child: RaisedButton.icon(
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(50.0),
-              side: BorderSide(width: 1, color: primaryColor)),
-          elevation: 0.0,
-          color: Colors.transparent,
+        child: ElevatedButton.icon(
+          style: ButtonStyle(
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(50.0),
+                  side: BorderSide(width: 1, color: primaryColor))),
+              elevation: MaterialStatePropertyAll(0.0),
+              backgroundColor: MaterialStatePropertyAll(
+                Colors.transparent,
+              )),
           icon: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [SvgPicture.asset('assets/images/svg/google.svg')],

@@ -18,13 +18,13 @@ class SubjectAdapter extends TypeAdapter<Subject> {
     };
     return Subject(
       photo: fields[0] as String,
-      id: fields[1] as String,
+      id: fields[1] as dynamic,
       name: fields[2] as String,
       description: fields[3] as String,
       grade: fields[4] as Grades,
       createdAt: fields[5] as DateTime,
       slug: fields[6] as String,
-      v: fields[7] as int,
+      v: fields[7] as dynamic,
       subjectId: fields[8] as String,
       icon: fields[9] as String,
       primaryColor: fields[10] as String,
